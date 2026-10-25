@@ -2,7 +2,7 @@
 -- Personas synthétiques : A, B, C (C = profil supprimé), anon.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(24);
+select plan(26);
 
 -- Données de test (postgres, propriétaire des tables : hors RLS).
 insert into auth.users (id, email, aud, role) values
@@ -51,8 +51,8 @@ select is((select count(*)::int from public.profile_positions where profile_id =
 select lives_ok($$update public.profiles set bio = 'Bio QA' where id = '00000000-0000-4000-8000-00000000000a'$$,
   'P2 — A modifie sa présentation');
 select is((select bio from public.profiles where id = '00000000-0000-4000-8000-00000000000a'), 'Bio QA', 'P2 — modification effective');
-select is((with u as (update public.profiles set bio = 'pirate' where id = '00000000-0000-4000-8000-00000000000b' returning 1) select count(*)::int from u), 0,
-  'R4 — A ne peut pas modifier le profil de B (IDOR)');
+select lives_ok($$update public.profiles set bio = 'pirate' where id = '00000000-0000-4000-8000-00000000000b'$$,
+  'R4 — tentative de A sur le profil de B (aucune ligne visée par la RLS)');
 select throws_ok($$update public.profiles set handle = 'qa_newname' where id = '00000000-0000-4000-8000-00000000000a'$$,
   '42501', null, 'P2 — pseudo non modifiable directement (commande dédiée)');
 select throws_ok($$update public.profiles set main_position = 'GK' where id = '00000000-0000-4000-8000-00000000000a'$$,
@@ -64,13 +64,19 @@ select throws_ok($$delete from public.profiles where id = '00000000-0000-4000-80
 select throws_ok($$insert into public.profile_positions (profile_id, position) values ('00000000-0000-4000-8000-00000000000a', 'CM')$$,
   '42501', null, 'P2 — aucune écriture directe des postes');
 select is((select count(*)::int from public.account_settings), 1, 'P2 — A ne lit que ses propres paramètres');
-select is((with u as (update public.account_settings set marketing_opt_in = true where profile_id = '00000000-0000-4000-8000-00000000000b' returning 1) select count(*)::int from u), 0,
-  'R4 — A ne peut pas modifier les paramètres de B');
+select lives_ok($$update public.account_settings set marketing_opt_in = true where profile_id = '00000000-0000-4000-8000-00000000000b'$$,
+  'R4 — tentative de A sur les paramètres de B (aucune ligne visée par la RLS)');
 select throws_ok($$update public.account_settings set age_threshold = 18 where profile_id = '00000000-0000-4000-8000-00000000000a'$$,
   '42501', null, 'P2 — le seuil d''âge n''est pas modifiable par le client');
 select throws_ok($$select count(*) from private.staff_members$$,
   '42501', null, 'P2 — schéma private inaccessible à authenticated');
 reset role;
+
+-- Vérification des tentatives IDOR, relues en tant que propriétaire (hors RLS).
+select is((select bio from public.profiles where id = '00000000-0000-4000-8000-00000000000b'), null,
+  'R4 — le profil de B est resté inchangé (IDOR bloqué)');
+select is((select marketing_opt_in from public.account_settings where profile_id = '00000000-0000-4000-8000-00000000000b'), false,
+  'R4 — les paramètres de B sont restés inchangés (IDOR bloqué)');
 
 -- Persona anon.
 set local role anon;
