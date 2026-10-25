@@ -1,6 +1,6 @@
 # ADR-0002 — Frontière d'authentification
 
-- **Statut :** 🟡 VALIDÉ SOUS RÉSERVE. Revue v3 favorable (Selim, 25/10 22:02). **Réserve maintenue** : levée uniquement après exécution **intégrale** de A1–A8, avec preuves (sorties Playwright/CI jointes). Aucun scénario déclaré PASS sans exécution.
+- **Statut :** 🟡 VALIDÉ SOUS RÉSERVE. Spike S-1.4a fusionné (`4cf9e74`) : A1, A2, A3, A4, A5a, A6 (email), A7, A8 ✅ en CI. **Réserve maintenue** pour : A6 Google (NON EXÉCUTÉ, requiert Vercel Preview + client Google) et A5b / D-40 (révocation immédiate des actions sensibles, à implémenter et tester).
 - **Date :** 25/10/2026 · **Révision :** v3 (corrige v2, qui affirmait à tort des cookies httpOnly)
 
 ## Contexte et vérification
@@ -40,9 +40,18 @@ Tests Playwright sur Supabase local, avec la version exacte épinglée :
 | A5b | Révocation **immédiate** | `fixme` tant que D-40 n'est pas tranchée (non garanti par Supabase) |
 | A6 | Retour OAuth Google et confirmation d'email (PKCE) | session établie, redirection interne |
 | A7 | En-têtes des routes privées | `Cache-Control: private, no-store`, aucun `Set-Cookie` en cache |
-| A8 | Relevé des attributs réels des cookies | consigné dans cet ADR |
+| A8 | Relevé des attributs réels des cookies | consigné dans cet ADR : `sb-<ref>-auth-token` — `httpOnly: false`, `SameSite=Lax`, `path=/`, max-age 400 j ; `secure: false` en HTTP local, `secure: true` dès que `NEXT_PUBLIC_SITE_URL` est en HTTPS (config `sessionCookieOptions`) |
 
 ## Conséquences
 Le risque XSS est le risque principal et il est traité explicitement. Si le spike révèle un flux incompatible avec la version retenue, l'ADR repasse en revue avant toute suite.
 
 Sources : [Advanced guide](https://supabase.com/docs/guides/auth/server-side/advanced-guide) · [Creating a Supabase client for SSR](https://supabase.com/docs/guides/auth/server-side/creating-a-client)
+
+## Garanties de révocation et limites (D-40, validé sous conditions le 25/10/2026)
+| Événement | Ce qui est garanti | Ce qui ne l'est PAS |
+|---|---|---|
+| Déconnexion locale | cookies supprimés sur ce navigateur | — |
+| Déconnexion globale (`scope: 'global'`) ou session révoquée | refresh tokens révoqués : **aucun nouveau JWT** ; la session tombe **au plus tard à l'expiration du JWT** (prouvé par A5a) ; le client navigateur se déconnecte de lui-même à sa prochaine tentative de rafraîchissement | **pas de révocation immédiate** : un JWT déjà émis reste valide jusqu'à son `exp` (60 min par défaut Supabase), y compris pour `getUser()` (constaté : 6 sur 8, run 40238344611) |
+| Actions sensibles (cible D-40) | à venir : contrôle serveur de session toujours active (`auth.sessions` via `session_id` du JWT) → refus immédiat | tant que ce contrôle n'existe pas, la fenêtre = durée du JWT |
+
+**Engagements D-40 :** JWT de 10 à 15 min à tester en staging ; contrôle de session active pour les actions sensibles ; tests de révocation immédiate (A5b, aujourd'hui `fixme`) ajoutés **avant** généralisation ; aucune communication ne présentera une déconnexion globale comme immédiate.

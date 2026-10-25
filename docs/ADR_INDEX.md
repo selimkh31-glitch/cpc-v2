@@ -3,7 +3,7 @@
 | ADR | Sujet | Statut | Reste à faire |
 |---|---|---|---|
 | [0001](ADR/0001-stack.md) | Stack applicative | ✅ | — |
-| [0002](ADR/0002-auth-boundary.md) | Frontière d'authentification | 🟡 | v3 revue favorable ; réserve levée après A1–A8 exécutés intégralement, avec preuves |
+| [0002](ADR/0002-auth-boundary.md) | Frontière d'authentification | 🟡 | Spike fusionné : A1–A4, A5a, A6 email, A7, A8 ✅ ; réserve maintenue : A6 Google, A5b / D-40 |
 | [0003](ADR/0003-supabase-boundary.md) | Frontière Supabase, SQL sans ORM | ✅ | — |
 | [0004](ADR/0004-mutation-model.md) | Commandes transactionnelles | 🟡 | Réserves R1–R4 prouvées **commande par commande** (permanent) |
 | [0005](ADR/0005-routes.md) | Convention de routes | ✅ | — |
