@@ -96,7 +96,12 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium webkit
+      - name: Cache des navigateurs Playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-chromium-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm exec playwright install --with-deps chromium
       - uses: supabase/setup-cli@v1
         with:
           version: ${{ env.SUPABASE_CLI_VERSION }}
@@ -121,7 +126,7 @@ jobs:
             echo "E2E_MAILPIT_URL=${SB_MAILPIT_URL:-${SB_INBUCKET_URL:-http://127.0.0.1:54324}}"
           } >> "$GITHUB_ENV"
       - run: pnpm build
-      - run: pnpm test:e2e
+      - run: pnpm test:e2e --project=mobile-chromium --project=desktop-chromium --project=auth-spike
       - if: always()
         run: node scripts/ci/annotate.mjs playwright playwright-report/results.json
       - if: always()
@@ -132,3 +137,26 @@ jobs:
           retention-days: 14
       - if: always()
         run: supabase stop --no-backup
+
+  e2e-webkit:
+    name: e2e-webkit (Playwright iPhone / WebKit)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Cache des navigateurs Playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-webkit-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm exec playwright install --with-deps webkit
+      - run: pnpm build
+      - run: pnpm test:e2e --project=mobile-webkit
+      - if: always()
+        run: node scripts/ci/annotate.mjs playwright playwright-report/results.json
