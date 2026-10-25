@@ -15,6 +15,7 @@
 ## Méthode
 - Développement exclusivement par PR (D-37, D-39) ; Selim valide et fusionne.
 - Migrations : fichiers `supabase/migrations/` = source ; testées en CI ; appliquées au staging **après fusion** via `apply_migration`, puis `list_migrations` + `get_advisors` (D-35).
+- Après chaque `apply_migration` : aligner le nom du fichier sur la version enregistrée par le staging, et rejouer les requêtes d'invariants (P2/R2/R3) **sur le staging** en lecture seule (la CI ne voit pas les objets de plateforme comme `rls_auto_enable()`).
 - Chaque commande SQL `api.*` respecte la Definition of Done d'ADR-0004 (R1 autorisation, R2 EXECUTE, R3 search_path, R4 abus).
 - Inventaire des tests ADR-0011 (P1–P10, C1–C11) : ni suppression ni désactivation sans ADR et accord de Selim.
 - **Règle de preuve** : un test déclaré réussi est accompagné de sa sortie d'exécution (CI ou journal). Un test non lancé est « NON EXÉCUTÉ ».
