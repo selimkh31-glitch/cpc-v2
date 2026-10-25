@@ -5,7 +5,8 @@ import { readFileSync, existsSync } from "node:fs";
 
 const [kind, file] = process.argv.slice(2);
 const esc = (s) => String(s).replace(/%/g, "%25").replace(/\r/g, "").replace(/\n/g, "%0A");
-const emit = (level, title, lines) => console.log(`::${level} title=${esc(title)}::${esc(lines.join("\n"))}`);
+const escProp = (s) => esc(s).replace(/:/g, "%3A").replace(/,/g, "%2C");
+const emit = (level, title, lines) => console.log(`::${level} title=${escProp(title)}::${esc(lines.join("\n"))}`);
 
 if (!file || !existsSync(file)) {
   emit("error", `${kind} — rapport absent`, [`Fichier introuvable : ${file}`]);
