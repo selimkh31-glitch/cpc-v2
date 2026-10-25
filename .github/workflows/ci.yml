@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, "diag/**"]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -126,7 +126,8 @@ jobs:
             echo "E2E_MAILPIT_URL=${SB_MAILPIT_URL:-${SB_INBUCKET_URL:-http://127.0.0.1:54324}}"
           } >> "$GITHUB_ENV"
       - run: pnpm build
-      - run: pnpm test:e2e --project=mobile-chromium --project=desktop-chromium --project=auth-spike
+      - name: DIAGNOSTIC — A5a répété 3 fois sur le code de main (branche jetable, hors PR)
+        run: pnpm exec playwright test --project=auth-spike -g "A5a" --repeat-each=3 --retries=0 --workers=3
       - if: always()
         run: node scripts/ci/annotate.mjs playwright playwright-report/results.json
       - if: always()
