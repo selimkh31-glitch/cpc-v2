@@ -7,7 +7,8 @@
 La v2 prévoyait des cookies `httpOnly`. **Vérification faite dans la documentation officielle Supabase** (*Advanced guide* et *Creating a client for SSR*, consultées le 25/10/2026) :
 - Le client navigateur (`createBrowserClient`) doit **lire** l'access token et le refresh token pour maintenir la session, rafraîchir le token et authentifier les canaux Realtime privés. La doc indique que le flag HttpOnly « n'est pas nécessaire » pour ce schéma, et le client navigateur ne fonctionnerait pas si les cookies lui étaient illisibles.
 - Côté serveur, le rafraîchissement écrit les nouveaux tokens via `Set-Cookie` dans `proxy.ts` (Next.js 16 ; `middleware.ts` en ≤ 15).
-- `getClaims()` vérifie la signature du JWT (en local avec les clés asymétriques par défaut des nouveaux projets) ; `getUser()` interroge le serveur Auth et détecte une session révoquée ailleurs ; `getSession()` côté serveur ne doit jamais servir à autoriser.
+- `getClaims()` vérifie la signature du JWT (en local avec les clés asymétriques par défaut des nouveaux projets) ; `getUser()` interroge le serveur Auth ; `getSession()` côté serveur ne doit jamais servir à autoriser.
+- **Correction (spike S-1.4a, 25/10/2026)** : contrairement à la v3, `getUser()` **ne détecte pas immédiatement** une session révoquée ailleurs. Doc Supabase (*Signing out*) : « Access Tokens of revoked sessions remain valid until their expiry time ». Constat CI : après `signOut({ scope: 'global' })`, `getUser()` accepte encore le JWT 6 fois sur 8 (run 40238344611). La révocation devient effective quand le JWT expire ou qu'un rafraîchissement est tenté (refresh token révoqué). **Décision D-40 ouverte** (révocation immédiate ou non pour les actions sensibles).
 - Une réponse portant un `Set-Cookie` de session mise en cache (ISR, CDN) peut connecter un utilisateur sous l'identité d'un autre.
 
 **Conclusion : on ne force pas `httpOnly`. On garde la configuration de cookies par défaut de la version épinglée de `@supabase/ssr`**, et on compense le risque XSS par d'autres mesures.
@@ -18,7 +19,7 @@ La v2 prévoyait des cookies `httpOnly`. **Vérification faite dans la documenta
 3. **Proxy** : `proxy.ts` appelle `updateSession`, renvoie **l'objet réponse construit par `setAll`** (ou recopie ses cookies et en-têtes de cache), et n'exécute aucune logique entre la création du client et l'appel à `getClaims()`. Le proxy sert au confort (rafraîchissement, redirection), pas à la sécurité.
 4. **Autorisation** :
    - pages et lectures privées : `getClaims()` ;
-   - Server Actions sensibles, admin, suppression de compte : `getUser()` (session révoquée détectée) ;
+   - Server Actions sensibles, admin, suppression de compte : `getUser()` (utilisateur supprimé ou banni détecté ; **session révoquée détectée seulement à l'expiration du JWT**, voir D-40) ;
    - l'autorisation métier est toujours revérifiée en base (ADR-0004) ;
    - `getSession()` est interdit pour autoriser côté serveur (règle ESLint).
 5. **Cache** : `Cache-Control: private, no-store` sur toutes les routes authentifiées ; aucune page privée en ISR ou mise en cache CDN.
@@ -35,7 +36,8 @@ Tests Playwright sur Supabase local, avec la version exacte épinglée :
 | A2 | Access token expiré, action côté client | le client navigateur rafraîchit sans déconnexion |
 | A3 | Deux onglets rafraîchissent simultanément | aucune déconnexion (pas de refresh token réutilisé en erreur) |
 | A4 | Abonnement Realtime privé après rafraîchissement | le canal reste autorisé avec le nouveau token |
-| A5 | Déconnexion sur un autre appareil | action sensible refusée (`getUser()`) |
+| A5a | Déconnexion globale sur un autre appareil | refresh révoqué ; action sensible refusée et redirection vers la connexion **dès l'expiration du JWT** |
+| A5b | Révocation **immédiate** | `fixme` tant que D-40 n'est pas tranchée (non garanti par Supabase) |
 | A6 | Retour OAuth Google et confirmation d'email (PKCE) | session établie, redirection interne |
 | A7 | En-têtes des routes privées | `Cache-Control: private, no-store`, aucun `Set-Cookie` en cache |
 | A8 | Relevé des attributs réels des cookies | consigné dans cet ADR |

@@ -102,6 +102,12 @@
 | D-07 | Opérateur de paiement, **prix**, essai, remboursement | Opérateur : Stripe ou Merchant of Record (à comparer). **Prix : non fixé** (voir V-10). | ⚪ |
 | D-32 | Porteur de l'entitlement | Par utilisateur (le manager qui lance COMBLER) | 🔵 |
 
+## 7 bis. Sécurité de session (ouverte par le spike S-1.4a)
+
+| ID | Sujet | Options | Statut |
+|---|---|---|---|
+| D-40 | Révocation d'une session déconnectée ailleurs | (a) accepter la fenêtre égale à la durée du JWT, et la réduire (ex. 10 min au lieu de 60) ; (b) **recommandé** : (a) + contrôle de session active côté base (`auth.sessions`, via `session_id` du JWT) dans les commandes sensibles (suppression de compte, rôles, admin), pour une révocation immédiate là où elle compte | ⚪ |
+
 ## 8. Release
 
 | ID | Sujet | Recommandation | Statut |

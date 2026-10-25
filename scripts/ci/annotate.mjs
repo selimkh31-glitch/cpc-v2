@@ -26,7 +26,19 @@ if (kind === "vitest") {
       for (const t of spec.tests ?? []) {
         const last = t.results?.[t.results.length - 1];
         const status = t.status === "skipped" ? "skipped" : last?.status === "passed" ? "passed" : t.status === "flaky" ? "flaky" : last?.status ?? "unknown";
-        rows.push({ status, title: `[${t.projectName}] ${[...path, spec.title].join(" › ")}` });
+        const seen = new Set();
+        const notes = (t.annotations ?? []).concat(last?.annotations ?? [])
+          .map((a) => `    ↳ ${a.type}: ${a.description ?? ""}`)
+          .filter((n) => (seen.has(n) ? false : seen.add(n)));
+        if (status !== "passed") {
+          const errs = last?.errors?.length ? last.errors : last?.error ? [last.error] : [];
+          for (const e of errs) {
+            const where = e.location ? ` (${e.location.file.split("/").pop()}:${e.location.line})` : "";
+            const msg = (e.message ?? "").replace(/\u001b\[[0-9;]*m/g, "").split("\n").slice(0, 14).join("\n      ");
+            notes.push(`    ✘${where} ${msg}`);
+          }
+        }
+        rows.push({ status, title: `[${t.projectName}] ${[...path, spec.title].join(" › ")}${notes.length ? "\n" + notes.join("\n") : ""}` });
       }
   };
   for (const s of r.suites ?? []) walk(s, []);

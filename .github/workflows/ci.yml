@@ -96,9 +96,37 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium webkit
+      - name: Cache des navigateurs Playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-chromium-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm exec playwright install --with-deps chromium
+      - uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+      - name: Supabase local (Auth, REST, Realtime, Mailpit) — JWT 120 s pour le spike S-1.4a
+        run: |
+          # Modification limitée au job : le fichier versionné garde jwt_expiry = 3600.
+          sed -i 's/^jwt_expiry = 3600$/jwt_expiry = 120/' supabase/config.toml
+          grep -q '^jwt_expiry = 120$' supabase/config.toml
+          supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,postgres-meta,storage-api
+      - name: Exporter l'environnement local (clés de démonstration du CLI, masquées)
+        run: |
+          eval "$(supabase status -o env | sed 's/^/export SB_/')"
+          SERVICE_KEY="${SB_SECRET_KEY:-$SB_SERVICE_ROLE_KEY}"
+          echo "::add-mask::$SERVICE_KEY"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$SB_API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${SB_PUBLISHABLE_KEY:-$SB_ANON_KEY}"
+            echo "NEXT_PUBLIC_SITE_URL=http://localhost:3000"
+            echo "ENABLE_AUTH_SPIKE=1"
+            echo "E2E_SUPABASE_SERVICE_KEY=$SERVICE_KEY"
+            echo "E2E_DB_URL=$SB_DB_URL"
+            echo "E2E_MAILPIT_URL=${SB_MAILPIT_URL:-${SB_INBUCKET_URL:-http://127.0.0.1:54324}}"
+          } >> "$GITHUB_ENV"
       - run: pnpm build
-      - run: pnpm test:e2e
+      - run: pnpm test:e2e --project=mobile-chromium --project=desktop-chromium --project=auth-spike
       - if: always()
         run: node scripts/ci/annotate.mjs playwright playwright-report/results.json
       - if: always()
@@ -107,3 +135,28 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 14
+      - if: always()
+        run: supabase stop --no-backup
+
+  e2e-webkit:
+    name: e2e-webkit (Playwright iPhone / WebKit)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Cache des navigateurs Playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-webkit-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm exec playwright install --with-deps webkit
+      - run: pnpm build
+      - run: pnpm test:e2e --project=mobile-webkit
+      - if: always()
+        run: node scripts/ci/annotate.mjs playwright playwright-report/results.json

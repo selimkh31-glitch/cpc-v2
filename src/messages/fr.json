@@ -8,5 +8,32 @@
     "title": "ClubPro Connect",
     "status": "Fondations en cours de construction.",
     "notice": "Aucune fonctionnalité n'est encore disponible."
+  },
+  "auth": {
+    "loginTitle": "Connexion",
+    "signupTitle": "Créer un compte",
+    "email": "Adresse email",
+    "password": "Mot de passe",
+    "passwordHint": "10 caractères minimum, avec des lettres et des chiffres.",
+    "submitLogin": "Se connecter",
+    "submitSignup": "Créer mon compte",
+    "goToSignup": "Pas encore de compte ? Créer un compte",
+    "goToLogin": "Déjà un compte ? Se connecter",
+    "invalidCredentials": "Identifiants invalides ou adresse email non confirmée.",
+    "invalidSignup": "Vérifie l'adresse email et le mot de passe (10 caractères minimum, lettres et chiffres).",
+    "checkEmailTitle": "Vérifie ta boîte mail",
+    "checkEmailBody": "Si l'adresse est valide, un lien de confirmation vient d'être envoyé."
+  },
+  "spike": {
+    "title": "Spike d'authentification (S-1.4a)",
+    "serverSub": "Utilisateur (serveur)",
+    "serverExp": "Expiration du jeton (serveur)",
+    "clientCheck": "Vérifier la session côté client",
+    "sensitiveAction": "Action sensible",
+    "realtimeOwn": "Canal privé personnel :",
+    "realtimeForeign": "Canal privé d'un autre utilisateur :",
+    "realtimeReceived": "Messages reçus :",
+    "signOutLocal": "Se déconnecter",
+    "signOutGlobal": "Se déconnecter partout"
   }
 }
