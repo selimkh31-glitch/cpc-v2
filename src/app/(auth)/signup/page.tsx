@@ -6,7 +6,7 @@ import { safeNextPath } from "@/lib/auth/redirect";
 export default async function SignupPage({ searchParams }: PageProps<"/signup">) {
   const params = await searchParams;
   const t = await getTranslations("auth");
-  const next = safeNextPath(params.next, "/spike/session");
+  const next = safeNextPath(params.next, "/home");
   if (params.sent) {
     return (
       <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-3 px-4 py-10">
