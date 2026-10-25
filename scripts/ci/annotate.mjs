@@ -26,7 +26,8 @@ if (kind === "vitest") {
       for (const t of spec.tests ?? []) {
         const last = t.results?.[t.results.length - 1];
         const status = t.status === "skipped" ? "skipped" : last?.status === "passed" ? "passed" : t.status === "flaky" ? "flaky" : last?.status ?? "unknown";
-        rows.push({ status, title: `[${t.projectName}] ${[...path, spec.title].join(" › ")}` });
+        const notes = (t.annotations ?? []).concat(last?.annotations ?? []).map((a) => `    ↳ ${a.type}: ${a.description ?? ""}`);
+        rows.push({ status, title: `[${t.projectName}] ${[...path, spec.title].join(" › ")}${notes.length ? "\n" + notes.join("\n") : ""}` });
       }
   };
   for (const s of r.suites ?? []) walk(s, []);

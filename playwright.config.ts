@@ -17,9 +17,11 @@ export default defineConfig({
     : "list",
   use: { baseURL, trace: "retain-on-failure" },
   projects: [
-    { name: "mobile-chromium", use: { ...devices["Pixel 7"] } },
-    { name: "mobile-webkit", use: { ...devices["iPhone 14"] } },
-    { name: "desktop-chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "mobile-chromium", testIgnore: /auth-spike/, use: { ...devices["Pixel 7"] } },
+    { name: "mobile-webkit", testIgnore: /auth-spike/, use: { ...devices["iPhone 14"] } },
+    { name: "desktop-chromium", testIgnore: /auth-spike/, use: { ...devices["Desktop Chrome"] } },
+    // Spike S-1.4a : requiert Supabase local (CI) ; attentes d'expiration longues, un seul navigateur.
+    { name: "auth-spike", testMatch: /auth-spike\.spec\.ts/, use: { ...devices["Desktop Chrome"] } },
   ],
   webServer: process.env.E2E_BASE_URL
     ? undefined
