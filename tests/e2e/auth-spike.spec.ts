@@ -129,12 +129,11 @@ test.describe("ADR-0002 — spike d'authentification", () => {
     await ctxY.close();
   });
 
-  test.fixme(
-    "A5b — révocation IMMÉDIATE d'une session déconnectée ailleurs (intention ADR-0002, décision D-40 en attente)",
+  test(
+    "A5b — révocation IMMÉDIATE pour les actions sensibles (D-40 : contrôle de session active côté base)",
     async ({ browser }) => {
       // Supabase : « Access Tokens of revoked sessions remain valid until their expiry time ».
-      // Constat CI (run 40238344611) : getUser() renvoie encore l'utilisateur 6 fois sur 8 juste après signOut global.
-      // À réactiver quand D-40 sera tranchée (ex. contrôle de session active côté base pour les actions sensibles).
+      // D-40 : l'action sensible appelle api.assert_session_active() → refus immédiat malgré un JWT encore valide.
       const user = await createConfirmedUser();
       const ctxX = await browser.newContext();
       const ctxY = await browser.newContext();
@@ -142,10 +141,16 @@ test.describe("ADR-0002 — spike d'authentification", () => {
       const pageY = await ctxY.newPage();
       await login(pageX, user.email);
       await login(pageY, user.email);
+      // Garde-fou contre un faux succès : tant que la session est active, l'action sensible passe.
+      await pageY.getByRole("button", { name: "Action sensible" }).click();
+      await expect(pageY.getByTestId("sensitive-result")).toHaveText("ok");
+      const expY = Number(await pageY.getByTestId("server-exp").textContent());
       await pageX.getByRole("button", { name: "Se déconnecter partout" }).click();
       await expect(pageX).toHaveURL(/\/login/);
       await pageY.getByRole("button", { name: "Action sensible" }).click();
       await expect(pageY.getByTestId("sensitive-result")).toHaveText("refused");
+      // Preuve que le refus est immédiat : le JWT de Y n'avait pas encore expiré.
+      expect(Date.now() / 1000, "JWT de Y encore valide au moment du refus").toBeLessThan(expY);
       await ctxX.close();
       await ctxY.close();
     },
