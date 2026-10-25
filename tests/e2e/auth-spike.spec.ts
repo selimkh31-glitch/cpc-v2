@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import {
   authCookies,
   createConfirmedUser,
@@ -8,6 +8,13 @@ import {
   waitForEmailLink,
   PASSWORD,
 } from "./helpers/supabase";
+
+/** Collecte les violations CSP signalées en console (une page cassée par la CSP doit faire échouer le test). */
+function trackCspViolations(page: Page, sink: string[]) {
+  page.on("console", (msg) => {
+    if (msg.type() === "error" && /Content Security Policy|violates the following/i.test(msg.text())) sink.push(msg.text());
+  });
+}
 
 /**
  * Spike S-1.4a — ADR-0002 scénarios A1–A8 (Supabase local, CI).
@@ -24,15 +31,19 @@ test.describe("ADR-0002 — spike d'authentification", () => {
     test.setTimeout(240_000);
     const user = await createConfirmedUser();
 
+    const cspViolations: string[] = [];
     const ctxA = await browser.newContext();
     const tab1 = await ctxA.newPage();
+    trackCspViolations(tab1, cspViolations);
     await login(tab1, user.email);
     const tab2 = await ctxA.newPage();
+    trackCspViolations(tab2, cspViolations);
     await tab2.goto("/spike/session");
     await expect(tab2.getByTestId("server-sub")).toHaveText(user.id);
 
     const ctxB = await browser.newContext();
     const pageB = await ctxB.newPage();
+    trackCspViolations(pageB, cspViolations);
     await login(pageB, user.email);
 
     // Realtime : canal personnel autorisé, canal d'autrui refusé (P8).
@@ -65,6 +76,7 @@ test.describe("ADR-0002 — spike d'authentification", () => {
     await expect(tab1.getByTestId("realtime-received")).toHaveText("1", { timeout: 15_000 });
     await expect(pageB.getByTestId("realtime-received")).not.toHaveText("0", { timeout: 15_000 });
 
+    expect(cspViolations, "aucune violation CSP pendant le scénario").toEqual([]);
     await ctxA.close();
     await ctxB.close();
   });

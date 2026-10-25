@@ -33,6 +33,11 @@ describe("buildCsp", () => {
     );
   });
 
+  it("en HTTP local, autorise le WebSocket ws:// de la même origine (et pas wss)", () => {
+    const csp = buildCsp({ nonce: "n", isDev: true, supabaseUrl: "http://127.0.0.1:54321" });
+    expect(directive(csp, "connect-src")).toBe("connect-src 'self' http://127.0.0.1:54321 ws://127.0.0.1:54321");
+  });
+
   it("sans URL Supabase, connect-src reste limité à 'self'", () => {
     expect(directive(buildCsp({ nonce: "n", isDev: false }), "connect-src")).toBe("connect-src 'self'");
   });

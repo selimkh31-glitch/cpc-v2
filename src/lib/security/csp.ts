@@ -14,7 +14,9 @@ export function buildCsp({ nonce, isDev, supabaseUrl }: CspOptions): string {
   const connect = ["'self'"];
   if (supabaseUrl) {
     const url = new URL(supabaseUrl);
-    connect.push(url.origin, `wss://${url.host}`);
+    // supabase-js dérive l'URL Realtime en remplaçant http→ws (https→wss) : même règle ici.
+    const wsScheme = url.protocol === "https:" ? "wss" : "ws";
+    connect.push(url.origin, `${wsScheme}://${url.host}`);
   }
   const directives: Record<string, string[]> = {
     "default-src": ["'self'"],
