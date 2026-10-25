@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+  NODE_VERSION: "22"
+  SUPABASE_CLI_VERSION: "2.122.0"
+
+jobs:
+  quality:
+    name: quality (lint · typecheck · unit · no-v1 · build sans Sentry)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test --reporter=default --reporter=json --outputFile=vitest-results.json
+      - if: always()
+        run: node scripts/ci/annotate.mjs vitest vitest-results.json
+      - run: pnpm check:no-v1
+      - name: Vérifier l'absence de toute variable Sentry (ADR-0012)
+        run: |
+          if env | grep -i '^SENTRY\|^NEXT_PUBLIC_SENTRY'; then echo "Variable Sentry présente"; exit 1; fi
+          echo "Aucune variable Sentry dans le job."
+      - run: pnpm build
+
+  gitleaks:
+    name: gitleaks (scan de secrets)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: gitleaks (historique complet)
+        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.24.2 git /repo --redact --verbose
+
+  db:
+    name: db (Supabase local · pgTAP)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+      - run: supabase db start
+      - name: supabase test db (verdict officiel)
+        run: supabase test db
+      - name: pgTAP détaillé (TAP verbeux pour les preuves)
+        if: always()
+        run: |
+          set -o pipefail
+          : > pgtap.log
+          for f in supabase/tests/database/*.test.sql; do
+            echo "# $f" | tee -a pgtap.log
+            psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -X -q -t -A -v ON_ERROR_STOP=1 -f "$f" 2>&1 | tee -a pgtap.log
+          done
+          if grep -q '^not ok' pgtap.log; then echo "::error::Au moins un test pgTAP a échoué"; exit 1; fi
+      - if: always()
+        run: node scripts/ci/annotate.mjs pgtap pgtap.log
+      - if: always()
+        run: supabase stop --no-backup
+
+  e2e:
+    name: e2e (Playwright mobile + desktop)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium webkit
+      - run: pnpm build
+      - run: pnpm test:e2e
+      - if: always()
+        run: node scripts/ci/annotate.mjs playwright playwright-report/results.json
+      - if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14

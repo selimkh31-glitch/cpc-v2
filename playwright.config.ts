@@ -12,7 +12,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
+  reporter: process.env.CI
+    ? [["list"], ["html", { open: "never" }], ["json", { outputFile: "playwright-report/results.json" }]]
+    : "list",
   use: { baseURL, trace: "retain-on-failure" },
   projects: [
     { name: "mobile-chromium", use: { ...devices["Pixel 7"] } },
