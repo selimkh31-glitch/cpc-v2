@@ -106,7 +106,7 @@
 
 | ID | Sujet | Options | Statut |
 |---|---|---|---|
-| D-40 | Révocation d'une session déconnectée ailleurs | (a) accepter la fenêtre égale à la durée du JWT, et la réduire (ex. 10 min au lieu de 60) ; (b) **recommandé** : (a) + contrôle de session active côté base (`auth.sessions`, via `session_id` du JWT) dans les commandes sensibles (suppression de compte, rôles, admin), pour une révocation immédiate là où elle compte | ⚪ |
+| D-40 | Révocation d'une session déconnectée ailleurs | **Validé sous conditions (Selim, 25/10/2026 23:58)** : (1) étudier et tester en staging une durée de vie du JWT de **10 à 15 min** ; (2) prévoir une **vérification serveur de session toujours active** pour les actions sensibles ; (3) ne jamais prétendre qu'un JWT valide est révoqué immédiatement par une déconnexion globale ; (4) documenter les garanties et leurs limites (ADR-0002) ; (5) ajouter les tests de révocation immédiate de la solution retenue **avant** sa généralisation (A5b) | 🟡 |
 
 ## 8. Release
 
@@ -124,6 +124,7 @@
 | 25/10/2026 | v1 : 33 décisions ouvertes issues de l'audit Phase 2 |
 | 25/10/2026 | v2 : V-01→V-11 validés ; D-05, D-14, D-15, D-16, D-17, D-20 ✅ ; D-12 🟠 (18+, à valider) ; D-18 et D-19 ⚪ avec impact précisé ; référence au prix Pro retirée (V-10) ; ADR-0004 🟡 |
 | 25/10/2026 | v2.1 : D-14 décompte explicité (15 codes, répartition par groupe) ; orientation technique Lot 1 approuvée ; ADR-0002, 0012 et 0015 corrigés (🟡, relecture) ; tests de permissions et de concurrence conservés intégralement (ADR-0011) |
+| 26/10/2026 00:00 | Fusions #1 (`363b5f3`), #2 (`4bcaed7`), #3 (`4cf9e74`) autorisées par Selim ; **D-40 🟡 validé sous conditions** |
 | 25/10/2026 22:32 (Selim) | **GO Phase 1** ; D-35 ✅ (migrations versionnées, appliquées au seul staging V2 après fusion et vérification) ; D-37 ✅ (Claude : branches, commits, PR ; Selim : validation et fusion) ; D-38 ✅ (durcissement `rls_auto_enable()` + non-régression + rollback préparé) ; D-39 ✅ (un commit documentaire sur `main`, puis PR exclusivement) ; cahier UX reçu → `docs/reference/` |
 | 25/10/2026 22:35 | G1 validé ; **D-34 ✅** staging eu-west-2 ; **D-36 ✅** prod future séparée, préférence Paris ; 3 projets Vercel V1 exclus en écriture (ADR-0016 ✅) ; D-38 (`rls_auto_enable` conservée, REVOKE proposé) 🔵 ; D-35, D-37, D-39 (mode opératoire Git/migrations) 🔵 ; connecteur `supabase-cpc-v2-write` vérifié, limité au projet |
 | 25/10/2026 22:25 | **G1 ✅** via le connecteur `supabase-cpc-v2` (limité au projet, lecture seule) : projet vide et isolé ; `rls_auto_enable()` d'origine plateforme détectée (REVOKE prévu en migration n°0, après GO) ; D-34 à trancher avant la première migration |
