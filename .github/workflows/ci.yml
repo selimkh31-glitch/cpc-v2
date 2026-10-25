@@ -67,10 +67,18 @@ jobs:
         with:
           version: ${{ env.SUPABASE_CLI_VERSION }}
       - run: supabase db start
-      - name: supabase test db
+      - name: supabase test db (verdict officiel)
+        run: supabase test db
+      - name: pgTAP détaillé (TAP verbeux pour les preuves)
+        if: always()
         run: |
           set -o pipefail
-          supabase test db 2>&1 | tee pgtap.log
+          : > pgtap.log
+          for f in supabase/tests/database/*.test.sql; do
+            echo "# $f" | tee -a pgtap.log
+            psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -X -q -t -A -v ON_ERROR_STOP=1 -f "$f" 2>&1 | tee -a pgtap.log
+          done
+          if grep -q '^not ok' pgtap.log; then echo "::error::Au moins un test pgTAP a échoué"; exit 1; fi
       - if: always()
         run: node scripts/ci/annotate.mjs pgtap pgtap.log
       - if: always()
