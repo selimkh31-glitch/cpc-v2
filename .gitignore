@@ -1,0 +1,26 @@
+# deps
+node_modules/
+.pnpm-store/
+# next
+.next/
+out/
+next-env.d.ts
+# build / test
+coverage/
+playwright-report/
+test-results/
+blob-report/
+*.tsbuildinfo
+# env & secrets
+.env
+.env.*
+!.env.example
+# vercel / supabase
+.vercel/
+supabase/.temp/
+supabase/.branches/
+# os / editors
+.DS_Store
+*.log
+.idea/
+.vscode/
