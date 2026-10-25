@@ -91,6 +91,7 @@ test.describe("ADR-0002 — spike d'authentification", () => {
     await login(pageX, user.email);
     await login(pageY, user.email);
     const expY = Number(await pageY.getByTestId("server-exp").textContent());
+    expect(Number.isFinite(expY), "exp du JWT lisible").toBe(true);
 
     await pageY.getByRole("button", { name: "Action sensible" }).click();
     await expect(pageY.getByTestId("sensitive-result")).toHaveText("ok");
@@ -108,9 +109,20 @@ test.describe("ADR-0002 — spike d'authentification", () => {
 
     // Garantie de la plateforme : le refresh token est révoqué ; à l'expiration du JWT, plus aucun accès.
     await pageY.waitForTimeout(Math.max(expY * 1000 - Date.now() + 5_000, 0));
-    await pageY.getByRole("button", { name: "Action sensible" }).click();
-    await expect(pageY.getByTestId("sensitive-result")).toHaveText("refused");
-    await pageY.reload();
+    // Pendant l'attente, le client navigateur de Y a pu tenter un rafraîchissement (refusé) et se déconnecter :
+    // on consigne l'état réel de la page avant d'agir, au lieu de cliquer sur un bouton disparu.
+    const sensitiveButton = pageY.getByRole("button", { name: "Action sensible" });
+    const stillOnPage = await sensitiveButton.isVisible();
+    test.info().annotations.push({ type: "A5-après-expiration", description: `url=${pageY.url()} · bouton visible=${stillOnPage}` });
+    if (stillOnPage) {
+      await sensitiveButton.click();
+      await expect(pageY.getByTestId("sensitive-result").or(pageY.getByRole("heading", { name: "Connexion" }))).toBeVisible();
+      if (await pageY.getByTestId("sensitive-result").isVisible()) {
+        await expect(pageY.getByTestId("sensitive-result")).toHaveText("refused");
+      }
+    }
+    // Preuve stricte, dans tous les cas : la page privée n'est plus accessible.
+    await pageY.goto("/spike/session");
     await expect(pageY).toHaveURL(/\/login\?next=(%2F|\/)spike(%2F|\/)session$/);
 
     await ctxX.close();
