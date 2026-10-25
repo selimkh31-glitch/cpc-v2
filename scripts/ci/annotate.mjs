@@ -30,8 +30,14 @@ if (kind === "vitest") {
         const notes = (t.annotations ?? []).concat(last?.annotations ?? [])
           .map((a) => `    ↳ ${a.type}: ${a.description ?? ""}`)
           .filter((n) => (seen.has(n) ? false : seen.add(n)));
-        const err = last?.error?.message ?? last?.errors?.[0]?.message;
-        if (err && status !== "passed") notes.push(`    ✘ ${err.replace(/\u001b\[[0-9;]*m/g, "").split("\n").slice(0, 12).join("\n      ")}`);
+        if (status !== "passed") {
+          const errs = last?.errors?.length ? last.errors : last?.error ? [last.error] : [];
+          for (const e of errs) {
+            const where = e.location ? ` (${e.location.file.split("/").pop()}:${e.location.line})` : "";
+            const msg = (e.message ?? "").replace(/\u001b\[[0-9;]*m/g, "").split("\n").slice(0, 14).join("\n      ");
+            notes.push(`    ✘${where} ${msg}`);
+          }
+        }
         rows.push({ status, title: `[${t.projectName}] ${[...path, spec.title].join(" › ")}${notes.length ? "\n" + notes.join("\n") : ""}` });
       }
   };

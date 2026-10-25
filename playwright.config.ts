@@ -15,7 +15,8 @@ export default defineConfig({
   reporter: process.env.CI
     ? [["list"], ["html", { open: "never" }], ["json", { outputFile: "playwright-report/results.json" }]]
     : "list",
-  use: { baseURL, trace: "retain-on-failure" },
+  // Une action bloquée échoue en 15 s avec son journal, au lieu d'épuiser le délai global du test.
+  use: { baseURL, trace: "retain-on-failure", actionTimeout: 15_000, navigationTimeout: 30_000 },
   projects: [
     { name: "mobile-chromium", testIgnore: /auth-spike/, use: { ...devices["Pixel 7"] } },
     { name: "mobile-webkit", testIgnore: /auth-spike/, use: { ...devices["iPhone 14"] } },
