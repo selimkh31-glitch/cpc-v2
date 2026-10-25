@@ -26,7 +26,12 @@ if (kind === "vitest") {
       for (const t of spec.tests ?? []) {
         const last = t.results?.[t.results.length - 1];
         const status = t.status === "skipped" ? "skipped" : last?.status === "passed" ? "passed" : t.status === "flaky" ? "flaky" : last?.status ?? "unknown";
-        const notes = (t.annotations ?? []).concat(last?.annotations ?? []).map((a) => `    ↳ ${a.type}: ${a.description ?? ""}`);
+        const seen = new Set();
+        const notes = (t.annotations ?? []).concat(last?.annotations ?? [])
+          .map((a) => `    ↳ ${a.type}: ${a.description ?? ""}`)
+          .filter((n) => (seen.has(n) ? false : seen.add(n)));
+        const err = last?.error?.message ?? last?.errors?.[0]?.message;
+        if (err && status !== "passed") notes.push(`    ✘ ${err.replace(/\u001b\[[0-9;]*m/g, "").split("\n").slice(0, 12).join("\n      ")}`);
         rows.push({ status, title: `[${t.projectName}] ${[...path, spec.title].join(" › ")}${notes.length ? "\n" + notes.join("\n") : ""}` });
       }
   };
