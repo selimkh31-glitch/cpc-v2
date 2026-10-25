@@ -27,3 +27,5 @@ supabase/.branches/
 # misc (scaffold)
 *.pem
 .pnp.*
+vitest-results.json
+pgtap.log

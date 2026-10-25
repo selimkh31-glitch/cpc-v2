@@ -20,19 +20,21 @@ env:
 jobs:
   quality:
     name: quality (lint · typecheck · unit · no-v1 · build sans Sentry)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
-      - run: pnpm test
+      - run: pnpm test --reporter=default --reporter=json --outputFile=vitest-results.json
+      - if: always()
+        run: node scripts/ci/annotate.mjs vitest vitest-results.json
       - run: pnpm check:no-v1
       - name: Vérifier l'absence de toute variable Sentry (ADR-0012)
         run: |
@@ -42,10 +44,10 @@ jobs:
 
   gitleaks:
     name: gitleaks (scan de secrets)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: gitleaks (historique complet)
@@ -53,26 +55,34 @@ jobs:
 
   db:
     name: db (Supabase local · pgTAP)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - uses: supabase/setup-cli@v1
         with:
           version: ${{ env.SUPABASE_CLI_VERSION }}
       - run: supabase db start
-      - run: supabase test db
+      - name: supabase test db
+        run: |
+          set -o pipefail
+          supabase test db 2>&1 | tee pgtap.log
+      - if: always()
+        run: node scripts/ci/annotate.mjs pgtap pgtap.log
       - if: always()
         run: supabase stop --no-backup
 
   e2e:
     name: e2e (Playwright mobile + desktop)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -81,7 +91,9 @@ jobs:
       - run: pnpm build
       - run: pnpm test:e2e
       - if: always()
-        uses: actions/upload-artifact@v4
+        run: node scripts/ci/annotate.mjs playwright playwright-report/results.json
+      - if: always()
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-report
           path: playwright-report/
