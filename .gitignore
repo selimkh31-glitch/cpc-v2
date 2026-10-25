@@ -24,3 +24,6 @@ supabase/.branches/
 *.log
 .idea/
 .vscode/
+# misc (scaffold)
+*.pem
+.pnp.*

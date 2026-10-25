@@ -1,0 +1,12 @@
+{
+  "app": {
+    "name": "ClubPro Connect",
+    "shortName": "CPC",
+    "description": "Trouver une occasion de jouer, recruter et gérer une session LIVE sur EA FC Clubs."
+  },
+  "home": {
+    "title": "ClubPro Connect",
+    "status": "Fondations en cours de construction.",
+    "notice": "Aucune fonctionnalité n'est encore disponible."
+  }
+}

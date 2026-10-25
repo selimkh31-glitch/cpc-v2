@@ -18,5 +18,6 @@
 | [0014](ADR/0014-ea-provider.md) | Fournisseur EA | 🔵 défaut `Unavailable` · ⚪ source | Avant la Phase 4 |
 | [0015](ADR/0015-media-storage.md) | Médias : buckets privés + URL signées | 🟡 | v3 revue favorable ; réserve levée après tests S1–S9 (policies, expiration, blocages) |
 | [0016](ADR/0016-v1-isolation.md) | Isolation V1 | ✅ | — |
+| [0017](ADR/0017-rendering-csp.md) | Rendu dynamique, Cache Components désactivé (CSP à nonce) | 🔵 | Validation Selim (PR-1) |
 
 **Corrections v3** : 0002 (cookies non httpOnly, conformément à la doc `@supabase/ssr`, avec compensations et spike) · 0012 (Sentry piloté par variables d'environnement, no-op par défaut) · 0015 (buckets privés, URL signées de 10 min) · 0011 (inventaire explicite et non négociable) · 0004 (renvoi à l'inventaire conservé).
