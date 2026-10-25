@@ -101,7 +101,14 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: pw-chromium-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-      - run: pnpm exec playwright install --with-deps chromium
+      - name: Installer Chromium (délai court + 3 tentatives, apt GitHub instable)
+        timeout-minutes: 15
+        run: |
+          for i in 1 2 3; do
+            timeout 240 pnpm exec playwright install --with-deps chromium && exit 0
+            echo "::warning::Installation Chromium : tentative $i échouée ou trop lente"
+          done
+          exit 1
       - uses: supabase/setup-cli@v1
         with:
           version: ${{ env.SUPABASE_CLI_VERSION }}
@@ -155,7 +162,14 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: pw-webkit-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-      - run: pnpm exec playwright install --with-deps webkit
+      - name: Installer WebKit (délai court + 3 tentatives, apt GitHub instable)
+        timeout-minutes: 15
+        run: |
+          for i in 1 2 3; do
+            timeout 240 pnpm exec playwright install --with-deps webkit && exit 0
+            echo "::warning::Installation WebKit : tentative $i échouée ou trop lente"
+          done
+          exit 1
       - run: pnpm build
       - run: pnpm test:e2e --project=mobile-webkit
       - if: always()

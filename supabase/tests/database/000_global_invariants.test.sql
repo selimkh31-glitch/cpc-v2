@@ -2,7 +2,7 @@
 -- Valables dès maintenant (base vide) et pour toutes les migrations futures.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(6);
+select plan(9);
 
 -- P2 : toute table des schémas exposés a la RLS activée.
 select is(
@@ -58,6 +58,29 @@ select is(
     where n.nspname = 'public' and p.prosecdef and has_function_privilege('anon', p.oid, 'EXECUTE')),
   0,
   'R2 — aucune fonction SECURITY DEFINER de public exécutable par anon'
+);
+
+-- P1 : anon n'a aucun privilège sur les tables de public.
+select is(
+  (select count(*)::int from information_schema.role_table_grants
+    where grantee = 'anon' and table_schema = 'public'),
+  0,
+  'P1 — anon n''a aucun privilège sur les tables de public'
+);
+
+-- P2 : le schéma private n'est utilisable ni par anon ni par authenticated.
+select ok(
+  not has_schema_privilege('anon', 'private', 'USAGE') and not has_schema_privilege('authenticated', 'private', 'USAGE'),
+  'P2 — schéma private fermé à anon et authenticated'
+);
+
+-- P2 : authenticated n'a ni INSERT ni DELETE ni TRUNCATE sur les tables de public (écritures par commandes).
+select is(
+  (select count(*)::int from information_schema.role_table_grants
+    where grantee = 'authenticated' and table_schema = 'public'
+      and privilege_type in ('INSERT', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER')),
+  0,
+  'P2 — aucune écriture INSERT/DELETE/TRUNCATE directe pour authenticated dans public'
 );
 
 select * from finish();

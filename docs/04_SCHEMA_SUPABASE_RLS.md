@@ -56,7 +56,9 @@ Le schéma part de zéro, sans aucune référence au schéma V1. Les tables marq
 
 **`public.profile_positions`** : `(profile_id, position)` PK ; au plus 3 postes secondaires (contrôlé par la commande), sans doublon du poste principal.
 
-**`public.account_settings`** (privé, propriétaire seul) : `profile_id` PK · `active_club_id` (affichage seulement, R-3) · `locale` · `age_confirmed_at` · `terms_version` · `privacy_version` · `marketing_opt_in`.
+**`public.account_settings`** (privé, propriétaire seul) : `profile_id` PK · `locale` · `age_confirmed_at` · `age_threshold` (seuil déclaré, ≥ 18, D-12) · `terms_version` · `privacy_version` · `marketing_opt_in`. `active_club_id` sera ajouté avec les clubs (Phase 2 du backlog).
+
+> **Implémenté en S-1.3** (migrations `20261026001000` → `20261026001300`) : D-38, schémas `api`/`private`, privilèges par défaut fermés, enums `platform` / `position_code` / `position_group` + `position_group_of()`, `profiles`, `profile_positions`, `account_settings`, `private.staff_members`, `private.idempotency_keys`, `private.rate_limits`. `notification_preferences` reportée à la Phase 5 (inutile au lot).
 
 **`public.notification_preferences`** : `(profile_id, type)` PK · `in_app` · `email` · `push`.
 
