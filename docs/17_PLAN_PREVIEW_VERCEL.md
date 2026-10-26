@@ -12,7 +12,7 @@ Disposer d'un environnement HTTPS relié au **staging** `cglbsllwdmluvbisozyx` p
 ## 2. Projet Vercel (action Selim 🔐)
 | Réglage | Valeur proposée |
 |---|---|
-| Nom | `cpc-v2-web` (aucun des 7 noms V1 exclus par ADR-0016 : `cpc`, `cpc-v1kt`, `cpclanding`, `cpcp-ed8e`, `cpc-admin`, `cpc-admin-mmjb`, `cpc-web-beta`) |
+| Nom | `cpc-v2-web` (différent de tous les projets exclus par ADR-0016) |
 | Dépôt | `selimkh31-glitch/cpc-v2`, branche de production = **aucune promotion** en Phase 1 (Previews seulement) |
 | Framework / Node / gestionnaire | Next.js · Node 22 · pnpm (`pnpm install --frozen-lockfile`, `pnpm build`) |
 | Région des fonctions | `lhr1` (Londres, proche du staging eu-west-2) |
