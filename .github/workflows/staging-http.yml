@@ -39,9 +39,22 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Garde-fous (branche main, cible staging CPC V2)
+        shell: bash
         run: |
           test "$GITHUB_REF" = "refs/heads/main" || { echo "::error::Exécution autorisée uniquement depuis main"; exit 1; }
-          test "$STAGING_SUPABASE_URL" = "https://cglbsllwdmluvbisozyx.supabase.co" || { echo "::error::Cible non autorisée"; exit 1; }
+          # Normalisation (espaces, retours à la ligne, « / » final) puis diagnostic SANS afficher la valeur.
+          norm=$(printf '%s' "$STAGING_SUPABASE_URL" | tr -d '[:space:]' | sed 's#/*$##')
+          if [ "$norm" != "https://cglbsllwdmluvbisozyx.supabase.co" ]; then
+            if [ -z "$STAGING_SUPABASE_URL" ]; then why="secret absent ou vide (environnement staging-qa ?)";
+            elif printf '%s' "$norm" | grep -q 'cglbsllwdmluvbisozyx'; then why="référence correcte mais format inattendu (http, chemin…)";
+            else why="valeur différente du staging CPC V2"; fi
+            echo "::error title=Garde-fou cible::Cible non autorisée : $why"; exit 1
+          fi
+          [ "$norm" = "$STAGING_SUPABASE_URL" ] || echo "::notice title=Garde-fou cible::URL normalisée (espaces ou « / » final retirés)"
+          echo "STAGING_SUPABASE_URL=$norm" >> "$GITHUB_ENV"
+          for v in STAGING_PUBLISHABLE_KEY QA_A_EMAIL QA_A_PASSWORD QA_B_EMAIL QA_B_PASSWORD; do
+            [ -n "$(printf '%s' "${!v}" | tr -d '[:space:]')" ] || { echo "::error title=Secrets::$v absent ou vide"; exit 1; }
+          done
       - name: Tests HTTP (API uniquement, sans navigateur)
         run: pnpm exec playwright test --project staging-http --workers=1 --reporter=json > playwright-staging.json
       - if: always()

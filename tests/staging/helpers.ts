@@ -16,23 +16,24 @@ const env = (name: string) => {
 };
 
 export const url = () => {
-  const u = env("STAGING_SUPABASE_URL");
+  // Même normalisation que le garde-fou du workflow : espaces et « / » final retirés.
+  const u = env("STAGING_SUPABASE_URL").replace(/\s+/g, "").replace(/\/+$/, "");
   // Garde-fou : ces tests ne visent QUE le staging CPC V2.
   if (u !== STAGING_REF_URL) throw new Error(`Cible refusée : ${u} (seul le staging CPC V2 est autorisé).`);
   return u;
 };
-export const apikey = () => env("STAGING_PUBLISHABLE_KEY");
+export const apikey = () => env("STAGING_PUBLISHABLE_KEY").trim();
 
 export type QaUser = { email: string; token: string; userId: string; sessionId: string };
 
 /** Connexion par mot de passe (Auth REST) : jeton porteur du session_id réel. */
 export async function signIn(prefix: "QA_A" | "QA_B"): Promise<QaUser> {
-  const email = env(`${prefix}_EMAIL`);
+  const email = env(`${prefix}_EMAIL`).trim();
   expect(email.endsWith("@example.test"), "compte synthétique uniquement").toBe(true);
   const res = await fetch(`${url()}/auth/v1/token?grant_type=password`, {
     method: "POST",
     headers: { apikey: apikey(), "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password: env(`${prefix}_PASSWORD`) }),
+    body: JSON.stringify({ email, password: env(`${prefix}_PASSWORD`).trim() }),
   });
   expect(res.status, `connexion ${prefix}`).toBe(200);
   const body = (await res.json()) as { access_token: string; user: { id: string } };
