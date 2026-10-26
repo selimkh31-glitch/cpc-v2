@@ -16,12 +16,23 @@ function trackCspViolations(page: Page, sink: string[]) {
   });
 }
 
-/** Déclenche l'action sensible et attend la réponse du serveur (jamais l'état « pending » ni l'ancien résultat). */
-async function runSensitiveAction(page: Page): Promise<string> {
+/**
+ * Déclenche l'action sensible et renvoie l'issue réelle côté serveur, jamais l'ancien affichage :
+ * - « ok » / « refused » : réponse de sensitiveCheckAction ;
+ * - « login » : session révoquée détectée par getUser() → cookies effacés dans l'action → la page privée
+ *   est re-rendue et redirige vers /login (le span disparaît, d'où une lecture qui ne bloque jamais).
+ */
+async function runSensitiveAction(page: Page): Promise<"ok" | "refused" | "login"> {
   await page.getByRole("button", { name: "Action sensible" }).click();
   const result = page.getByTestId("sensitive-result");
-  await expect(result).toHaveText(/^(ok|refused)$/, { timeout: 15_000 });
-  return (await result.textContent()) ?? "";
+  const deadline = Date.now() + 15_000;
+  while (Date.now() < deadline) {
+    const text = await result.textContent({ timeout: 250 }).catch(() => null);
+    if (text === "ok" || text === "refused") return text;
+    if (new URL(page.url()).pathname === "/login") return "login";
+    await page.waitForTimeout(100);
+  }
+  throw new Error(`action sensible sans issue en 15 s (url=${page.url()})`);
 }
 
 /**
@@ -149,8 +160,13 @@ test.describe("ADR-0002 — spike d'authentification", () => {
       const expY = Number(await pageY.getByTestId("server-exp").textContent());
       await pageX.getByRole("button", { name: "Se déconnecter partout" }).click();
       await expect(pageX).toHaveURL(/\/login/);
-      // Le résultat affiché est réinitialisé à « pending » au clic : aucun faux constat sur l'ancien « ok ».
-      expect(await runSensitiveAction(pageY)).toBe("refused");
+      // Issue réelle du serveur (jamais l'ancien « ok ») : refus explicite, ou session purgée → /login.
+      const outcome = await runSensitiveAction(pageY);
+      test.info().annotations.push({ type: "A5b-issue", description: outcome });
+      expect(["refused", "login"], `refus immédiat attendu, obtenu « ${outcome} »`).toContain(outcome);
+      // Preuve stricte complémentaire : la page privée n'est plus accessible à Y.
+      await pageY.goto("/spike/session");
+      await expect(pageY).toHaveURL(/\/login\?next=(%2F|\/)spike(%2F|\/)session$/);
       // Preuve que le refus est immédiat : le JWT de Y n'avait pas encore expiré.
       expect(Date.now() / 1000, "JWT de Y encore valide au moment du refus").toBeLessThan(expY);
       await ctxX.close();
