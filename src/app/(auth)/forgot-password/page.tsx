@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { PendingButton } from "@/components/states/pending-button";
 import { requestPasswordResetAction } from "@/features/auth/actions";
 
 export default async function ForgotPasswordPage({ searchParams }: PageProps<"/forgot-password">) {
   const params = await searchParams;
   const t = await getTranslations("auth");
+  const tStates = await getTranslations("states");
   if (params.sent) {
     return (
       <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-3 px-4 py-10">
@@ -22,9 +24,9 @@ export default async function ForgotPasswordPage({ searchParams }: PageProps<"/f
           {t("email")}
           <input name="email" type="email" autoComplete="email" required className="min-h-11 rounded-card border px-3" />
         </label>
-        <button type="submit" className="min-h-11 rounded-card bg-foreground px-4 font-medium text-background">
+        <PendingButton pendingLabel={tStates("pending")} className="bg-foreground font-medium text-background">
           {t("submitForgot")}
-        </button>
+        </PendingButton>
       </form>
       <Link href="/login" className="inline-flex min-h-11 items-center text-sm underline">{t("goToLogin")}</Link>
     </main>

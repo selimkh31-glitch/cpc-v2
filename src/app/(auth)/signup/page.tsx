@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { PendingButton } from "@/components/states/pending-button";
 import { signUpAction } from "@/features/auth/actions";
 import { safeNextPath } from "@/lib/auth/redirect";
 
 export default async function SignupPage({ searchParams }: PageProps<"/signup">) {
   const params = await searchParams;
   const t = await getTranslations("auth");
+  const tStates = await getTranslations("states");
   const next = safeNextPath(params.next, "/home");
   if (params.sent) {
     return (
@@ -34,9 +36,9 @@ export default async function SignupPage({ searchParams }: PageProps<"/signup">)
           <input name="password" type="password" autoComplete="new-password" required minLength={10} className="min-h-11 rounded-card border px-3" />
           <span className="text-xs opacity-70">{t("passwordHint")}</span>
         </label>
-        <button type="submit" className="min-h-11 rounded-card bg-foreground px-4 font-medium text-background">
+        <PendingButton pendingLabel={tStates("pending")} className="bg-foreground font-medium text-background">
           {t("submitSignup")}
-        </button>
+        </PendingButton>
       </form>
       <Link href={`/login?next=${encodeURIComponent(next)}`} className="inline-flex min-h-11 items-center text-sm underline">
         {t("goToLogin")}

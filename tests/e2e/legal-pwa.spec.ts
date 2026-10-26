@@ -41,6 +41,9 @@ test.describe("S-1.11 — pages légales provisoires et PWA", () => {
     await expect(page.locator('link[rel="manifest"]')).toHaveCount(1);
     await expect(page.locator('link[rel="manifest"]')).toHaveAttribute("href", "/manifest.webmanifest");
     await expect(page.locator('link[rel="manifest"]')).toHaveAttribute("crossorigin", "use-credentials");
+    // QA iPhone A-4 : barre d'état opaque (texte lisible en thème clair comme sombre), plein écran conservé.
+    await expect(page.locator('meta[name="apple-mobile-web-app-status-bar-style"]')).toHaveAttribute("content", "default");
+    await expect(page.locator('meta[name="viewport"]')).toHaveAttribute("content", /viewport-fit=cover/);
     const registrations = await page.evaluate(async () => (navigator.serviceWorker ? (await navigator.serviceWorker.getRegistrations()).length : 0));
     expect(registrations, "D-08 non validé : aucun service worker").toBe(0);
   });
