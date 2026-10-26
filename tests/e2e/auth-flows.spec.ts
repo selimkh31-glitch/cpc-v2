@@ -29,7 +29,12 @@ test.describe("S-1.4 / S-1.5 — authentification et garde d'accès", () => {
     await page.goto("/login");
     await page.getByRole("link", { name: "Mot de passe oublié ?" }).click();
     await page.getByLabel("Adresse email").fill(user.email);
+    // L'action serveur attend l'envoi de l'email par Supabase avant de rediriger : délai variable en CI.
+    // On attend la redirection réelle (15 s) et on consigne la durée mesurée.
+    const t0 = Date.now();
     await page.getByRole("button", { name: "Recevoir un lien" }).click();
+    await expect(page).toHaveURL(/\/forgot-password\?sent=1$/, { timeout: 15_000 });
+    test.info().annotations.push({ type: "AUTH-01-délai-envoi", description: `${Date.now() - t0} ms` });
     await expect(page.getByRole("status")).toBeVisible();
 
     const link = await waitForEmailLink(user.email);
