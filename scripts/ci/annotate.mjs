@@ -56,6 +56,8 @@ const count = (s) => rows.filter((r) => r.status === s).length;
 const failed = rows.filter((r) => !["passed", "skipped", "flaky"].includes(r.status));
 const summary = `${kind} — ${count("passed")} réussis, ${failed.length} échoués, ${count("skipped")} ignorés, ${count("flaky")} instables (total ${rows.length})`;
 const icon = { passed: "✔", skipped: "⏭", flaky: "⚠" };
+// Chaque échec dans sa propre annotation : le résumé global peut être tronqué par GitHub (taille maximale).
+failed.slice(0, 20).forEach((r, i) => emit("error", `${kind} — échec ${i + 1}/${failed.length}`, [`✘ ${r.title}`.slice(0, 4000)]));
 emit(failed.length ? "error" : "notice", summary, rows.map((r) => `${icon[r.status] ?? "✘"} ${r.title}`));
 if (rows.length === 0) {
   emit("error", `${kind} — aucun test détecté`, ["Le rapport ne contient aucun test."]);
