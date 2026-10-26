@@ -1,0 +1,7 @@
+# Faux positifs gitleaks documentés — une ligne = une empreinte exacte (commit:fichier:règle:ligne).
+# Toute entrée doit être justifiée ici et validée en revue de PR.
+#
+# 4d4bb3e — tests/e2e/auth-flows.spec.ts:37 — mot de passe de TEST synthétique écrit en dur
+# (compte qa_*@example.test sur Supabase local de CI, jamais un secret réel). Remplacé dès le commit
+# suivant par une valeur générée à l'exécution ; l'entrée ne couvre que ce commit historique.
+4d4bb3efc82fec64b98f3c1518fb6333a6c990ff:tests/e2e/auth-flows.spec.ts:generic-api-key:37

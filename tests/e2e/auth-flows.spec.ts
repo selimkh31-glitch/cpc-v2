@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 import { createConfirmedUser, login, waitForEmailLink, PASSWORD } from "./helpers/supabase";
 
 /** S-1.4 / S-1.5 — parcours d'authentification définitifs et garde d'accès (Supabase local, CI). */
@@ -34,7 +35,8 @@ test.describe("S-1.4 / S-1.5 — authentification et garde d'accès", () => {
     const link = await waitForEmailLink(user.email);
     await page.goto(link);
     await expect(page).toHaveURL(/\/reset-password$/);
-    const newPassword = "NouveauMotDePasse2026";
+    // Généré à l'exécution (synthétique, lettres + chiffres) : aucun mot de passe littéral dans le dépôt.
+    const newPassword = `Qa${randomUUID().replace(/-/g, "").slice(0, 12)}9z`;
     await page.getByLabel("Nouveau mot de passe").fill(newPassword);
     await page.getByRole("button", { name: "Enregistrer" }).click();
     await expect(page).toHaveURL(/\/home$/);
