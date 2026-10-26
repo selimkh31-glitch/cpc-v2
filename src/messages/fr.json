@@ -7,7 +7,10 @@
   "home": {
     "title": "ClubPro Connect",
     "status": "Fondations en cours de construction.",
-    "notice": "Aucune fonctionnalité n'est encore disponible."
+    "notice": "Aucune fonctionnalité n'est encore disponible.",
+    "legalTerms": "Conditions d'utilisation",
+    "legalPrivacy": "Confidentialité",
+    "legalSupport": "Aide"
   },
   "auth": {
     "loginTitle": "Connexion",
@@ -111,6 +114,62 @@
     "statsTitle": "Statistiques EA",
     "statsUnavailable": "Compte EA non lié : aucune statistique disponible.",
     "settingsTitle": "Paramètres",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "avatarAlt": "Ton avatar",
+    "avatarTitle": "Avatar",
+    "avatarLabel": "Choisir une image",
+    "avatarHint": "PNG, JPEG ou WebP, 2 Mo maximum. Visible uniquement par les membres connectés.",
+    "avatarSubmit": "Envoyer l'avatar",
+    "avatarRemove": "Retirer l'avatar",
+    "presentationTitle": "Présentation",
+    "bioLabel": "Ta présentation",
+    "bioHint": "280 caractères maximum.",
+    "save": "Enregistrer",
+    "eaTitle": "Identifiant EA",
+    "eaLabel": "Gamertag EA",
+    "eaHint": "Déclaratif : il n'est pas vérifié par CPC.",
+    "saved": {
+      "presentation": "Présentation enregistrée.",
+      "gamertag": "Identifiant EA enregistré.",
+      "avatar": "Avatar mis à jour.",
+      "avatar_removed": "Avatar retiré."
+    },
+    "errors": {
+      "presentation": "Présentation invalide : 280 caractères maximum.",
+      "gamertag": "Identifiant EA invalide : 32 caractères maximum.",
+      "avatar_missing": "Choisis une image.",
+      "avatar_size": "Image trop lourde : 2 Mo maximum.",
+      "avatar_type": "Format refusé : PNG, JPEG ou WebP uniquement.",
+      "avatar_upload": "L'avatar n'a pas pu être enregistré. Réessaie.",
+      "avatar_remove": "L'avatar n'a pas pu être retiré. Réessaie."
+    }
+  },
+  "states": {
+    "loading": "Chargement…",
+    "offline": "Hors ligne : les actions seront possibles dès le retour du réseau. Ta saisie est conservée.",
+    "errorTitle": "Impossible d'afficher cette page",
+    "errorBody": "Vérifie ta connexion puis réessaie. Rien n'a été enregistré à ta place.",
+    "retry": "Réessayer",
+    "notFoundTitle": "Page introuvable",
+    "notFoundBody": "Cette page n'existe pas ou n'est plus disponible.",
+    "backHome": "Retour à l'accueil",
+    "pending": "Envoi en cours…"
+  },
+  "legal": {
+    "draftBadge": "Provisoire",
+    "draftNotice": "Document en cours de rédaction, sans valeur contractuelle. L'entité éditrice du service n'est pas encore désignée ; le texte définitif sera publié avant toute ouverture au public.",
+    "navLabel": "Autres documents",
+    "terms": {
+      "title": "Conditions générales d'utilisation",
+      "purpose": "Cette page accueillera les règles d'utilisation de ClubPro Connect."
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "purpose": "Cette page décrira les données traitées, leurs finalités, leur durée de conservation et tes droits."
+    },
+    "support": {
+      "title": "Aide et contact",
+      "purpose": "Cette page indiquera comment obtenir de l'aide ou signaler un problème."
+    }
   }
 }

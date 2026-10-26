@@ -39,3 +39,23 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* S-1.10 — accessibilité (cahier UX §12, WCAG 2.1 AA). */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Écrans tactiles : champs à 16 px minimum (évite le zoom automatique d'iOS, lisibilité). */
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+}
+
+/* Lien d'évitement et contenus réservés aux lecteurs d'écran restent atteignables au clavier. */
+.sr-only:focus-visible {
+  outline-offset: 0;
+}
