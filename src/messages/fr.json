@@ -112,5 +112,16 @@
     "statsUnavailable": "Compte EA non lié : aucune statistique disponible.",
     "settingsTitle": "Paramètres",
     "signOut": "Se déconnecter"
+  },
+  "states": {
+    "loading": "Chargement…",
+    "offline": "Hors ligne : les actions seront possibles dès le retour du réseau. Ta saisie est conservée.",
+    "errorTitle": "Impossible d'afficher cette page",
+    "errorBody": "Vérifie ta connexion puis réessaie. Rien n'a été enregistré à ta place.",
+    "retry": "Réessayer",
+    "notFoundTitle": "Page introuvable",
+    "notFoundBody": "Cette page n'existe pas ou n'est plus disponible.",
+    "backHome": "Retour à l'accueil",
+    "pending": "Envoi en cours…"
   }
 }

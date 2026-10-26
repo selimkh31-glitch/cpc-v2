@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PendingButton } from "@/components/states/pending-button";
 import { signOutAction } from "@/features/auth/actions";
 import { getOwnProfile } from "@/features/profiles/queries";
 import { requireOnboardedUser } from "@/lib/auth/session";
@@ -12,6 +13,7 @@ export default async function ProfilePage() {
   const profile = await getOwnProfile(user.userId);
   const t = await getTranslations("profile");
   const tRef = await getTranslations("onboarding");
+  const tStates = await getTranslations("states");
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-4 py-6">
@@ -42,7 +44,7 @@ export default async function ProfilePage() {
         <h2 id="profile-settings" className="font-medium">{t("settingsTitle")}</h2>
         <form action={signOutAction}>
           <input type="hidden" name="scope" value="local" />
-          <button type="submit" className="min-h-11 rounded-card border px-4">{t("signOut")}</button>
+          <PendingButton pendingLabel={tStates("pending")} className="border">{t("signOut")}</PendingButton>
         </form>
       </section>
     </main>
