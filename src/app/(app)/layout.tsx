@@ -1,11 +1,15 @@
+import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { AppHeader } from "@/components/layout/app-header";
 import { TabBar } from "@/components/layout/tab-bar";
+import { REQUEST_PATH_HEADER, safeNextPath } from "@/lib/auth/redirect";
 import { requireOnboardedUser } from "@/lib/auth/session";
 
 /** Shell authentifié (ADR-0005, S-1.7) : en-tête + contenu + trois onglets. Garde serveur. */
 export default async function AppLayout({ children }: LayoutProps<"/">) {
-  await requireOnboardedUser("/home");
+  // Retour au contexte (AUTH-05) : chemin demandé, assaini (anti open redirect).
+  const requested = safeNextPath((await headers()).get(REQUEST_PATH_HEADER));
+  await requireOnboardedUser(requested);
   const t = await getTranslations("nav");
   return (
     <>
