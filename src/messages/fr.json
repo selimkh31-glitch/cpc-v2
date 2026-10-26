@@ -111,7 +111,35 @@
     "statsTitle": "Statistiques EA",
     "statsUnavailable": "Compte EA non lié : aucune statistique disponible.",
     "settingsTitle": "Paramètres",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "avatarAlt": "Ton avatar",
+    "avatarTitle": "Avatar",
+    "avatarLabel": "Choisir une image",
+    "avatarHint": "PNG, JPEG ou WebP, 2 Mo maximum. Visible uniquement par les membres connectés.",
+    "avatarSubmit": "Envoyer l'avatar",
+    "avatarRemove": "Retirer l'avatar",
+    "presentationTitle": "Présentation",
+    "bioLabel": "Ta présentation",
+    "bioHint": "280 caractères maximum.",
+    "save": "Enregistrer",
+    "eaTitle": "Identifiant EA",
+    "eaLabel": "Gamertag EA",
+    "eaHint": "Déclaratif : il n'est pas vérifié par CPC.",
+    "saved": {
+      "presentation": "Présentation enregistrée.",
+      "gamertag": "Identifiant EA enregistré.",
+      "avatar": "Avatar mis à jour.",
+      "avatar_removed": "Avatar retiré."
+    },
+    "errors": {
+      "presentation": "Présentation invalide : 280 caractères maximum.",
+      "gamertag": "Identifiant EA invalide : 32 caractères maximum.",
+      "avatar_missing": "Choisis une image.",
+      "avatar_size": "Image trop lourde : 2 Mo maximum.",
+      "avatar_type": "Format refusé : PNG, JPEG ou WebP uniquement.",
+      "avatar_upload": "L'avatar n'a pas pu être enregistré. Réessaie.",
+      "avatar_remove": "L'avatar n'a pas pu être retiré. Réessaie."
+    }
   },
   "states": {
     "loading": "Chargement…",
