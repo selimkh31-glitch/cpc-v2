@@ -78,3 +78,20 @@ export async function waitForEmailLink(to: string, timeoutMs = 30_000): Promise<
 export async function authCookies(page: Page) {
   return (await page.context().cookies()).filter((c) => /^sb-.*-auth-token/.test(c.name));
 }
+
+/** Utilisateur confirmé ET onboardé (profil + paramètres insérés via l'API REST locale avec la clé de démo service). */
+export async function createOnboardedUser() {
+  const user = await createConfirmedUser();
+  const key = env("E2E_SUPABASE_SERVICE_KEY");
+  const headers = { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "return=minimal" };
+  const handle = `qa_${randomUUID().replace(/-/g, "").slice(0, 10)}`;
+  const p = await fetch(`${SUPABASE_URL()}/rest/v1/profiles`, {
+    method: "POST", headers, body: JSON.stringify({ id: user.id, handle, platform: "pc", main_position: "ST" }),
+  });
+  expect(p.ok, `profil qa : HTTP ${p.status} ${await p.text()}`).toBeTruthy();
+  const s = await fetch(`${SUPABASE_URL()}/rest/v1/account_settings`, {
+    method: "POST", headers, body: JSON.stringify({ profile_id: user.id, age_confirmed_at: new Date().toISOString(), age_threshold: 18 }),
+  });
+  expect(s.ok, `paramètres qa : HTTP ${s.status} ${await s.text()}`).toBeTruthy();
+  return { ...user, handle };
+}
