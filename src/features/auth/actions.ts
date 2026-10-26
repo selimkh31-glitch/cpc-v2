@@ -51,11 +51,15 @@ export async function signOutAction(formData: FormData) {
 }
 
 /**
- * Action « sensible » du spike (A5) : getUser() interroge le serveur Auth et détecte
- * une session révoquée ailleurs, contrairement à getClaims() (vérification locale du JWT).
+ * Action « sensible » du spike (A5) — D-40 :
+ * 1. getUser() : utilisateur existant et non banni (ne détecte PAS une session révoquée avant l'exp du JWT) ;
+ * 2. api.assert_session_active() : la session du JWT existe encore dans auth.sessions → refus immédiat
+ *    après une déconnexion globale, même si le JWT n'a pas expiré.
  */
 export async function sensitiveCheckAction(): Promise<"ok" | "refused"> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.getUser();
-  return !error && data.user ? "ok" : "refused";
+  if (error || !data.user) return "refused";
+  const { data: active, error: rpcError } = await supabase.schema("api").rpc("assert_session_active");
+  return !rpcError && active === true ? "ok" : "refused";
 }

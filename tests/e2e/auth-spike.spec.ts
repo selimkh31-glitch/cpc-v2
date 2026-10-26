@@ -17,6 +17,25 @@ function trackCspViolations(page: Page, sink: string[]) {
 }
 
 /**
+ * Déclenche l'action sensible et renvoie l'issue réelle côté serveur, jamais l'ancien affichage :
+ * - « ok » / « refused » : réponse de sensitiveCheckAction ;
+ * - « login » : session révoquée détectée par getUser() → cookies effacés dans l'action → la page privée
+ *   est re-rendue et redirige vers /login (le span disparaît, d'où une lecture qui ne bloque jamais).
+ */
+async function runSensitiveAction(page: Page): Promise<"ok" | "refused" | "login"> {
+  await page.getByRole("button", { name: "Action sensible" }).click();
+  const result = page.getByTestId("sensitive-result");
+  const deadline = Date.now() + 15_000;
+  while (Date.now() < deadline) {
+    const text = await result.textContent({ timeout: 250 }).catch(() => null);
+    if (text === "ok" || text === "refused") return text;
+    if (new URL(page.url()).pathname === "/login") return "login";
+    await page.waitForTimeout(100);
+  }
+  throw new Error(`action sensible sans issue en 15 s (url=${page.url()})`);
+}
+
+/**
  * Spike S-1.4a — ADR-0002 scénarios A1–A8 (Supabase local, CI).
  * En CI : jwt_expiry = 120 s (config locale modifiée dans le job uniquement).
  */
@@ -93,19 +112,14 @@ test.describe("ADR-0002 — spike d'authentification", () => {
     const expY = Number(await pageY.getByTestId("server-exp").textContent());
     expect(Number.isFinite(expY), "exp du JWT lisible").toBe(true);
 
-    await pageY.getByRole("button", { name: "Action sensible" }).click();
-    await expect(pageY.getByTestId("sensitive-result")).toHaveText("ok");
+    expect(await runSensitiveAction(pageY)).toBe("ok");
 
     await pageX.getByRole("button", { name: "Se déconnecter partout" }).click();
     await expect(pageX).toHaveURL(/\/login/);
 
-    // Constat (non bloquant, voir A5b) : résultat immédiat tant que le JWT de Y est valide.
-    await pageY.getByRole("button", { name: "Action sensible" }).click();
-    await expect(pageY.getByTestId("sensitive-result")).toHaveText(/^(ok|refused)$/);
-    test.info().annotations.push({
-      type: "A5-immédiat",
-      description: `résultat immédiat après révocation globale : ${await pageY.getByTestId("sensitive-result").textContent()}`,
-    });
+    // Constat (le refus immédiat est exigé par A5b) : résultat réel du serveur, jamais l'ancien affichage.
+    const immediate = await runSensitiveAction(pageY);
+    test.info().annotations.push({ type: "A5-immédiat", description: `résultat immédiat après révocation globale : ${immediate}` });
 
     // Garantie de la plateforme : le refresh token est révoqué ; à l'expiration du JWT, plus aucun accès.
     await pageY.waitForTimeout(Math.max(expY * 1000 - Date.now() + 5_000, 0));
@@ -129,12 +143,11 @@ test.describe("ADR-0002 — spike d'authentification", () => {
     await ctxY.close();
   });
 
-  test.fixme(
-    "A5b — révocation IMMÉDIATE d'une session déconnectée ailleurs (intention ADR-0002, décision D-40 en attente)",
+  test(
+    "A5b — révocation IMMÉDIATE pour les actions sensibles (D-40 : contrôle de session active côté base)",
     async ({ browser }) => {
       // Supabase : « Access Tokens of revoked sessions remain valid until their expiry time ».
-      // Constat CI (run 40238344611) : getUser() renvoie encore l'utilisateur 6 fois sur 8 juste après signOut global.
-      // À réactiver quand D-40 sera tranchée (ex. contrôle de session active côté base pour les actions sensibles).
+      // D-40 : l'action sensible appelle api.assert_session_active() → refus immédiat malgré un JWT encore valide.
       const user = await createConfirmedUser();
       const ctxX = await browser.newContext();
       const ctxY = await browser.newContext();
@@ -142,10 +155,20 @@ test.describe("ADR-0002 — spike d'authentification", () => {
       const pageY = await ctxY.newPage();
       await login(pageX, user.email);
       await login(pageY, user.email);
+      // Garde-fou contre un faux succès : tant que la session est active, l'action sensible passe.
+      expect(await runSensitiveAction(pageY)).toBe("ok");
+      const expY = Number(await pageY.getByTestId("server-exp").textContent());
       await pageX.getByRole("button", { name: "Se déconnecter partout" }).click();
       await expect(pageX).toHaveURL(/\/login/);
-      await pageY.getByRole("button", { name: "Action sensible" }).click();
-      await expect(pageY.getByTestId("sensitive-result")).toHaveText("refused");
+      // Issue réelle du serveur (jamais l'ancien « ok ») : refus explicite, ou session purgée → /login.
+      const outcome = await runSensitiveAction(pageY);
+      test.info().annotations.push({ type: "A5b-issue", description: outcome });
+      expect(["refused", "login"], `refus immédiat attendu, obtenu « ${outcome} »`).toContain(outcome);
+      // Preuve stricte complémentaire : la page privée n'est plus accessible à Y.
+      await pageY.goto("/spike/session");
+      await expect(pageY).toHaveURL(/\/login\?next=(%2F|\/)spike(%2F|\/)session$/);
+      // Preuve que le refus est immédiat : le JWT de Y n'avait pas encore expiré.
+      expect(Date.now() / 1000, "JWT de Y encore valide au moment du refus").toBeLessThan(expY);
       await ctxX.close();
       await ctxY.close();
     },
