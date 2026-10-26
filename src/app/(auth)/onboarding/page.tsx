@@ -25,11 +25,11 @@ export default async function OnboardingPage({ searchParams }: PageProps<"/onboa
       ) : null}
       <form action={completeOnboardingAction} className="flex flex-col gap-5">
         <input type="hidden" name="requestId" value={requestId} />
-        <label className="flex flex-col gap-1 text-sm">
-          {t("handle")}
-          <input name="handle" required minLength={3} maxLength={20} pattern="[a-zA-Z0-9_.\-]{3,20}" autoComplete="nickname" className="min-h-11 rounded-card border px-3" />
-          <span className="text-xs opacity-70">{t("handleHint")}</span>
-        </label>
+        <div className="flex flex-col gap-1 text-sm">
+          <label htmlFor="handle">{t("handle")}</label>
+          <input id="handle" name="handle" required minLength={3} maxLength={20} pattern="[a-zA-Z0-9_.\-]{3,20}" autoComplete="nickname" aria-describedby="handle-hint" className="min-h-11 rounded-card border px-3" />
+          <span id="handle-hint" className="text-xs opacity-70">{t("handleHint")}</span>
+        </div>
         <fieldset className="flex flex-col gap-2 text-sm">
           <legend className="mb-1">{t("platform")}</legend>
           {PLATFORMS.map((p) => (
