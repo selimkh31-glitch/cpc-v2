@@ -2,7 +2,7 @@
 -- Valables dès maintenant (base vide) et pour toutes les migrations futures.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(9);
+select plan(11);
 
 -- P2 : toute table des schémas exposés a la RLS activée.
 select is(
@@ -61,9 +61,13 @@ select is(
 );
 
 -- P1 : anon n'a aucun privilège sur les tables de public.
+-- Évalué avec has_table_privilege (privilèges effectifs) : information_schema ne montre que les droits
+-- visibles par le rôle courant, et ne prouverait rien rejoué sur le staging par un rôle non superutilisateur.
 select is(
-  (select count(*)::int from information_schema.role_table_grants
-    where grantee = 'anon' and table_schema = 'public'),
+  (select count(*)::int
+     from pg_class c join pg_namespace n on n.oid = c.relnamespace,
+          unnest(array['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER']) priv
+    where n.nspname = 'public' and c.relkind in ('r', 'p', 'v', 'm') and has_table_privilege('anon', c.oid, priv)),
   0,
   'P1 — anon n''a aucun privilège sur les tables de public'
 );
@@ -76,11 +80,29 @@ select ok(
 
 -- P2 : authenticated n'a ni INSERT ni DELETE ni TRUNCATE sur les tables de public (écritures par commandes).
 select is(
-  (select count(*)::int from information_schema.role_table_grants
-    where grantee = 'authenticated' and table_schema = 'public'
-      and privilege_type in ('INSERT', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER')),
+  (select count(*)::int
+     from pg_class c join pg_namespace n on n.oid = c.relnamespace,
+          unnest(array['INSERT', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER']) priv
+    where n.nspname = 'public' and c.relkind in ('r', 'p') and has_table_privilege('authenticated', c.oid, priv)),
   0,
   'P2 — aucune écriture INSERT/DELETE/TRUNCATE directe pour authenticated dans public'
+);
+
+-- R2 : aucune fonction de api / private exécutable par PUBLIC (donc par tout rôle sans GRANT explicite).
+select is(
+  (select count(*)::int
+     from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname in ('api', 'private') and has_function_privilege('public', p.oid, 'EXECUTE')),
+  0,
+  'R2 — aucune fonction api/private exécutable par PUBLIC'
+);
+
+-- R2 : une fonction créée sans GRANT dans api n'est exécutable ni par authenticated ni par anon (droits par défaut).
+create function api.qa_default_privileges_probe() returns int language sql as $$ select 1 $$;
+select ok(
+  not has_function_privilege('authenticated', 'api.qa_default_privileges_probe()', 'EXECUTE')
+  and not has_function_privilege('anon', 'api.qa_default_privileges_probe()', 'EXECUTE'),
+  'R2 — nouvelle fonction api fermée par défaut (aucun EXECUTE implicite)'
 );
 
 select * from finish();
