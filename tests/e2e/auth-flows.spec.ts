@@ -91,4 +91,69 @@ test.describe("S-1.4 / S-1.5 — authentification et garde d'accès", () => {
     await page.goto("/login");
     await expect(page.getByRole("button", { name: /google/i })).toHaveCount(0);
   });
+
+  test("QA iPhone A-5 — / redirige selon la session : anonyme → /login, connecté → /home", async ({ page }) => {
+    await page.goto("/");
+    await expect(page).toHaveURL(/\/login$/);
+    const user = await createOnboardedUser();
+    await login(page, user.email);
+    await page.goto("/");
+    await expect(page).toHaveURL(/\/home$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Accueil");
+  });
+
+  test("QA iPhone A-3 — connexion : un seul envoi malgré le double appui et la touche Entrée", async ({ page }) => {
+    const user = await createOnboardedUser();
+    await page.goto("/login?next=/home");
+    await page.getByLabel("Adresse email").fill(user.email);
+    await page.getByLabel("Mot de passe").fill(PASSWORD);
+
+    // Actions serveur envoyées (POST portant l'en-tête Next-Action).
+    const actions: string[] = [];
+    page.on("request", (r) => {
+      if (r.method() === "POST" && r.headers()["next-action"]) actions.push(r.url());
+    });
+    // Réseau mobile lent simulé : la réponse de l'action est retardée, la fenêtre de double envoi est ouverte.
+    await page.route(/\/login/, async (route) => {
+      if (route.request().method() === "POST") await new Promise((resolve) => setTimeout(resolve, 1500));
+      await route.continue();
+    });
+
+    // Deux appuis rapprochés (cas observé sur iPhone : 14 connexions en 9 s).
+    await page.getByRole("button", { name: "Se connecter" }).dblclick();
+    const pending = page.getByRole("button", { name: "Envoi en cours…" });
+    await expect(pending).toBeDisabled();
+    await expect(pending).toHaveAttribute("aria-busy", "true");
+    // Entrée dans le champ : la soumission implicite ne doit pas repartir pendant l'envoi.
+    await page.getByLabel("Mot de passe").press("Enter");
+
+    await expect(page).toHaveURL(/\/home$/);
+    expect(actions, "une seule action de connexion envoyée").toHaveLength(1);
+  });
+
+  test("QA iPhone A-3 — inscription et mot de passe oublié : bouton verrouillé pendant l'envoi", async ({ page }) => {
+    const actions: string[] = [];
+    page.on("request", (r) => {
+      if (r.method() === "POST" && r.headers()["next-action"]) actions.push(new URL(r.url()).pathname);
+    });
+    await page.route(/\/(signup|forgot-password)/, async (route) => {
+      if (route.request().method() === "POST") await new Promise((resolve) => setTimeout(resolve, 1500));
+      await route.continue();
+    });
+
+    await page.goto("/signup");
+    await page.getByLabel("Adresse email").fill(`qa_${randomUUID().slice(0, 8)}@example.test`);
+    await page.getByLabel("Mot de passe").fill(`Qa${randomUUID().replace(/-/g, "").slice(0, 12)}9z`);
+    await page.getByRole("button", { name: "Créer mon compte" }).dblclick();
+    await expect(page.getByRole("button", { name: "Envoi en cours…" })).toBeDisabled();
+    await expect(page).toHaveURL(/\/signup\?sent=1/);
+
+    await page.goto("/forgot-password");
+    await page.getByLabel("Adresse email").fill(`qa_${randomUUID().slice(0, 8)}@example.test`);
+    await page.getByRole("button", { name: "Recevoir un lien" }).dblclick();
+    await expect(page.getByRole("button", { name: "Envoi en cours…" })).toBeDisabled();
+    await expect(page).toHaveURL(/\/forgot-password\?sent=1$/);
+
+    expect(actions, "une action par formulaire").toEqual(["/signup", "/forgot-password"]);
+  });
 });

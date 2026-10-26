@@ -2,16 +2,25 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 test.describe("Smoke — socle", () => {
-  test("la page d'accueil se charge en français avec une CSP à nonce", async ({ page }) => {
+  test("QA A-5 — anonyme sur / : redirection vers la connexion (ADR-0005, plus de page provisoire)", async ({ page }) => {
+    await page.goto("/");
+    await expect(page).toHaveURL(/\/login$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Connexion");
+    await expect(page.getByText("Fondations en cours de construction")).toHaveCount(0);
+    // Les documents légaux restent accessibles sans compte depuis la page de connexion.
+    await expect(page.getByRole("navigation", { name: "Informations légales" }).getByRole("link")).toHaveCount(3);
+  });
+
+  test("la page de connexion se charge en français avec une CSP à nonce", async ({ page }) => {
     const violations: string[] = [];
     page.on("console", (msg) => {
       if (msg.type() === "error" && /Content Security Policy|CSP/i.test(msg.text())) violations.push(msg.text());
     });
 
-    const response = await page.goto("/");
+    const response = await page.goto("/login");
     expect(response?.status()).toBe(200);
     await expect(page.locator("html")).toHaveAttribute("lang", "fr");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("ClubPro Connect");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Connexion");
 
     const headers = response!.headers();
     const csp = headers["content-security-policy"] ?? "";
@@ -28,14 +37,14 @@ test.describe("Smoke — socle", () => {
 
   test("deux requêtes successives reçoivent des nonces différents", async ({ request }) => {
     const nonceOf = async () =>
-      ((await request.get("/")).headers()["content-security-policy"] ?? "").match(/'nonce-([^']+)'/)?.[1];
+      ((await request.get("/login")).headers()["content-security-policy"] ?? "").match(/'nonce-([^']+)'/)?.[1];
     const [a, b] = [await nonceOf(), await nonceOf()];
     expect(a).toBeTruthy();
     expect(a).not.toBe(b);
   });
 
   test("aucune violation d'accessibilité critique ou sérieuse", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/login");
     const results = await new AxeBuilder({ page }).analyze();
     const blocking = results.violations.filter((v) => v.impact === "critical" || v.impact === "serious");
     expect(blocking.map((v) => v.id)).toEqual([]);

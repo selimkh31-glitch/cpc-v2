@@ -8,7 +8,7 @@ test("sans Sentry configuré : aucune requête d'observabilité ni erreur consol
   page.on("console", (m) => {
     if (m.type() === "error") consoleErrors.push(m.text());
   });
-  await page.goto("/");
+  await page.goto("/"); // redirige vers /login (QA A-5)
   await page.goto("/login");
   await page.waitForLoadState("networkidle");
   expect(requests.filter((u) => /sentry|ingest/i.test(u)), "aucun appel Sentry").toEqual([]);

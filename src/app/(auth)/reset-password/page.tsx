@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PendingButton } from "@/components/states/pending-button";
 import { requireUser } from "@/lib/auth/session";
 import { updatePasswordAction } from "@/features/auth/actions";
 
@@ -7,6 +8,7 @@ export default async function ResetPasswordPage({ searchParams }: PageProps<"/re
   await requireUser("/reset-password");
   const params = await searchParams;
   const t = await getTranslations("auth");
+  const tStates = await getTranslations("states");
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-4 px-4 py-10">
       <h1 className="text-2xl font-semibold">{t("resetTitle")}</h1>
@@ -19,9 +21,9 @@ export default async function ResetPasswordPage({ searchParams }: PageProps<"/re
           <input name="password" type="password" autoComplete="new-password" required minLength={10} className="min-h-11 rounded-card border px-3" />
           <span className="text-xs opacity-70">{t("passwordHint")}</span>
         </label>
-        <button type="submit" className="min-h-11 rounded-card bg-foreground px-4 font-medium text-background">
+        <PendingButton pendingLabel={tStates("pending")} className="bg-foreground font-medium text-background">
           {t("submitReset")}
-        </button>
+        </PendingButton>
       </form>
     </main>
   );

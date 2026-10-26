@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { PendingButton } from "@/components/states/pending-button";
 import { signInAction } from "@/features/auth/actions";
 import { safeNextPath } from "@/lib/auth/redirect";
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const params = await searchParams;
   const t = await getTranslations("auth");
+  const tStates = await getTranslations("states");
   const next = safeNextPath(params.next, "/home");
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-4 px-4 py-10">
@@ -25,9 +27,9 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           {t("password")}
           <input name="password" type="password" autoComplete="current-password" required minLength={10} className="min-h-11 rounded-card border px-3" />
         </label>
-        <button type="submit" className="min-h-11 rounded-card bg-foreground px-4 font-medium text-background">
+        <PendingButton pendingLabel={tStates("pending")} className="bg-foreground font-medium text-background">
           {t("submitLogin")}
-        </button>
+        </PendingButton>
       </form>
       <Link href="/forgot-password" className="inline-flex min-h-11 items-center text-sm underline">
         {t("goToForgot")}
@@ -35,6 +37,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
       <Link href={`/signup?next=${encodeURIComponent(next)}`} className="inline-flex min-h-11 items-center text-sm underline">
         {t("goToSignup")}
       </Link>
+      {/* Accès sans compte aux documents légaux (auparavant sur la page provisoire `/`). */}
+      <nav aria-label={t("legalNav")} className="mt-6 flex flex-wrap gap-x-4 text-sm">
+        <Link href="/legal/terms" className="inline-flex min-h-11 items-center underline">{t("legalTerms")}</Link>
+        <Link href="/legal/privacy" className="inline-flex min-h-11 items-center underline">{t("legalPrivacy")}</Link>
+        <Link href="/legal/support" className="inline-flex min-h-11 items-center underline">{t("legalSupport")}</Link>
+      </nav>
     </main>
   );
 }

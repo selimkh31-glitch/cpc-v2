@@ -10,7 +10,9 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t("name"),
     description: t("description"),
     applicationName: t("name"),
-    appleWebApp: { capable: true, title: t("shortName"), statusBarStyle: "black-translucent" },
+    // QA iPhone A-4 : « black-translucent » affiche l'heure et la batterie en blanc, illisibles sur
+    // l'en-tête blanc du thème clair. « default » : barre d'état opaque, contraste géré par iOS.
+    appleWebApp: { capable: true, title: t("shortName"), statusBarStyle: "default" },
     icons: { apple: "/icons/apple-touch-icon.png" },
   };
 }
@@ -18,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  // iPhone (PWA plein écran, barre d'état translucide) : le contenu s'étend sous les encoches ;
+  // iPhone (PWA plein écran) : viewport-fit=cover étend la page sous la barre d'accueil et, en paysage, sous l'encoche ;
   // l'en-tête et la barre d'onglets compensent avec env(safe-area-inset-*).
   viewportFit: "cover",
   themeColor: [
