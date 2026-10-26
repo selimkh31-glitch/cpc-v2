@@ -95,3 +95,28 @@ export async function createOnboardedUser() {
   expect(s.ok, `paramètres qa : HTTP ${s.status} ${await s.text()}`).toBeTruthy();
   return { ...user, handle };
 }
+
+/** Jeton d'accès d'un utilisateur qa (grant mot de passe, clé publishable locale). */
+export async function userAccessToken(email: string, password = PASSWORD): Promise<string> {
+  const res = await fetch(`${SUPABASE_URL()}/auth/v1/token?grant_type=password`, {
+    method: "POST",
+    headers: { apikey: env("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"), "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  expect(res.ok, `jeton qa : HTTP ${res.status}`).toBeTruthy();
+  return ((await res.json()) as { access_token: string }).access_token;
+}
+
+/** Appel Storage REST avec le JWT d'un utilisateur (jamais la clé secrète). */
+export async function storageAsUser(token: string, path: string, init: RequestInit = {}) {
+  return fetch(`${SUPABASE_URL()}/storage/v1${path}`, {
+    ...init,
+    headers: { apikey: env("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"), Authorization: `Bearer ${token}`, ...(init.headers ?? {}) },
+  });
+}
+
+/** Image PNG 1×1 valide (synthétique). */
+export const TINY_PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+  "base64",
+);

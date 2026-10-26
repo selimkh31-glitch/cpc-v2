@@ -6,7 +6,13 @@ import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("app");
-  return { title: t("name"), description: t("description") };
+  return {
+    title: t("name"),
+    description: t("description"),
+    applicationName: t("name"),
+    appleWebApp: { capable: true, title: t("shortName"), statusBarStyle: "black-translucent" },
+    icons: { apple: "/icons/apple-touch-icon.png" },
+  };
 }
 
 export const viewport: Viewport = {

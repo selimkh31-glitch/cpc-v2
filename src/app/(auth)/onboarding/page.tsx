@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { hasProfile, requireUser } from "@/lib/auth/session";
+import { PendingButton } from "@/components/states/pending-button";
 import { completeOnboardingAction } from "@/features/onboarding/actions";
 import { AGE_MIN, PLATFORMS, POSITIONS } from "@/features/onboarding/referentials";
 
@@ -12,6 +13,7 @@ export default async function OnboardingPage({ searchParams }: PageProps<"/onboa
   if (await hasProfile(user.userId)) redirect("/home");
   const params = await searchParams;
   const t = await getTranslations("onboarding");
+  const tStates = await getTranslations("states");
   const errorKey = typeof params.error === "string" && ERRORS.has(params.error) ? params.error : null;
   // Clé d'idempotence générée au rendu : une double soumission du même formulaire n'écrit qu'une fois.
   const requestId = crypto.randomUUID();
@@ -61,7 +63,7 @@ export default async function OnboardingPage({ searchParams }: PageProps<"/onboa
           <input type="checkbox" name="ageConfirmed" required className="size-5" />
           {t("ageConfirm", { age: AGE_MIN })}
         </label>
-        <button type="submit" className="min-h-11 rounded-card bg-foreground px-4 font-medium text-background">{t("submit")}</button>
+        <PendingButton pendingLabel={tStates("pending")} className="bg-foreground font-medium text-background">{t("submit")}</PendingButton>
       </form>
     </main>
   );
