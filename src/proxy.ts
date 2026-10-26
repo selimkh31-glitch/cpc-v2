@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { buildCsp, generateNonce } from "@/lib/security/csp";
+import { REQUEST_PATH_HEADER } from "@/lib/auth/redirect";
 import { refreshSession } from "@/lib/supabase/proxy";
 
 /**
@@ -22,6 +23,9 @@ export async function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
   requestHeaders.set("Content-Security-Policy", csp);
+  // Chemin demandé, pour le retour au contexte après connexion (AUTH-05) depuis les layouts,
+  // qui n'ont pas accès à l'URL. Toujours écrasé ici : une valeur envoyée par le client est ignorée.
+  requestHeaders.set(REQUEST_PATH_HEADER, request.nextUrl.pathname + request.nextUrl.search);
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   for (const { name, value, options } of auth.cookies) response.cookies.set(name, value, options);

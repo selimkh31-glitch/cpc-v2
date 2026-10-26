@@ -29,10 +29,10 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           {t("submitLogin")}
         </button>
       </form>
-      <Link href="/forgot-password" className="text-sm underline">
+      <Link href="/forgot-password" className="inline-flex min-h-11 items-center text-sm underline">
         {t("goToForgot")}
       </Link>
-      <Link href={`/signup?next=${encodeURIComponent(next)}`} className="text-sm underline">
+      <Link href={`/signup?next=${encodeURIComponent(next)}`} className="inline-flex min-h-11 items-center text-sm underline">
         {t("goToSignup")}
       </Link>
     </main>
