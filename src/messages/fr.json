@@ -7,7 +7,10 @@
   "home": {
     "title": "ClubPro Connect",
     "status": "Fondations en cours de construction.",
-    "notice": "Aucune fonctionnalité n'est encore disponible."
+    "notice": "Aucune fonctionnalité n'est encore disponible.",
+    "legalTerms": "Conditions d'utilisation",
+    "legalPrivacy": "Confidentialité",
+    "legalSupport": "Aide"
   },
   "auth": {
     "loginTitle": "Connexion",
@@ -85,6 +88,23 @@
       "LW": "LW — Ailier gauche",
       "CF": "CF — Attaquant en retrait",
       "ST": "ST — Avant-centre"
+    }
+  },
+  "legal": {
+    "draftBadge": "Provisoire",
+    "draftNotice": "Document en cours de rédaction, sans valeur contractuelle. L'entité éditrice du service n'est pas encore désignée ; le texte définitif sera publié avant toute ouverture au public.",
+    "navLabel": "Autres documents",
+    "terms": {
+      "title": "Conditions générales d'utilisation",
+      "purpose": "Cette page accueillera les règles d'utilisation de ClubPro Connect."
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "purpose": "Cette page décrira les données traitées, leurs finalités, leur durée de conservation et tes droits."
+    },
+    "support": {
+      "title": "Aide et contact",
+      "purpose": "Cette page indiquera comment obtenir de l'aide ou signaler un problème."
     }
   }
 }
