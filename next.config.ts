@@ -35,5 +35,20 @@ const nextConfig: NextConfig = {
 };
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+const config = withNextIntl(nextConfig);
 
-export default withNextIntl(nextConfig);
+/**
+ * ADR-0012 : upload des source maps UNIQUEMENT si SENTRY_AUTH_TOKEN est présent.
+ * Sans jeton, le SDK n'est même pas importé ici : le build ne dépend jamais de Sentry.
+ */
+export default async function nextConfigWithOptionalSentry() {
+  if (!process.env.SENTRY_AUTH_TOKEN) return config;
+  const { withSentryConfig } = await import("@sentry/nextjs/config");
+  return withSentryConfig(config, {
+    org: process.env.SENTRY_ORG,
+    project: process.env.SENTRY_PROJECT,
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    silent: true,
+    telemetry: false,
+  });
+}
