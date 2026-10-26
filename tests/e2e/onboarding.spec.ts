@@ -36,7 +36,7 @@ test.describe("S-1.6 — onboarding", () => {
     await page.getByLabel(/ans ou plus/).check();
     await page.getByRole("button", { name: "Créer mon profil" }).click();
     await expect(page).toHaveURL(/\/onboarding\?error=CONFLICT$/);
-    await expect(page.getByRole("alert")).toHaveText("Ce pseudo est déjà pris.");
+    await expect(page.getByRole("main").getByRole("alert")).toHaveText("Ce pseudo est déjà pris.");
     await page.goto("/home");
     await expect(page).toHaveURL(/\/onboarding$/);
   });
@@ -52,6 +52,6 @@ test.describe("S-1.6 — onboarding", () => {
     await page.getByLabel(/ans ou plus/).check();
     await page.getByRole("button", { name: "Créer mon profil" }).click();
     await expect(page).toHaveURL(/\/onboarding\?error=VALIDATION$/);
-    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(page.getByRole("main").getByRole("alert")).toBeVisible();
   });
 });
