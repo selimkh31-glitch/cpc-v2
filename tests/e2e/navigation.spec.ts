@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { createOnboardedUser, login } from "./helpers/supabase";
+import { createOnboardedUser, login, PASSWORD } from "./helpers/supabase";
 
 /** S-1.7 — navigation mobile-first à trois onglets (cahier UX §1–2). Supabase local, CI. */
 test.describe("S-1.7 — navigation à trois onglets", () => {
@@ -47,10 +47,22 @@ test.describe("S-1.7 — navigation à trois onglets", () => {
     }
   });
 
-  test("onglets privés inaccessibles sans session", async ({ page }) => {
+  test("onglets privés inaccessibles sans session, puis retour au contexte après connexion (AUTH-05)", async ({ page }) => {
     for (const path of ["/explore", "/profile"]) {
       await page.goto(path);
       await expect(page).toHaveURL(new RegExp(`/login\\?next=(%2F|/)${path.slice(1)}$`));
     }
+    const user = await createOnboardedUser();
+    await page.goto("/explore");
+    await page.getByLabel("Adresse email").fill(user.email);
+    await page.getByLabel("Mot de passe").fill(PASSWORD);
+    await page.getByRole("button", { name: "Se connecter" }).click();
+    await expect(page).toHaveURL(/\/explore$/);
+  });
+
+  test("en-tête de chemin forgé par le client ignoré (anti open redirect)", async ({ page }) => {
+    await page.setExtraHTTPHeaders({ "x-cpc-pathname": "//evil.example/phish" });
+    await page.goto("/profile");
+    await expect(page).toHaveURL(/\/login\?next=(%2F|\/)profile$/);
   });
 });
