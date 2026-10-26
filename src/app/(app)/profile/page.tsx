@@ -63,7 +63,7 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
             <h2 id="profile-avatar" className="font-medium">{t("avatarTitle")}</h2>
             <form action={uploadAvatarAction} className="flex flex-col gap-2">
               <label htmlFor="avatar" className="text-sm">{t("avatarLabel")}</label>
-              <input id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp" required aria-describedby="avatar-hint" className="text-sm" />
+              <input id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp" required aria-describedby="avatar-hint" className="min-h-11 text-sm file:min-h-11 file:rounded-card file:border file:px-3" />
               <span id="avatar-hint" className="text-xs opacity-70">{t("avatarHint")}</span>
               <PendingButton pendingLabel={tStates("pending")} className="border">{t("avatarSubmit")}</PendingButton>
             </form>
