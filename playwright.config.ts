@@ -18,6 +18,8 @@ export default defineConfig({
   // Une action bloquée échoue en 15 s avec son journal, au lieu d'épuiser le délai global du test.
   use: { baseURL, trace: "retain-on-failure", actionTimeout: 15_000, navigationTimeout: 30_000 },
   projects: [
+    // C-2 (préparé, non exécuté) : uniquement avec E2E_TARGET=preview et E2E_BASE_URL.
+    ...(process.env.E2E_TARGET === "preview" ? [{ name: "preview-c2", testDir: "./tests/preview", retries: 0, use: { ...devices["Desktop Chrome"] } }] : []),
     { name: "mobile-chromium", testIgnore: /(auth-(spike|flows)|onboarding)/, use: { ...devices["Pixel 7"] } },
     { name: "mobile-webkit", testIgnore: /(auth-(spike|flows)|onboarding)/, use: { ...devices["iPhone 14"] } },
     { name: "desktop-chromium", testIgnore: /(auth-(spike|flows)|onboarding)/, use: { ...devices["Desktop Chrome"] } },
