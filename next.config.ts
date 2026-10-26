@@ -19,6 +19,8 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  // ADR-0015 : avatars ≤ 2 Mo transmis par Server Action (marge pour l'encodage multipart).
+  experimental: { serverActions: { bodySizeLimit: "3mb" } },
   turbopack: {
     rules: {
       "*.css": {

@@ -1,3 +1,6 @@
+/** En-tête interne posé par le proxy : chemin demandé (jamais une valeur fournie par le client). */
+export const REQUEST_PATH_HEADER = "x-cpc-pathname";
+
 /**
  * Redirection post-authentification : chemins internes relatifs uniquement (ADR-0002, anti open redirect).
  */

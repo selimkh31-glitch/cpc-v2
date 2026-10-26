@@ -28,8 +28,18 @@ test.describe("S-1.4 / S-1.5 — authentification et garde d'accès", () => {
     const user = await createOnboardedUser();
     await page.goto("/login");
     await page.getByRole("link", { name: "Mot de passe oublié ?" }).click();
+    // Cause racine des échecs intermittents : la navigation client vers /forgot-password n'était pas attendue ;
+    // le champ « Adresse email » rempli pouvait être celui de la page de connexion encore affichée, et le
+    // formulaire de récupération partait vide (bloqué par « required », URL inchangée).
+    await expect(page).toHaveURL(/\/forgot-password$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Mot de passe oublié");
     await page.getByLabel("Adresse email").fill(user.email);
+    await expect(page.getByLabel("Adresse email")).toHaveValue(user.email);
+    // Délai de redirection mesuré et consigné (délai par défaut d'expect : aucune augmentation de timeout).
+    const t0 = Date.now();
     await page.getByRole("button", { name: "Recevoir un lien" }).click();
+    await expect(page).toHaveURL(/\/forgot-password\?sent=1$/);
+    test.info().annotations.push({ type: "AUTH-01-délai-envoi", description: `${Date.now() - t0} ms` });
     await expect(page.getByRole("status")).toBeVisible();
 
     const link = await waitForEmailLink(user.email);
@@ -41,6 +51,8 @@ test.describe("S-1.4 / S-1.5 — authentification et garde d'accès", () => {
     await page.getByRole("button", { name: "Enregistrer" }).click();
     await expect(page).toHaveURL(/\/home$/);
 
+    // S-1.7 : la déconnexion se trouve dans Profil → Paramètres (cahier UX §7).
+    await page.getByRole("link", { name: "Profil" }).click();
     await page.getByRole("button", { name: "Se déconnecter" }).click();
     await expect(page).toHaveURL(/\/login/);
 
@@ -68,7 +80,7 @@ test.describe("S-1.4 / S-1.5 — authentification et garde d'accès", () => {
   test("Déconnexion : la page privée redevient inaccessible", async ({ page }) => {
     const user = await createOnboardedUser();
     await login(page, user.email);
-    await page.goto("/home");
+    await page.goto("/profile");
     await page.getByRole("button", { name: "Se déconnecter" }).click();
     await expect(page).toHaveURL(/\/login/);
     await page.goto("/home");

@@ -137,7 +137,7 @@ jobs:
           # Modification limitée au job : le fichier versionné garde jwt_expiry = 3600.
           sed -i 's/^jwt_expiry = 3600$/jwt_expiry = 120/' supabase/config.toml
           grep -q '^jwt_expiry = 120$' supabase/config.toml
-          supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,postgres-meta,storage-api
+          supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,postgres-meta
       - name: Exporter l'environnement local (clés de démonstration du CLI, masquées)
         run: |
           eval "$(supabase status -o env | sed 's/^/export SB_/')"
