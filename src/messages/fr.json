@@ -46,7 +46,9 @@
   },
   "appHome": {
     "title": "Accueil",
-    "empty": "Rien à afficher pour l'instant : l'accueil contextuel arrive dans un prochain lot.",
+    "activityTitle": "Ton activité",
+    "empty": "Aucune activité pour l'instant. Les sessions et les clubs apparaîtront ici dès leur ouverture.",
+    "explore": "Explorer",
     "signOut": "Se déconnecter"
   },
   "onboarding": {
@@ -86,5 +88,29 @@
       "CF": "CF — Attaquant en retrait",
       "ST": "ST — Avant-centre"
     }
+  },
+  "nav": {
+    "tabsLabel": "Navigation principale",
+    "home": "Accueil",
+    "explore": "Explorer",
+    "profile": "Profil",
+    "skipToContent": "Aller au contenu"
+  },
+  "explore": {
+    "title": "Explorer",
+    "unavailable": "Les sessions ouvertes, les clubs et la recherche de joueurs ne sont pas encore disponibles."
+  },
+  "profile": {
+    "title": "Profil",
+    "identity": "Identité",
+    "handle": "Pseudo CPC",
+    "platform": "Plateforme",
+    "mainPosition": "Poste principal",
+    "secondaryPositions": "Postes secondaires",
+    "none": "Aucun",
+    "statsTitle": "Statistiques EA",
+    "statsUnavailable": "Compte EA non lié : aucune statistique disponible.",
+    "settingsTitle": "Paramètres",
+    "signOut": "Se déconnecter"
   }
 }
