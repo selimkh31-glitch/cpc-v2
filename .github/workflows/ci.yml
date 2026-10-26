@@ -46,11 +46,11 @@ jobs:
           set -o pipefail
           (pnpm dev --port 3100 > dev.log 2>&1 &)
           for i in $(seq 1 60); do code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3100/ || true); [ "$code" = "200" ] && break; sleep 2; done
-          code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3100/legal/terms || true)
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3100/login || true)
           pkill -f "next dev" || true
           sentry_lines=$(grep -ci sentry dev.log || true)
           err_lines=$(grep -Eci "^ ?(⨯|error)" dev.log || true)
-          msg="GET / puis /legal/terms → HTTP $code ; lignes mentionnant Sentry : $sentry_lines ; erreurs : $err_lines"
+          msg="GET / puis /login → HTTP $code ; lignes mentionnant Sentry : $sentry_lines ; erreurs : $err_lines"
           if [ "$code" = "200" ] && [ "$sentry_lines" = "0" ] && [ "$err_lines" = "0" ]; then
             echo "::notice title=ADR-0012 — pnpm dev sans Sentry::$msg"
           else

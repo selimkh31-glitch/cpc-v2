@@ -57,4 +57,10 @@ describe("generateNonce", () => {
     expect(withSentry).toMatch(/connect-src [^;]*https:\/\/o1\.ingest\.example\.io/);
     expect(buildCsp({ nonce: "n", isDev: false, extraConnect: ["http://evil.example"] })).not.toContain("evil.example");
   });
+
+  it("upgrade-insecure-requests seulement en HTTPS (WebKit en http://localhost)", () => {
+    expect(buildCsp({ nonce: "n", isDev: false })).toContain("upgrade-insecure-requests");
+    expect(buildCsp({ nonce: "n", isDev: false, secure: true })).toContain("upgrade-insecure-requests");
+    expect(buildCsp({ nonce: "n", isDev: false, secure: false })).not.toContain("upgrade-insecure-requests");
+  });
 });

@@ -18,6 +18,7 @@ export async function proxy(request: NextRequest) {
     isDev: process.env.NODE_ENV === "development",
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
     extraConnect: [sentryConnectOrigin(process.env)].filter((o): o is string => o !== null),
+    secure: request.nextUrl.protocol === "https:",
   });
 
   // En-têtes de requête construits APRÈS le rafraîchissement : ils portent les cookies à jour.

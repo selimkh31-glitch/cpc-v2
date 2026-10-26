@@ -10,9 +10,14 @@ export type CspOptions = {
   supabaseUrl?: string;
   /** Origines supplémentaires de connect-src (ex. ingestion Sentry, seulement si activé — ADR-0012). */
   extraConnect?: string[];
+  /**
+   * Requête servie en HTTPS. `upgrade-insecure-requests` n'est émis qu'en HTTPS : sur http://localhost (CI),
+   * WebKit, contrairement à Chromium, réécrit les ressources en https et leur chargement échoue.
+   */
+  secure?: boolean;
 };
 
-export function buildCsp({ nonce, isDev, supabaseUrl, extraConnect = [] }: CspOptions): string {
+export function buildCsp({ nonce, isDev, supabaseUrl, extraConnect = [], secure = true }: CspOptions): string {
   const connect = ["'self'"];
   if (supabaseUrl) {
     const url = new URL(supabaseUrl);
@@ -37,7 +42,7 @@ export function buildCsp({ nonce, isDev, supabaseUrl, extraConnect = [] }: CspOp
     "frame-ancestors": ["'none'"],
   };
   const parts = Object.entries(directives).map(([k, v]) => `${k} ${v.join(" ")}`);
-  if (!isDev) parts.push("upgrade-insecure-requests");
+  if (!isDev && secure) parts.push("upgrade-insecure-requests");
   return parts.join("; ");
 }
 
