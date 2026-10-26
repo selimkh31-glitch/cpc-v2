@@ -18,6 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  // iPhone (PWA plein écran, barre d'état translucide) : le contenu s'étend sous les encoches ;
+  // l'en-tête et la barre d'onglets compensent avec env(safe-area-inset-*).
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },

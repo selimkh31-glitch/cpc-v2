@@ -1,0 +1,48 @@
+name: staging-http (G2, manuel)
+
+# Contrôles HTTP réels sur le staging CPC V2 (C-1, isolation, D-40, Storage).
+# Déclenchement MANUEL uniquement ; aucune exécution sur push ou PR.
+# Secrets requis dans l'environnement « staging-qa » (Settings → Environments), jamais dans Git :
+#   STAGING_SUPABASE_URL, STAGING_PUBLISHABLE_KEY, QA_A_EMAIL, QA_A_PASSWORD, QA_B_EMAIL, QA_B_PASSWORD
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-http
+  cancel-in-progress: false
+
+jobs:
+  staging-http:
+    name: staging-http (Supabase staging, HTTP réel)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    # Secrets stockés dans l'environnement « staging-qa », restreint à la branche main :
+    # aucune autre branche, PR ou fork ne peut y accéder.
+    environment: staging-qa
+    env:
+      E2E_TARGET: staging
+      STAGING_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+      STAGING_PUBLISHABLE_KEY: ${{ secrets.STAGING_PUBLISHABLE_KEY }}
+      QA_A_EMAIL: ${{ secrets.QA_A_EMAIL }}
+      QA_A_PASSWORD: ${{ secrets.QA_A_PASSWORD }}
+      QA_B_EMAIL: ${{ secrets.QA_B_EMAIL }}
+      QA_B_PASSWORD: ${{ secrets.QA_B_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Garde-fous (branche main, cible staging CPC V2)
+        run: |
+          test "$GITHUB_REF" = "refs/heads/main" || { echo "::error::Exécution autorisée uniquement depuis main"; exit 1; }
+          test "$STAGING_SUPABASE_URL" = "https://cglbsllwdmluvbisozyx.supabase.co" || { echo "::error::Cible non autorisée"; exit 1; }
+      - name: Tests HTTP (API uniquement, sans navigateur)
+        run: pnpm exec playwright test --project staging-http --workers=1 --reporter=json > playwright-staging.json
+      - if: always()
+        run: node scripts/ci/annotate.mjs playwright playwright-staging.json
