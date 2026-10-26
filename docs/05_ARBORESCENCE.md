@@ -35,7 +35,7 @@ cpc-v2/
 │  │  ├─ admin/                       # layout serveur : is_staff, sinon notFound()
 │  │  │  ├─ reports/  cases/  sanctions/  appeals/
 │  │  ├─ api/webhooks/billing/route.ts   # Phase 6 uniquement, signature vérifiée
-│  │  ├─ manifest.ts                  # PWA (D-08)
+│  │  ├─ manifest.webmanifest/route.ts # PWA (D-08) ; lien émis dans layout.tsx (crossorigin use-credentials)
 │  │  └─ layout.tsx  error.tsx  not-found.tsx  global-error.tsx
 │  ├─ components/
 │  │  ├─ ui/                          # primitives shadcn/ui (Radix) + tokens

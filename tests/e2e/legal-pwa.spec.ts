@@ -36,7 +36,11 @@ test.describe("S-1.11 — pages légales provisoires et PWA", () => {
     expect((manifest.icons as { purpose: string }[]).some((i) => i.purpose === "maskable")).toBe(true);
 
     await page.goto("/");
+    expect(res.headers()["content-type"]).toContain("application/manifest+json");
+    // Un seul lien, envoyé avec les cookies (Preview protégée par Vercel Authentication).
+    await expect(page.locator('link[rel="manifest"]')).toHaveCount(1);
     await expect(page.locator('link[rel="manifest"]')).toHaveAttribute("href", "/manifest.webmanifest");
+    await expect(page.locator('link[rel="manifest"]')).toHaveAttribute("crossorigin", "use-credentials");
     const registrations = await page.evaluate(async () => (navigator.serviceWorker ? (await navigator.serviceWorker.getRegistrations()).length : 0));
     expect(registrations, "D-08 non validé : aucun service worker").toBe(0);
   });

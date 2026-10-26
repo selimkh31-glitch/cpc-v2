@@ -33,6 +33,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const locale = await getLocale();
   return (
     <html lang={locale} className="h-full antialiased">
+      <head>
+        {/* use-credentials : le manifest doit être récupéré avec le cookie Vercel Authentication (Preview protégée). */}
+        <link rel="manifest" href="/manifest.webmanifest" crossOrigin="use-credentials" />
+      </head>
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
