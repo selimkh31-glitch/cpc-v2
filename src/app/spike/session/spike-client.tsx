@@ -53,7 +53,11 @@ export function SpikeClient({ userId }: { userId: string }) {
       <div className="flex items-center gap-2">
         <button
           type="button"
-          onClick={async () => setSensitive(await sensitiveCheckAction())}
+          onClick={async () => {
+            // UX-02 : état « en cours » visible jusqu'à la réponse du serveur (jamais l'ancien résultat).
+            setSensitive("pending");
+            setSensitive(await sensitiveCheckAction());
+          }}
           className="min-h-11 rounded-card border px-3"
         >
           {t("sensitiveAction")}
