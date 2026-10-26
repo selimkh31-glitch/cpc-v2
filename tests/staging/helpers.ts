@@ -19,7 +19,7 @@ export const url = () => {
   // Même normalisation que le garde-fou du workflow : espaces et « / » final retirés.
   const u = env("STAGING_SUPABASE_URL").replace(/\s+/g, "").replace(/\/+$/, "");
   // Garde-fou : ces tests ne visent QUE le staging CPC V2.
-  if (u !== STAGING_REF_URL) throw new Error(`Cible refusée : ${u} (seul le staging CPC V2 est autorisé).`);
+  if (u !== STAGING_REF_URL) throw new Error("Cible refusée : seul le staging CPC V2 est autorisé (valeur non affichée).");
   return u;
 };
 export const apikey = () => env("STAGING_PUBLISHABLE_KEY").trim();
