@@ -52,7 +52,7 @@ Supabase staging → Authentication → URL Configuration :
 | Réglage | Valeur |
 |---|---|
 | Site URL | `https://<alias-preview>` (identique à `NEXT_PUBLIC_SITE_URL`, sans `/` final) |
-| Redirect URLs | `https://<alias-preview>/auth/callback` **et** `http://localhost:3000/auth/callback` — URL exactes, **aucun joker** |
+| Redirect URLs | `https://<alias-preview>/auth/callback` **et** `http://localhost:3000/auth/callback` — URL exactes, **aucun joker**. ⚠️ Révisé (`docs/19` §2) : ces entrées exactes ne couvrent pas nos liens `…/auth/callback?next=…` ; c'est la *Site URL* = alias qui les autorise. |
 
 Avant : relever et capturer les valeurs actuelles (retour arrière). Ne pas toucher à la durée JWT (C-2), à Google (A6) ni à aucun autre réglage Auth.
 Sans P-1 : la connexion par mot de passe d'un compte qa pré-créé fonctionne ; les liens d'email (confirmation, réinitialisation) ne fonctionnent pas.

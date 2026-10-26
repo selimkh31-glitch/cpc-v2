@@ -37,7 +37,7 @@
 |---|---|
 | `manifest.webmanifest` | `display: standalone`, `start_url: /home`, `scope: /`, portrait, icônes 192/512 + *maskable* ✅ |
 | `apple-touch-icon` 180 px, `apple-mobile-web-app-capable`, titre court « CPC » | ✅ |
-| Barre d'état `black-translucent` + **`viewport-fit=cover`** | ajouté par cette PR : sans lui, les encoches ne sont pas compensées en mode plein écran |
+| Barre d'état `default` (QA iPhone A-4, `docs/21`) + **`viewport-fit=cover`** | `black-translucent` rendait l'heure illisible en thème clair ; `viewport-fit=cover` + `env(safe-area-inset-*)` compensent encoche et barre d'accueil |
 | Encoches / Dynamic Island / barre d'accueil | `env(safe-area-inset-top/bottom)` sur l'en-tête et la barre d'onglets ✅ |
 | Champs ≥ 16 px sur écran tactile | ✅ (pas de zoom automatique, S-1.10) |
 | Service worker | **aucun** (D-08 non validé ; pas de cache de données privées) |
