@@ -55,6 +55,12 @@ jobs:
           for v in STAGING_PUBLISHABLE_KEY QA_A_EMAIL QA_A_PASSWORD QA_B_EMAIL QA_B_PASSWORD; do
             [ -n "$(printf '%s' "${!v}" | tr -d '[:space:]')" ] || { echo "::error title=Secrets::$v absent ou vide"; exit 1; }
           done
+          for v in QA_A_EMAIL QA_B_EMAIL; do
+            e=$(printf '%s' "${!v}" | tr -d '[:space:]')
+            case "$e" in *=*) echo "::error title=Secrets::$v contient « = » (nom de variable collé avec la valeur ?)"; exit 1;; esac
+            case "$e" in qa_*@example.test) ;; *) echo "::error title=Secrets::$v n'est pas un compte synthétique qa_*@example.test (valeur non affichée)"; exit 1;; esac
+            [ "$e" = "${!v}" ] || echo "::notice title=Secrets::$v contenait des espaces ou retours à la ligne (retirés)"
+          done
       - name: Tests HTTP (API uniquement, sans navigateur)
         run: pnpm exec playwright test --project staging-http --workers=1 --reporter=json > playwright-staging.json
       - if: always()
