@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
-import { createConfirmedUser, login, waitForEmailLink, PASSWORD } from "./helpers/supabase";
+import { createConfirmedUser, createOnboardedUser, login, waitForEmailLink, PASSWORD } from "./helpers/supabase";
 
 /** S-1.4 / S-1.5 — parcours d'authentification définitifs et garde d'accès (Supabase local, CI). */
 test.describe("S-1.4 / S-1.5 — authentification et garde d'accès", () => {
   test("AUTH-05 — anonyme sur /home : redirection vers la connexion puis retour au contexte", async ({ page }) => {
-    const user = await createConfirmedUser();
+    const user = await createOnboardedUser();
     await page.goto("/home");
     await expect(page).toHaveURL(/\/login\?next=(%2F|\/)home$/);
     await page.getByLabel("Adresse email").fill(user.email);
@@ -25,7 +25,7 @@ test.describe("S-1.4 / S-1.5 — authentification et garde d'accès", () => {
   });
 
   test("AUTH-01 — mot de passe oublié : lien email, nouveau mot de passe, ancien refusé", async ({ page }) => {
-    const user = await createConfirmedUser();
+    const user = await createOnboardedUser();
     await page.goto("/login");
     await page.getByRole("link", { name: "Mot de passe oublié ?" }).click();
     await page.getByLabel("Adresse email").fill(user.email);
@@ -63,7 +63,7 @@ test.describe("S-1.4 / S-1.5 — authentification et garde d'accès", () => {
   });
 
   test("Déconnexion : la page privée redevient inaccessible", async ({ page }) => {
-    const user = await createConfirmedUser();
+    const user = await createOnboardedUser();
     await login(page, user.email);
     await page.goto("/home");
     await page.getByRole("button", { name: "Se déconnecter" }).click();

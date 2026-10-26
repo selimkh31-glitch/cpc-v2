@@ -48,5 +48,43 @@
     "title": "Accueil",
     "empty": "Rien à afficher pour l'instant : l'accueil contextuel arrive dans un prochain lot.",
     "signOut": "Se déconnecter"
+  },
+  "onboarding": {
+    "title": "Ton profil joueur",
+    "intro": "Ces informations te présentent aux clubs et aux autres joueurs.",
+    "handle": "Pseudo CPC",
+    "handleHint": "3 à 20 caractères : lettres minuscules, chiffres, « _ », « . » ou « - ».",
+    "platform": "Plateforme",
+    "mainPosition": "Poste principal",
+    "secondaryPositions": "Postes secondaires (3 maximum, facultatif)",
+    "ageConfirm": "Je confirme avoir {age} ans ou plus.",
+    "submit": "Créer mon profil",
+    "errors": {
+      "VALIDATION": "Vérifie les champs : pseudo valide, plateforme, poste principal, 3 postes secondaires maximum différents du principal, et confirmation d'âge.",
+      "CONFLICT": "Ce pseudo est déjà pris.",
+      "UNKNOWN": "Une erreur est survenue. Réessaie."
+    },
+    "platforms": {
+      "ps5": "PS5",
+      "xbox_series": "Xbox Series",
+      "pc": "PC"
+    },
+    "positions": {
+      "GK": "GK — Gardien",
+      "RB": "RB — Arrière droit",
+      "LB": "LB — Arrière gauche",
+      "CB": "CB — Défenseur central",
+      "RWB": "RWB — Piston droit",
+      "LWB": "LWB — Piston gauche",
+      "CDM": "CDM — Milieu défensif",
+      "CM": "CM — Milieu central",
+      "CAM": "CAM — Milieu offensif",
+      "RM": "RM — Milieu droit",
+      "LM": "LM — Milieu gauche",
+      "RW": "RW — Ailier droit",
+      "LW": "LW — Ailier gauche",
+      "CF": "CF — Attaquant en retrait",
+      "ST": "ST — Avant-centre"
+    }
   }
 }

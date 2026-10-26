@@ -1,10 +1,10 @@
 import { getTranslations } from "next-intl/server";
-import { requireUser } from "@/lib/auth/session";
+import { requireOnboardedUser } from "@/lib/auth/session";
 import { signOutAction } from "@/features/auth/actions";
 
 /** Accueil provisoire : aucun contenu métier tant que l'Accueil contextuel (ACC) n'est pas implémenté. */
 export default async function HomePage() {
-  await requireUser("/home");
+  await requireOnboardedUser("/home");
   const t = await getTranslations("appHome");
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 py-10">
