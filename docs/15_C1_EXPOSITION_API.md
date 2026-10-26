@@ -32,8 +32,8 @@ notify pgrst, 'reload schema';
 |---|---|---|
 | Configuration enregistrée | `pg_db_role_setting` du rôle `authenticator` | `pgrst.db_schemas=public, graphql_public, api` ✅ |
 | Alertes de sécurité | `get_advisors` | 0 WARN (3 INFO attendus : tables `private` sans policy) ✅ |
-| Anonyme interdit sur `api` | inventaire : anon sans USAGE ni EXECUTE ; test d'isolation n° 13 (26/10 08:4x) | refusé ✅ |
-| Isolation de deux utilisateurs | test d'isolation 14/14 (rejoué en base, simulation des rôles et JWT comme PostgREST, transaction annulée) | ✅ |
+| Anonyme interdit sur `api` | test I12–I14 rejoué **après** le changement (simulation des rôles et du JWT comme PostgREST) | refusé ✅ |
+| Isolation de deux utilisateurs + `complete_onboarding` | test d'isolation rejoué **après** le changement : **14/14 ✅** (onboarding de A et B par la commande, lectures et écritures croisées refusées, écritures directes refusées, `private.*` inaccessible) ; transaction toujours annulée, 0 donnée restante | ✅ |
 | Révocation des sessions et actions sensibles | test en base sur `auth.sessions` | **NON EXÉCUTÉ** : l'appel a été refusé deux fois côté permissions (« cancelled »), non contourné. Couvert en CI par pgTAP 040 et e2e A5b. |
 | `complete_onboarding` via HTTP | appel REST au staging | **NON EXÉCUTÉ** : l'environnement de travail ne peut pas joindre le staging en HTTP (liste d'accès réseau). |
 
