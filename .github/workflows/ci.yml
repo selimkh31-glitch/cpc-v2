@@ -105,7 +105,9 @@ jobs:
         timeout-minutes: 15
         run: |
           pnpm exec playwright install chromium
-          if node -e "require('playwright').chromium.launch().then(b => b.close())"; then
+          # @playwright/test est la seule dépendance directe : « playwright » n'est pas résolvable avec pnpm,
+          # ce qui faisait échouer ce contrôle à chaque fois et forçait l'installation apt (instable).
+          if node -e "require('@playwright/test').chromium.launch().then(b => b.close())"; then
             echo "Chromium démarre sans dépendances supplémentaires."; exit 0
           fi
           echo "::warning::Chromium ne démarre pas : installation des dépendances système"
