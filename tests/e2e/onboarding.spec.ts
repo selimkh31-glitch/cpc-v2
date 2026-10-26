@@ -10,11 +10,11 @@ test.describe("S-1.6 — onboarding", () => {
     await expect(page).toHaveURL(/\/onboarding$/);
 
     const handle = `qa_${Date.now().toString(36)}`;
-    await page.getByLabel("Pseudo CPC").fill(handle.toUpperCase());
-    await page.getByLabel("PC").check();
+    await page.getByLabel("Pseudo CPC", { exact: true }).fill(handle.toUpperCase());
+    await page.getByRole("radio", { name: "PC", exact: true }).check();
     await page.getByLabel("Poste principal").selectOption("CB");
-    await page.getByLabel("LB — Arrière gauche").check();
-    await page.getByLabel("CDM — Milieu défensif").check();
+    await page.getByLabel("LB — Arrière gauche", { exact: true }).check();
+    await page.getByLabel("CDM — Milieu défensif", { exact: true }).check();
     await page.getByLabel(/ans ou plus/).check();
     await page.getByRole("button", { name: "Créer mon profil" }).click();
 
@@ -30,8 +30,8 @@ test.describe("S-1.6 — onboarding", () => {
     const user = await createConfirmedUser();
     await login(page, user.email);
     await page.goto("/onboarding");
-    await page.getByLabel("Pseudo CPC").fill(taken.handle);
-    await page.getByLabel("PS5").check();
+    await page.getByLabel("Pseudo CPC", { exact: true }).fill(taken.handle);
+    await page.getByRole("radio", { name: "PS5", exact: true }).check();
     await page.getByLabel("Poste principal").selectOption("ST");
     await page.getByLabel(/ans ou plus/).check();
     await page.getByRole("button", { name: "Créer mon profil" }).click();
@@ -45,10 +45,10 @@ test.describe("S-1.6 — onboarding", () => {
     const user = await createConfirmedUser();
     await login(page, user.email);
     await page.goto("/onboarding");
-    await page.getByLabel("Pseudo CPC").fill(`qa_${Date.now().toString(36)}b`);
-    await page.getByLabel("Xbox Series").check();
+    await page.getByLabel("Pseudo CPC", { exact: true }).fill(`qa_${Date.now().toString(36)}b`);
+    await page.getByRole("radio", { name: "Xbox Series", exact: true }).check();
     await page.getByLabel("Poste principal").selectOption("GK");
-    await page.getByLabel("GK — Gardien").check();
+    await page.getByLabel("GK — Gardien", { exact: true }).check();
     await page.getByLabel(/ans ou plus/).check();
     await page.getByRole("button", { name: "Créer mon profil" }).click();
     await expect(page).toHaveURL(/\/onboarding\?error=VALIDATION$/);
