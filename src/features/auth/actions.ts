@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireSupabasePublicEnv } from "@/lib/supabase/env";
 import { safeNextPath } from "@/lib/auth/redirect";
-import { credentialsSchema } from "./schemas";
+import { credentialsSchema, emailSchema, passwordSchema } from "./schemas";
 
-const DEFAULT_AFTER_LOGIN = "/spike/session";
+const DEFAULT_AFTER_LOGIN = "/home";
 
 function withNext(path: string, next: string) {
   return `${path}${path.includes("?") ? "&" : "?"}next=${encodeURIComponent(next)}`;
@@ -62,4 +62,29 @@ export async function sensitiveCheckAction(): Promise<"ok" | "refused"> {
   if (error || !data.user) return "refused";
   const { data: active, error: rpcError } = await supabase.schema("api").rpc("assert_session_active");
   return !rpcError && active === true ? "ok" : "refused";
+}
+
+/** Récupération de compte (AUTH-01) : même réponse que l'adresse existe ou non (pas d'énumération). */
+export async function requestPasswordResetAction(formData: FormData) {
+  const parsed = emailSchema.safeParse(formData.get("email"));
+  if (parsed.success) {
+    const { siteUrl } = requireSupabasePublicEnv();
+    const supabase = await createSupabaseServerClient();
+    await supabase.auth.resetPasswordForEmail(parsed.data, {
+      redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent("/reset-password")}`,
+    });
+  }
+  redirect("/forgot-password?sent=1");
+}
+
+/** Nouveau mot de passe après lien de récupération (session fraîche établie par /auth/callback). */
+export async function updatePasswordAction(formData: FormData) {
+  const parsed = passwordSchema.safeParse(formData.get("password"));
+  if (!parsed.success) redirect("/reset-password?error=invalid");
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) redirect("/login?next=/reset-password");
+  const { error } = await supabase.auth.updateUser({ password: parsed.data });
+  if (error) redirect("/reset-password?error=invalid");
+  redirect("/home");
 }

@@ -22,7 +22,15 @@
     "invalidCredentials": "Identifiants invalides ou adresse email non confirmée.",
     "invalidSignup": "Vérifie l'adresse email et le mot de passe (10 caractères minimum, lettres et chiffres).",
     "checkEmailTitle": "Vérifie ta boîte mail",
-    "checkEmailBody": "Si l'adresse est valide, un lien de confirmation vient d'être envoyé."
+    "checkEmailBody": "Si l'adresse est valide, un lien de confirmation vient d'être envoyé.",
+    "forgotTitle": "Mot de passe oublié",
+    "submitForgot": "Recevoir un lien",
+    "resetEmailSent": "Si un compte existe pour cette adresse, un lien de réinitialisation vient d'être envoyé.",
+    "goToForgot": "Mot de passe oublié ?",
+    "resetTitle": "Nouveau mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "submitReset": "Enregistrer",
+    "invalidNewPassword": "Mot de passe invalide : 10 caractères minimum, avec des lettres et des chiffres."
   },
   "spike": {
     "title": "Spike d'authentification (S-1.4a)",
@@ -35,5 +43,10 @@
     "realtimeReceived": "Messages reçus :",
     "signOutLocal": "Se déconnecter",
     "signOutGlobal": "Se déconnecter partout"
+  },
+  "appHome": {
+    "title": "Accueil",
+    "empty": "Rien à afficher pour l'instant : l'accueil contextuel arrive dans un prochain lot.",
+    "signOut": "Se déconnecter"
   }
 }

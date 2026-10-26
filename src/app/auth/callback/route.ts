@@ -9,7 +9,7 @@ import { safeNextPath } from "@/lib/auth/redirect";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get("code");
-  const next = safeNextPath(searchParams.get("next"), "/spike/session");
+  const next = safeNextPath(searchParams.get("next"), "/home");
 
   if (code) {
     const supabase = await createSupabaseServerClient();

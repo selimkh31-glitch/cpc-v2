@@ -6,7 +6,7 @@ import { safeNextPath } from "@/lib/auth/redirect";
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const params = await searchParams;
   const t = await getTranslations("auth");
-  const next = safeNextPath(params.next, "/spike/session");
+  const next = safeNextPath(params.next, "/home");
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-4 px-4 py-10">
       <h1 className="text-2xl font-semibold">{t("loginTitle")}</h1>
@@ -29,6 +29,9 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           {t("submitLogin")}
         </button>
       </form>
+      <Link href="/forgot-password" className="text-sm underline">
+        {t("goToForgot")}
+      </Link>
       <Link href={`/signup?next=${encodeURIComponent(next)}`} className="text-sm underline">
         {t("goToSignup")}
       </Link>
