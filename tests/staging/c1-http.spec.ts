@@ -12,7 +12,12 @@ test("H1 — anonyme : aucune fonction api, aucune table privée", async () => {
   const rpc = await rest("/rpc/assert_session_active", { method: "POST", schema: "api", body: "{}" });
   test.info().annotations.push({ type: "H1-rpc-anon", description: String(rpc.status) });
   expect([401, 403]).toContain(rpc.status);
-  const onboarding = await rest("/rpc/complete_onboarding", { method: "POST", schema: "api", body: "{}" });
+  // Signature complète : un corps vide renverrait 404 (aucune fonction pour ces arguments), sans tester les droits.
+  const onboarding = await rest("/rpc/complete_onboarding", {
+    method: "POST", schema: "api",
+    body: JSON.stringify({ p_request_id: crypto.randomUUID(), p_handle: "qa_anon", p_platform: "pc", p_main_position: "ST", p_secondary_positions: [], p_age_confirmed: true }),
+  });
+  test.info().annotations.push({ type: "H1-onboarding-anon", description: String(onboarding.status) });
   expect([401, 403]).toContain(onboarding.status);
   const settings = await rest("/account_settings?select=profile_id");
   expect([401, 403]).toContain(settings.status);
