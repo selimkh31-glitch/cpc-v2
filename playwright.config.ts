@@ -21,6 +21,8 @@ export default defineConfig({
   use: { baseURL, trace: "retain-on-failure", actionTimeout: 15_000, navigationTimeout: 30_000 },
   // Specs nécessitant Supabase local : un seul motif, exclu des projets « smoke » et inclus dans « auth-spike ».
   projects: [
+    // C-2 (préparé, non exécuté) : uniquement avec E2E_TARGET=preview et E2E_BASE_URL.
+    ...(process.env.E2E_TARGET === "preview" ? [{ name: "preview-c2", testDir: "./tests/preview", retries: 0, use: { ...devices["Desktop Chrome"] } }] : []),
     { name: "mobile-chromium", testIgnore: SUPABASE_SPECS, use: { ...devices["Pixel 7"] } },
     { name: "mobile-webkit", testIgnore: SUPABASE_SPECS, use: { ...devices["iPhone 14"] } },
     { name: "desktop-chromium", testIgnore: SUPABASE_SPECS, use: { ...devices["Desktop Chrome"] } },
