@@ -1,6 +1,6 @@
 # ADR-0017 — Rendu dynamique et Cache Components
 
-- **Statut :** 🔵 PROPOSÉ (PR-1, 25/10/2026) — à valider par Selim
+- **Statut :** ✅ VALIDÉ (Selim, 26/10/2026 00:18)
 - **Contexte :** `create-next-app` 16.4.3 active par défaut `cacheComponents` et `partialPrefetching`. La documentation embarquée de Next.js (`node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md`) indique que **le Partial Prerendering est incompatible avec une CSP à nonce** : les scripts du shell statique ne reçoivent pas le nonce. Or ADR-0002 v3 retient une CSP stricte à nonce comme compensation XSS (cookies de session lisibles par le JS).
 
 ## Décision
