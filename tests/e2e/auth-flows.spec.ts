@@ -49,7 +49,7 @@ test.describe("S-1.4 / S-1.5 — authentification et garde d'accès", () => {
     await page.getByLabel("Adresse email").fill(user.email);
     await page.getByLabel("Mot de passe").fill(PASSWORD);
     await page.getByRole("button", { name: "Se connecter" }).click();
-    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(page.getByRole("main").getByRole("alert")).toBeVisible();
     await page.getByLabel("Mot de passe").fill(newPassword);
     await page.getByRole("button", { name: "Se connecter" }).click();
     await expect(page).toHaveURL(/\/home$/);
