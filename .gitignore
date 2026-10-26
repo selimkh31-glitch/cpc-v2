@@ -1,5 +1,7 @@
 # deps
 node_modules/
+# lien symbolique éventuel (worktrees) : node_modules sans barre finale
+node_modules
 .pnpm-store/
 # next
 .next/
