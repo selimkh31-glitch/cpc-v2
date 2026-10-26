@@ -101,12 +101,17 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: pw-chromium-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-      - name: Installer Chromium (délai court + 3 tentatives, apt GitHub instable)
+      - name: Installer Chromium (sans apt ; dépendances système seulement en secours)
         timeout-minutes: 15
         run: |
+          pnpm exec playwright install chromium
+          if node -e "require('playwright').chromium.launch().then(b => b.close())"; then
+            echo "Chromium démarre sans dépendances supplémentaires."; exit 0
+          fi
+          echo "::warning::Chromium ne démarre pas : installation des dépendances système"
           for i in 1 2 3; do
-            timeout 240 pnpm exec playwright install --with-deps chromium && exit 0
-            echo "::warning::Installation Chromium : tentative $i échouée ou trop lente"
+            timeout 240 pnpm exec playwright install-deps chromium && exit 0
+            echo "::warning::install-deps Chromium : tentative $i échouée ou trop lente"
           done
           exit 1
       - uses: supabase/setup-cli@v1
@@ -149,6 +154,12 @@ jobs:
     name: e2e-webkit (Playwright iPhone / WebKit)
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    # Image officielle Playwright (même version que @playwright/test) : navigateurs et dépendances
+    # préinstallés, aucun apt (instable sur les runners GitHub).
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+    env:
+      HOME: /root
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -157,19 +168,6 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Cache des navigateurs Playwright
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: pw-webkit-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-      - name: Installer WebKit (délai court + 3 tentatives, apt GitHub instable)
-        timeout-minutes: 15
-        run: |
-          for i in 1 2 3; do
-            timeout 240 pnpm exec playwright install --with-deps webkit && exit 0
-            echo "::warning::Installation WebKit : tentative $i échouée ou trop lente"
-          done
-          exit 1
       - run: pnpm build
       - run: pnpm test:e2e --project=mobile-webkit
       - if: always()
