@@ -59,7 +59,14 @@ Workflow manuel `staging-http` (`.github/workflows/staging-http.yml`), tests `te
 | H5 | D-40 réel : action sensible `true`, puis refusée juste après une déconnexion globale, JWT encore valide | idem |
 | ST1–ST6 | Storage entre utilisateurs : dépôt propriétaire, écriture/remplacement/suppression par autrui refusés (S5), SVG et nom non conforme refusés (S7), anonyme refusé (S1), URL signée qui expire (S4), objet supprimé → URL refusée (S8) | **tests Storage entre utilisateurs sur le staging** |
 
-Prérequis : 2 comptes synthétiques confirmés et onboardés (`qa_*@example.test`), mots de passe générés aléatoirement, puis les 6 secrets GitHub. Aucune donnée réelle ; les objets Storage créés sont supprimés en fin de test.
+Prérequis : 2 comptes synthétiques confirmés et onboardés (`qa_*@example.test`), mots de passe générés aléatoirement, puis les 6 secrets GitHub.
+
+**Accès aux secrets limité aux exécutions de confiance :**
+- secrets stockés dans l'**environnement GitHub `staging-qa`** (pas au niveau du dépôt), avec *Deployment branches* = `main` uniquement ;
+- workflow déclenché **uniquement à la main** (`workflow_dispatch` : droits d'écriture requis), garde-fou `GITHUB_REF = refs/heads/main` et garde-fou sur l'URL du staging ;
+- `permissions: contents: read` ; aucun workflow `pull_request_target` dans le dépôt ;
+- les workflows de PR provenant de forks ne reçoivent jamais de secrets (règle GitHub) ; vérifier en plus *Settings → Actions → Fork pull request workflows* = approbation requise ;
+- GitHub masque automatiquement les valeurs des secrets dans les journaux ; les tests n'affichent ni jeton, ni mot de passe, ni email. Aucune donnée réelle ; les objets Storage créés sont supprimés en fin de test.
 
 ### 6.2 Preview sur iPhone (après création du projet)
 | ID | Scénario (Safari iOS, puis PWA installée) |
