@@ -22,16 +22,16 @@ export default async function LegalPage({ params }: PageProps<"/legal/[doc]">) {
   if (!isDoc(doc)) notFound();
   const t = await getTranslations("legal");
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 py-8">
-      <p className="w-fit rounded-card border px-2 py-1 text-xs font-medium uppercase" data-testid="legal-draft">{t("draftBadge")}</p>
-      <h1 className="text-2xl font-semibold">{t(`${doc}.title`)}</h1>
-      <p role="note" className="rounded-card border border-foreground/15 p-3 text-sm">{t("draftNotice")}</p>
-      <p className="text-sm opacity-80">{t(`${doc}.purpose`)}</p>
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 px-4 pb-10 pt-[calc(2rem+env(safe-area-inset-top))]">
+      <p className="w-fit rounded-full bg-surface-3 px-3 py-1 text-caption uppercase tracking-wide text-ink-2" data-testid="legal-draft">{t("draftBadge")}</p>
+      <h1 className="px-1 text-large-title">{t(`${doc}.title`)}</h1>
+      <p role="note" className="rounded-row bg-surface-1 p-4 text-subhead text-ink">{t("draftNotice")}</p>
+      <p className="px-1 text-body text-ink-2">{t(`${doc}.purpose`)}</p>
       <nav aria-label={t("navLabel")}>
-        <ul className="flex flex-col">
+        <ul className="overflow-hidden rounded-row bg-surface-1 [&>li+li>*]:hairline-t">
           {DOCS.filter((d) => d !== doc).map((d) => (
             <li key={d}>
-              <Link href={`/legal/${d}`} className="inline-flex min-h-11 items-center text-sm underline">{t(`${d}.title`)}</Link>
+              <Link href={`/legal/${d}`} className="flex min-h-12 items-center px-4 text-body active:bg-surface-3">{t(`${d}.title`)}</Link>
             </li>
           ))}
         </ul>

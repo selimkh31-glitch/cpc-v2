@@ -48,7 +48,11 @@
     "activityTitle": "Ton activité",
     "empty": "Aucune activité pour l'instant. Les sessions et les clubs apparaîtront ici dès leur ouverture.",
     "explore": "Explorer",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "greeting": "Salut {handle}",
+    "profileShortcut": "Ton profil",
+    "profileShortcutDetail": "Présentation, avatar, identifiant EA",
+    "shortcuts": "Raccourcis"
   },
   "onboarding": {
     "title": "Ton profil joueur",
@@ -110,7 +114,8 @@
   },
   "explore": {
     "title": "Explorer",
-    "unavailable": "Les sessions ouvertes, les clubs et la recherche de joueurs ne sont pas encore disponibles."
+    "unavailable": "Les sessions ouvertes, les clubs et la recherche de joueurs ne sont pas encore disponibles.",
+    "emptyTitle": "Rien à explorer pour l'instant"
   },
   "profile": {
     "title": "Profil",
@@ -151,7 +156,19 @@
       "avatar_type": "Format refusé : PNG, JPEG ou WebP uniquement.",
       "avatar_upload": "L'avatar n'a pas pu être enregistré. Réessaie.",
       "avatar_remove": "L'avatar n'a pas pu être retiré. Réessaie."
-    }
+    },
+    "sectionProfile": "Profil joueur",
+    "sectionAccount": "Compte",
+    "noPresentation": "Aucune présentation",
+    "notProvided": "Non renseigné",
+    "avatarRow": "Photo de profil",
+    "avatarRowNone": "Aucune photo",
+    "avatarRowSet": "Photo ajoutée",
+    "close": "Fermer",
+    "editPresentation": "Modifier ta présentation",
+    "editGamertag": "Modifier ton identifiant EA",
+    "editAvatar": "Modifier ta photo",
+    "eaFieldHint": "32 caractères maximum. Information déclarée, non vérifiée par CPC."
   },
   "states": {
     "loading": "Chargement…",

@@ -66,3 +66,37 @@ test.describe("S-1.7 — navigation à trois onglets", () => {
     await expect(page).toHaveURL(/\/login\?next=(%2F|\/)profile$/);
   });
 });
+
+/** P2-A (docs/23 §7) : captures des écrans réels du shell (clair et sombre), jointes au rapport CI. */
+test.describe("P2-A — écrans du shell", () => {
+  test.use({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+
+  for (const colorScheme of ["dark", "light"] as const) {
+    test(`captures Accueil, Explorer, Profil et sheet — ${colorScheme}`, async ({ page }, testInfo) => {
+      await page.emulateMedia({ colorScheme });
+      const user = await createOnboardedUser();
+      await login(page, user.email);
+      for (const path of ["/home", "/explore", "/profile"]) {
+        await page.goto(path);
+        await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+        await testInfo.attach(`${path.slice(1)}-${colorScheme}`, { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
+      }
+      await page.getByRole("button", { name: /^Présentation/ }).click();
+      await expect(page.getByRole("dialog", { name: "Présentation" })).toBeVisible();
+      await testInfo.attach(`profile-sheet-${colorScheme}`, { body: await page.screenshot(), contentType: "image/png" });
+    });
+  }
+
+  test("titre compact du Profil au défilement", async ({ page }) => {
+    const user = await createOnboardedUser();
+    await login(page, user.email);
+    // Écran court : le contenu du Profil dépasse forcément la hauteur visible.
+    await page.setViewportSize({ width: 390, height: 520 });
+    await page.goto("/profile");
+    const compact = page.getByTestId("header-compact-title");
+    await expect(compact).toHaveCSS("opacity", "0");
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect(compact).toHaveText("Profil");
+    await expect(compact).toHaveCSS("opacity", "1");
+  });
+});

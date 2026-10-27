@@ -21,14 +21,10 @@ export function StatePanel({
 }) {
   const urgent = kind === "error" || kind === "conflict";
   return (
-    <section
-      role={urgent ? "alert" : "status"}
-      data-state={kind}
-      className={cn("flex flex-col gap-2 rounded-card border border-foreground/15 p-4", urgent && "border-red-500", className)}
-    >
-      <h2 className="font-medium">{title}</h2>
-      {description ? <p className="text-sm opacity-80">{description}</p> : null}
-      {action ? <div className="pt-1">{action}</div> : null}
+    <section role={urgent ? "alert" : "status"} data-state={kind} className={cn("flex flex-col gap-2 rounded-hero bg-surface-1 p-5", className)}>
+      <h2 className={cn("text-headline", urgent ? "text-danger" : "text-ink")}>{title}</h2>
+      {description ? <p className="text-subhead text-ink-2">{description}</p> : null}
+      {action ? <div className="pt-2">{action}</div> : null}
     </section>
   );
 }
