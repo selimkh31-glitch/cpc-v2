@@ -53,3 +53,9 @@
 2. Cette PR fusionnée, `preview` redéployée.
 3. Campagne iPhone rejouée : M1 (en-têtes), M5 (HEIC), M6, M7 (barre d'état en thème clair), M8, M9 ; vérification qu'un seul envoi part par appui sur « Se connecter ».
 4. Décision de Selim sur M2, M10 et A6 Google : débloquer D-18 / Google, ou les reporter formellement hors des critères G2.
+
+## 6. Suivi (27/10/2026)
+- A-1 : variables Production de l'intégration Supabase retirées de `cpc-v2-web` (vérifié : 4 variables, toutes Preview).
+- A-2 : déploiements Production et de branches autres que `preview` supprimés ; aucun domaine Production rattaché (vérifié).
+- A-7 : Node.js 22.x (vérifié).
+- Ignored Build Step : contrôlé par une branche de test (résultat ci-dessous).
