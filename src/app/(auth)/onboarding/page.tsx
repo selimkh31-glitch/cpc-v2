@@ -1,13 +1,21 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { hasProfile, requireUser } from "@/lib/auth/session";
-import { PendingButton } from "@/components/states/pending-button";
+import { AuthShell } from "@/components/patterns/auth-shell";
+import { SubmitButton } from "@/components/ui/button";
+import { ChoiceChip } from "@/components/ui/choice-chip";
+import { InlineStatus } from "@/components/ui/inline-status";
+import { TextField } from "@/components/ui/text-field";
 import { completeOnboardingAction } from "@/features/onboarding/actions";
-import { AGE_MIN, PLATFORMS, POSITIONS } from "@/features/onboarding/referentials";
+import { OnboardingStepper } from "@/features/onboarding/components/onboarding-stepper";
+import { AGE_MIN, PLATFORMS, POSITION_GROUPS } from "@/features/onboarding/referentials";
+import { hasProfile, requireUser } from "@/lib/auth/session";
 
 const ERRORS = new Set(["VALIDATION", "CONFLICT", "UNKNOWN"]);
 
-/** S-1.6 / AUTH-03 : profil minimal (pseudo, plateforme, postes, déclaration d'âge). Aucune donnée de plus. */
+/**
+ * S-1.6 / AUTH-03 : profil minimal (pseudo, plateforme, postes, déclaration d'âge), aucune donnée de plus.
+ * P2-A : mêmes champs et même commande `complete_onboarding`, présentés en 3 étapes, un seul envoi.
+ */
 export default async function OnboardingPage({ searchParams }: PageProps<"/onboarding">) {
   const user = await requireUser("/onboarding");
   if (await hasProfile(user.userId)) redirect("/home");
@@ -17,54 +25,99 @@ export default async function OnboardingPage({ searchParams }: PageProps<"/onboa
   const errorKey = typeof params.error === "string" && ERRORS.has(params.error) ? params.error : null;
   // Clé d'idempotence générée au rendu : une double soumission du même formulaire n'écrit qu'une fois.
   const requestId = crypto.randomUUID();
+  const short = (code: string) => t(`positions.${code}`).split(" — ")[1] ?? code;
+
+  const legend = "mb-3 px-1 text-subhead font-medium text-ink-2";
+
+  const identity = (
+    <>
+      <TextField
+        label={t("handle")}
+        name="handle"
+        required
+        minLength={3}
+        maxLength={20}
+        pattern="[a-zA-Z0-9_.\-]{3,20}"
+        autoComplete="nickname"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        hint={t("handleHint")}
+      />
+      <fieldset>
+        <legend className={legend}>{t("platform")}</legend>
+        <div className="grid grid-cols-3 gap-2">
+          {PLATFORMS.map((p) => (
+            <ChoiceChip key={p} type="radio" name="platform" value={p} label={t(`platforms.${p}`)} required />
+          ))}
+        </div>
+      </fieldset>
+    </>
+  );
+
+  const positions = (
+    <>
+      <fieldset>
+        <legend className={legend}>{t("mainPosition")}</legend>
+        <div className="flex flex-col gap-4">
+          {POSITION_GROUPS.map((group) => (
+            <div key={group.key} className="flex flex-col gap-2">
+              <p className="px-1 text-caption uppercase tracking-wide text-ink-3">{t(`groups.${group.key}`)}</p>
+              <div className="grid grid-cols-3 gap-2">
+                {group.positions.map((p) => (
+                  <ChoiceChip key={p} type="radio" name="mainPosition" value={p} label={p} detail={short(p)} accessibleLabel={t(`positions.${p}`)} required />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend className={legend}>{t("secondaryPositions")}</legend>
+        <div className="flex flex-col gap-4">
+          {POSITION_GROUPS.map((group) => (
+            <div key={group.key} className="flex flex-col gap-2">
+              <p className="px-1 text-caption uppercase tracking-wide text-ink-3">{t(`groups.${group.key}`)}</p>
+              <div className="grid grid-cols-3 gap-2">
+                {group.positions.map((p) => (
+                  <ChoiceChip key={p} type="checkbox" name="secondaryPositions" value={p} label={p} detail={short(p)} accessibleLabel={t(`positions.${p}`)} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </fieldset>
+    </>
+  );
+
+  const confirm = (
+    <>
+      <p className="px-1 text-body text-ink-2">{t("confirmIntro")}</p>
+      <label className="flex min-h-12 items-center gap-3 rounded-row bg-surface-1 px-4 py-3 text-body">
+        <input type="checkbox" name="ageConfirmed" required className="size-5 shrink-0 accent-[var(--accent)]" />
+        {t("ageConfirm", { age: AGE_MIN })}
+      </label>
+      <SubmitButton size="lg" pendingLabel={tStates("pending")}>
+        {t("submit")}
+      </SubmitButton>
+    </>
+  );
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 py-8">
-      <h1 className="text-2xl font-semibold">{t("title")}</h1>
-      <p className="text-sm opacity-80">{t("intro")}</p>
-      {errorKey ? (
-        <p role="alert" className="rounded-card border border-red-500 p-3 text-sm">{t(`errors.${errorKey}`)}</p>
-      ) : null}
-      <form action={completeOnboardingAction} className="flex flex-col gap-5">
+    <AuthShell title={t("title")} className="justify-start">
+      <p className="-mt-4 px-1 text-body text-ink-2">{t("intro")}</p>
+      {errorKey ? <InlineStatus kind="error">{t(`errors.${errorKey}`)}</InlineStatus> : null}
+      <form action={completeOnboardingAction} className="flex flex-col">
         <input type="hidden" name="requestId" value={requestId} />
-        <div className="flex flex-col gap-1 text-sm">
-          <label htmlFor="handle">{t("handle")}</label>
-          <input id="handle" name="handle" required minLength={3} maxLength={20} pattern="[a-zA-Z0-9_.\-]{3,20}" autoComplete="nickname" aria-describedby="handle-hint" className="min-h-11 rounded-card border px-3" />
-          <span id="handle-hint" className="text-xs opacity-70">{t("handleHint")}</span>
-        </div>
-        <fieldset className="flex flex-col gap-2 text-sm">
-          <legend className="mb-1">{t("platform")}</legend>
-          {PLATFORMS.map((p) => (
-            <label key={p} className="flex min-h-11 items-center gap-3">
-              <input type="radio" name="platform" value={p} required className="size-5" />
-              {t(`platforms.${p}`)}
-            </label>
-          ))}
-        </fieldset>
-        <label className="flex flex-col gap-1 text-sm">
-          {t("mainPosition")}
-          <select name="mainPosition" required defaultValue="" className="min-h-11 rounded-card border px-3">
-            <option value="" disabled>—</option>
-            {POSITIONS.map((p) => (
-              <option key={p} value={p}>{t(`positions.${p}`)}</option>
-            ))}
-          </select>
-        </label>
-        <fieldset className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
-          <legend className="col-span-2 mb-1">{t("secondaryPositions")}</legend>
-          {POSITIONS.map((p) => (
-            <label key={p} className="flex min-h-11 items-center gap-2">
-              <input type="checkbox" name="secondaryPositions" value={p} className="size-5" />
-              {t(`positions.${p}`)}
-            </label>
-          ))}
-        </fieldset>
-        <label className="flex min-h-11 items-center gap-3 text-sm">
-          <input type="checkbox" name="ageConfirmed" required className="size-5" />
-          {t("ageConfirm", { age: AGE_MIN })}
-        </label>
-        <PendingButton pendingLabel={tStates("pending")} className="bg-foreground font-medium text-background">{t("submit")}</PendingButton>
+        <OnboardingStepper
+          steps={[
+            { title: t("stepIdentity"), content: identity },
+            { title: t("stepPositions"), content: positions },
+            { title: t("stepConfirm"), content: confirm },
+          ]}
+          labels={{ next: t("next"), back: t("back"), progress: [1, 2, 3].map((current) => t("progress", { current, total: 3 })) }}
+        />
       </form>
-    </main>
+    </AuthShell>
   );
 }
