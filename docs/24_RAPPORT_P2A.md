@@ -28,8 +28,8 @@ Les PR empilées ont été remises sur `main` sans force-push : rebasculement de
 ## 2. Incidents
 
 1. **e2e-webkit en échec sur #31 (violation CSP `style-src-elem`).** Un diagnostic par étape, ajouté au test (run 40570628534), a montré qu'en WebKit `page.screenshot()` de Playwright injecte lui-même un `<style>body {}</style>`. Notre CSP à nonce le bloque, ce qui est normal. C'est un artefact de l'outil de test : le HTML servi ne contient aucun `<style>` et le runtime React/Next n'en ajoute aucun. **Correctif limité aux tests** : la CSP est vérifiée juste avant chaque capture et après la fermeture de la sheet. **CSP inchangée.**
-3. **Connecteur Vercel.** `list_deployments` renvoie 403, `get_project` 404, et `list_projects` ne trouve plus `cpc-v2-web`. La vérification est passée par les statuts de commit GitHub publiés par Vercel. Aucune configuration n'a été modifiée.
 2. **Job e2e en échec sur #31 après remise à niveau.** L'échec est survenu à l'étape « Supabase local » (infrastructure CI), avant tout test, avec un arbre identique au SHA vert. Une seule relance a été faite, verte.
+3. **Connecteur Vercel.** `list_deployments` renvoie 403, `get_project` 404, et `list_projects` ne trouve plus `cpc-v2-web`. La vérification est passée par les statuts de commit GitHub publiés par Vercel. Aucune configuration n'a été modifiée.
 
 ## 3. Ce qui change visiblement sur iPhone
 
