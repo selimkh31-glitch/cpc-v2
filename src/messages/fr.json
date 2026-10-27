@@ -86,7 +86,20 @@
       "LW": "LW — Ailier gauche",
       "CF": "CF — Attaquant en retrait",
       "ST": "ST — Avant-centre"
-    }
+    },
+    "stepIdentity": "Identité",
+    "stepPositions": "Postes",
+    "stepConfirm": "Confirmation",
+    "next": "Continuer",
+    "back": "Retour",
+    "progress": "Étape {current} sur {total}",
+    "groups": {
+      "GK": "Gardien",
+      "DEF": "Défense",
+      "MID": "Milieu",
+      "ATT": "Attaque"
+    },
+    "confirmIntro": "Ton profil sera visible des autres joueurs connectés à CPC."
   },
   "nav": {
     "tabsLabel": "Navigation principale",
