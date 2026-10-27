@@ -2,6 +2,12 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import type { Page } from "@playwright/test";
 
+/** Aucune violation CSP ni <style> sans nonce, hors étapes « :capture » (injection de Playwright). */
+async function expectNoCsp(page: Page, label: string) {
+  const entries = await page.evaluate(() => (window as unknown as { __csp?: string[] }).__csp ?? []);
+  expect(entries.filter((e) => !/^[^|]*:capture \|/.test(e)), `violations CSP — ${label}`).toEqual([]);
+}
+
 /** Marque l'étape en cours pour attribuer chaque violation CSP (diagnostic). */
 async function step(page: Page, name: string) {
   await page.evaluate((n) => { (window as unknown as { __step: string }).__step = n; }, name);
@@ -128,9 +134,11 @@ test.describe("P2-A · A4 — écrans (données fictives de galerie)", () => {
   for (const colorScheme of ["dark", "light"] as const) {
     test(`Accueil et Profil : accessibilité, CSP, sheet — ${colorScheme}`, async ({ page }, testInfo) => {
       await page.emulateMedia({ colorScheme });
-      // Diagnostic CSP : élément, directive et extrait de chaque violation (sans contenu sensible).
-      // Les captures utilisent caret: "initial" : par défaut Playwright injecte un <style> (masquage du
-      // curseur) que WebKit bloque à juste titre sous notre CSP à nonce — artefact de test, pas de l'appli.
+      // Diagnostic CSP : étape, directive et extrait de chaque violation (sans contenu sensible).
+      // En WebKit, page.screenshot() injecte lui-même un <style>body {}</style> que notre CSP à nonce
+      // bloque à juste titre (constaté en CI : étapes « :capture » uniquement). C'est un artefact de
+      // l'outil de test : la CSP est donc vérifiée juste avant chaque capture, et les seules entrées
+      // écartées ensuite sont celles produites pendant une étape « :capture ».
       await page.addInitScript(() => {
         const w = window as unknown as { __csp: string[]; __step: string };
         const store: string[] = [];
@@ -158,6 +166,8 @@ test.describe("P2-A · A4 — écrans (données fictives de galerie)", () => {
         const results = await new AxeBuilder({ page }).analyze();
         const blocking = results.violations.filter((v) => v.impact === "critical" || v.impact === "serious");
         expect(blocking.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(", ")}`), screen).toEqual([]);
+        await expectNoCsp(page, `${screen} avant capture`);
+        if (screen === "home") expect(cspErrors, "console avant toute capture").toEqual([]);
         await step(page, `${screen}:capture`);
         await testInfo.attach(`${screen}-${colorScheme}-${testInfo.project.name}`, { body: await page.screenshot({ fullPage: true, caret: "initial" }), contentType: "image/png" });
       }
@@ -166,15 +176,14 @@ test.describe("P2-A · A4 — écrans (données fictives de galerie)", () => {
       await page.getByRole("button", { name: /^Présentation/ }).click();
       const sheet = page.getByRole("dialog", { name: "Présentation" });
       await expect(sheet.getByLabel("Ta présentation")).toHaveValue("Exemple de présentation fictive pour la galerie.");
+      await expectNoCsp(page, "sheet avant capture");
       await step(page, "sheet:capture");
       await testInfo.attach(`profile-sheet-${colorScheme}-${testInfo.project.name}`, { body: await page.screenshot({ caret: "initial" }), contentType: "image/png" });
       await step(page, "sheet:fermeture");
       await sheet.getByRole("button", { name: "Fermer" }).click();
       await expect(page.getByRole("dialog")).toHaveCount(0);
       await page.waitForLoadState("networkidle");
-      const violations = await page.evaluate(() => (window as unknown as { __csp?: string[] }).__csp ?? []);
-      expect(violations, "violations CSP détaillées").toEqual([]);
-      expect(cspErrors).toEqual([]);
+      await expectNoCsp(page, "après fermeture de la sheet");
     });
   }
 
