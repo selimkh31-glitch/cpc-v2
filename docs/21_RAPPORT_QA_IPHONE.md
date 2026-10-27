@@ -58,4 +58,5 @@
 - A-1 : variables Production de l'intégration Supabase retirées de `cpc-v2-web` (vérifié : 4 variables, toutes Preview).
 - A-2 : déploiements Production et de branches autres que `preview` supprimés ; aucun domaine Production rattaché (vérifié).
 - A-7 : Node.js 22.x (vérifié).
-- Ignored Build Step : contrôlé par une branche de test (résultat ci-dessous).
+- Ignored Build Step : **vérifié** — un commit sur la branche `docs/suivi-qa-vercel` (`ad30d08`) a produit un déploiement `CANCELED` (« Canceled by Ignored Build Step ») ; seule `preview` construit.
+- Reste ouvert : Site URL du staging à confirmer (`docs/19` §5) ; intégration Supabase toujours installée au niveau de l'équipe (portée « tous les projets ») — à restreindre pour qu'elle ne réinjecte pas de clés dans un futur projet.
