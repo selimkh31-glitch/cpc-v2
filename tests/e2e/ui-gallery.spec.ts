@@ -39,7 +39,7 @@ for (const colorScheme of ["dark", "light"] as const) {
       expect(cspErrors).toEqual([]);
 
       await testInfo.attach(`galerie-${colorScheme}-${testInfo.project.name}`, {
-        body: await page.screenshot({ fullPage: true }),
+        body: await page.screenshot({ fullPage: true, caret: "initial" }),
         contentType: "image/png",
       });
     });
@@ -123,6 +123,8 @@ test.describe("P2-A · A4 — écrans (données fictives de galerie)", () => {
     test(`Accueil et Profil : accessibilité, CSP, sheet — ${colorScheme}`, async ({ page }, testInfo) => {
       await page.emulateMedia({ colorScheme });
       // Diagnostic CSP : élément, directive et extrait de chaque violation (sans contenu sensible).
+      // Les captures utilisent caret: "initial" : par défaut Playwright injecte un <style> (masquage du
+      // curseur) que WebKit bloque à juste titre sous notre CSP à nonce — artefact de test, pas de l'appli.
       await page.addInitScript(() => {
         const store: string[] = [];
         (window as unknown as { __csp: string[] }).__csp = store;
@@ -141,13 +143,13 @@ test.describe("P2-A · A4 — écrans (données fictives de galerie)", () => {
         const results = await new AxeBuilder({ page }).analyze();
         const blocking = results.violations.filter((v) => v.impact === "critical" || v.impact === "serious");
         expect(blocking.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(", ")}`), screen).toEqual([]);
-        await testInfo.attach(`${screen}-${colorScheme}-${testInfo.project.name}`, { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
+        await testInfo.attach(`${screen}-${colorScheme}-${testInfo.project.name}`, { body: await page.screenshot({ fullPage: true, caret: "initial" }), contentType: "image/png" });
       }
       // Édition en sheet : panneau court, une action, fermeture.
       await page.getByRole("button", { name: /^Présentation/ }).click();
       const sheet = page.getByRole("dialog", { name: "Présentation" });
       await expect(sheet.getByLabel("Ta présentation")).toHaveValue("Exemple de présentation fictive pour la galerie.");
-      await testInfo.attach(`profile-sheet-${colorScheme}-${testInfo.project.name}`, { body: await page.screenshot(), contentType: "image/png" });
+      await testInfo.attach(`profile-sheet-${colorScheme}-${testInfo.project.name}`, { body: await page.screenshot({ caret: "initial" }), contentType: "image/png" });
       await sheet.getByRole("button", { name: "Fermer" }).click();
       await expect(page.getByRole("dialog")).toHaveCount(0);
       await page.waitForLoadState("networkidle");

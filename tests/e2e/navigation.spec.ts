@@ -79,11 +79,11 @@ test.describe("P2-A — écrans du shell", () => {
       for (const path of ["/home", "/explore", "/profile"]) {
         await page.goto(path);
         await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-        await testInfo.attach(`${path.slice(1)}-${colorScheme}`, { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
+        await testInfo.attach(`${path.slice(1)}-${colorScheme}`, { body: await page.screenshot({ fullPage: true, caret: "initial" }), contentType: "image/png" });
       }
       await page.getByRole("button", { name: /^Présentation/ }).click();
       await expect(page.getByRole("dialog", { name: "Présentation" })).toBeVisible();
-      await testInfo.attach(`profile-sheet-${colorScheme}`, { body: await page.screenshot(), contentType: "image/png" });
+      await testInfo.attach(`profile-sheet-${colorScheme}`, { body: await page.screenshot({ caret: "initial" }), contentType: "image/png" });
     });
   }
 
