@@ -33,7 +33,7 @@ Palette validée par Selim : **noir, vert, blanc, gris**. Aucune autre teinte de
 | `--text-3` | `#828289` | `#6E6E75` | tertiaire |
 | `--accent` | `#22C55E` | `#0F7A3A` | actions principales, liens, onglet actif |
 | `--on-accent` | `#050607` (noir) | `#FFFFFF` | texte sur accent |
-| `--live` | `#39FF88` | `#00A651` | **LIVE uniquement** : pastille, halo, terrain (élément graphique) |
+| `--live` | `#39FF88` | `#009B4C` | **LIVE uniquement** : pastille, halo, terrain (élément graphique) |
 | `--live-text` | `#39FF88` | `#00803F` | libellé « LIVE » |
 | `--danger` | `#FF6B6B` | `#C62828` | destructif, erreurs |
 
