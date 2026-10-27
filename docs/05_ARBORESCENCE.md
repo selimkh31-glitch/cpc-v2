@@ -7,6 +7,7 @@ cpc-v2/
 ├─ src/
 │  ├─ app/
 │  │  ├─ dev/ui/page.tsx              # galerie du design system (P2-A) : notFound() hors ENABLE_UI_GALLERY=1, jamais sur Vercel
+│  │  ├─ dev/ui/screens/[screen]/     # écrans réels (HomeView, ProfileView) avec données fictives, même garde
 │  │  ├─ (public)/                    # accessible sans compte
 │  │  │  ├─ page.tsx                  # accueil public → /login ou /home si connecté
 │  │  │  ├─ legal/{terms,privacy,support}/

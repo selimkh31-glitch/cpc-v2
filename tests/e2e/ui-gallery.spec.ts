@@ -117,3 +117,39 @@ test.describe("P2-A · A2 — sheets et shell", () => {
     }
   });
 });
+
+test.describe("P2-A · A4 — écrans (données fictives de galerie)", () => {
+  for (const colorScheme of ["dark", "light"] as const) {
+    test(`Accueil et Profil : accessibilité, CSP, sheet — ${colorScheme}`, async ({ page }, testInfo) => {
+      await page.emulateMedia({ colorScheme });
+      const cspErrors: string[] = [];
+      page.on("console", (msg) => {
+        if (msg.type() === "error" && /Content Security Policy|CSP/i.test(msg.text())) cspErrors.push(msg.text());
+      });
+      for (const screen of ["home", "profile"]) {
+        await page.goto(`/dev/ui/screens/${screen}`);
+        await expect(page.getByRole("heading", { level: 1 })).toHaveText(screen === "home" ? "Accueil" : "Profil");
+        const results = await new AxeBuilder({ page }).analyze();
+        const blocking = results.violations.filter((v) => v.impact === "critical" || v.impact === "serious");
+        expect(blocking.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(", ")}`), screen).toEqual([]);
+        await testInfo.attach(`${screen}-${colorScheme}-${testInfo.project.name}`, { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
+      }
+      // Édition en sheet : panneau court, une action, fermeture.
+      await page.getByRole("button", { name: /^Présentation/ }).click();
+      const sheet = page.getByRole("dialog", { name: "Présentation" });
+      await expect(sheet.getByLabel("Ta présentation")).toHaveValue("Exemple de présentation fictive pour la galerie.");
+      await testInfo.attach(`profile-sheet-${colorScheme}-${testInfo.project.name}`, { body: await page.screenshot(), contentType: "image/png" });
+      await sheet.getByRole("button", { name: "Fermer" }).click();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await page.waitForLoadState("networkidle");
+      expect(cspErrors).toEqual([]);
+    });
+  }
+
+  // La fermeture de la sheet après un enregistrement réel est vérifiée par profile.spec (Supabase, CI).
+  test("Profil : confirmation d'enregistrement affichée, aucune sheet ouverte", async ({ page }) => {
+    await page.goto("/dev/ui/screens/profile?saved=presentation");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("status").filter({ hasText: "Présentation enregistrée." })).toBeVisible();
+  });
+});
