@@ -95,8 +95,13 @@ test.describe("P2-A — écrans du shell", () => {
     await page.goto("/profile");
     const compact = page.getByTestId("header-compact-title");
     await expect(compact).toHaveCSS("opacity", "0");
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await expect(compact).toHaveText("Profil");
+    // Défilement répété jusqu'à l'état attendu : un défilement antérieur à l'hydratation n'est pas observé.
+    await expect
+      .poll(async () => {
+        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+        return (await compact.textContent()) ?? "";
+      })
+      .toBe("Profil");
     await expect(compact).toHaveCSS("opacity", "1");
   });
 });

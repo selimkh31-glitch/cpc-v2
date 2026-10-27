@@ -52,7 +52,8 @@ test.describe("S-1.4 / S-1.5 — authentification et garde d'accès", () => {
     await expect(page).toHaveURL(/\/home$/);
 
     // S-1.7 : la déconnexion se trouve dans Profil → Paramètres (cahier UX §7).
-    await page.getByRole("link", { name: "Profil" }).click();
+    // Onglet Profil de la barre de navigation (l'Accueil contient aussi un raccourci « Ton profil »).
+    await page.getByRole("navigation", { name: "Navigation principale" }).getByRole("link", { name: "Profil" }).click();
     await page.getByRole("button", { name: "Se déconnecter" }).click();
     await expect(page).toHaveURL(/\/login/);
 
