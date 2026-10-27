@@ -31,7 +31,7 @@ export function ListRowContent({ icon, label, detail, value, chevron, tone = "de
       ) : null}
       <span className="flex min-w-0 flex-1 flex-col">
         <span className={cn("truncate", tone === "destructive" && "text-danger", tone === "accent" && "text-accent")}>{label}</span>
-        {detail ? <span className="truncate text-footnote text-ink-2">{detail}</span> : null}
+        {detail ? <span className="line-clamp-2 text-footnote text-ink-2">{detail}</span> : null}
       </span>
       {value ? <span className="max-w-[45%] truncate text-subhead text-ink-2">{value}</span> : null}
       {chevron ? <ChevronRight aria-hidden className="size-5 shrink-0 text-ink-3" /> : null}

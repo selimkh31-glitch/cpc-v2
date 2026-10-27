@@ -18,7 +18,7 @@ export function OfflineBanner() {
   const online = useSyncExternalStore(subscribe, () => navigator.onLine, () => true);
   if (online) return null;
   return (
-    <div role="status" data-state="offline" className="sticky top-0 z-50 bg-foreground px-4 py-2 text-center text-sm text-background">
+    <div role="status" data-state="offline" className="sticky top-0 z-50 bg-surface-3 px-4 pb-2 pt-[calc(0.5rem+env(safe-area-inset-top))] text-center text-footnote text-ink">
       {t("offline")}
     </div>
   );
