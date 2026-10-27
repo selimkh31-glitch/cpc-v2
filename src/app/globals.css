@@ -139,6 +139,35 @@
   }
 }
 
+/* Mouvements courts (docs/23 §2.4) : jamais en boucle, neutralisés par Reduce Motion. */
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes live-glow {
+  0% {
+    box-shadow: 0 0 0 1px var(--live), 0 0 0 0 var(--live);
+  }
+  50% {
+    box-shadow: 0 0 0 1px var(--live), 0 0 32px 2px var(--live);
+  }
+  100% {
+    box-shadow: 0 0 0 1px var(--live), 0 0 24px -4px var(--live);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 body {
   background: var(--bg);
   color: var(--text);

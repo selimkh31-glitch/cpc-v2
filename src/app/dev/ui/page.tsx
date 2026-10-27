@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation";
-import { Compass, Shield } from "lucide-react";
+import { Bell, Compass, LogOut, Shield, UserRound } from "lucide-react";
+import { AppHeader } from "@/components/layout/app-header";
+import { PageTitle, ShellTitleProvider } from "@/components/layout/shell-title";
+import { TabBar } from "@/components/layout/tab-bar";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,9 +10,12 @@ import { Chip } from "@/components/ui/chip";
 import { EmptyState } from "@/components/ui/empty-state";
 import { IconButton } from "@/components/ui/icon-button";
 import { InlineStatus } from "@/components/ui/inline-status";
+import { ListRow, ListSection } from "@/components/ui/list";
+import { LiveHalo, LivePill } from "@/components/ui/live";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TextArea, TextField } from "@/components/ui/text-field";
 import { isUiGalleryEnabled } from "@/lib/dev/gallery";
+import { GallerySheets } from "./gallery-sheets";
 
 export const metadata = { title: "Galerie UI (développement)", robots: { index: false, follow: false } };
 
@@ -20,10 +26,12 @@ export const metadata = { title: "Galerie UI (développement)", robots: { index:
 export default function UiGalleryPage() {
   if (!isUiGalleryEnabled()) notFound();
   return (
-    <main className="mx-auto flex w-full max-w-md flex-col gap-8 px-4 pb-16 pt-[calc(env(safe-area-inset-top)+1.5rem)]">
+    <ShellTitleProvider>
+    <AppHeader />
+    <main className="mx-auto flex w-full max-w-md flex-col gap-8 px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-4">
       <header className="flex flex-col gap-1">
-        <p className="text-footnote uppercase tracking-wide text-ink-3">Développement · exemples fictifs</p>
-        <h1 className="text-large-title">Galerie UI</h1>
+        <p className="px-1 text-footnote uppercase tracking-wide text-ink-3">Développement · exemples fictifs</p>
+        <PageTitle>Galerie UI</PageTitle>
       </header>
 
       <Section title="Typographie">
@@ -87,7 +95,30 @@ export default function UiGalleryPage() {
         <EmptyState icon={<Compass />} title="Rien pour l'instant" description="Explication de la cause et action utile." action={<Button size="lg">Action utile</Button>} />
         <Skeleton className="h-16 w-full" />
       </Section>
+
+      <ListSection title="Liste groupée" footer="Lignes ≥ 44 px, filets fins.">
+        <ListRow href="/dev/ui" icon={<UserRound />} label="Ligne avec lien" detail="Détail secondaire" />
+        <ListRow icon={<Bell />} label="Ligne statique" value="Valeur" />
+        <ListRow icon={<LogOut />} label="Action destructive" tone="destructive" />
+      </ListSection>
+
+      <Section title="Panneaux inférieurs">
+        <GallerySheets />
+      </Section>
+
+      <Section title="LIVE (galerie uniquement)">
+        <div className="flex items-center gap-3">
+          <LivePill />
+          <LivePill detail="42 min" />
+        </div>
+        <LiveHalo className="bg-surface-2 p-4">
+          <p className="text-headline">Carte LIVE d&apos;exemple</p>
+          <p className="text-subhead text-ink-2">Halo statique, une pulsation à l&apos;apparition.</p>
+        </LiveHalo>
+      </Section>
     </main>
+    <TabBar />
+    </ShellTitleProvider>
   );
 }
 

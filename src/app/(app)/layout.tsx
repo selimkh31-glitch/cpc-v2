@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { AppHeader } from "@/components/layout/app-header";
 import { OfflineBanner } from "@/components/states/offline-banner";
+import { ShellTitleProvider } from "@/components/layout/shell-title";
 import { TabBar } from "@/components/layout/tab-bar";
 import { REQUEST_PATH_HEADER, safeNextPath } from "@/lib/auth/redirect";
 import { requireOnboardedUser } from "@/lib/auth/session";
@@ -13,8 +14,8 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   await requireOnboardedUser(requested);
   const t = await getTranslations("nav");
   return (
-    <>
-      <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-card focus:bg-background focus:p-3">
+    <ShellTitleProvider>
+      <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-row focus:bg-surface-1 focus:p-3">
         {t("skipToContent")}
       </a>
       <OfflineBanner />
@@ -23,6 +24,6 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         {children}
       </div>
       <TabBar />
-    </>
+    </ShellTitleProvider>
   );
 }
