@@ -7,7 +7,7 @@
 | [0003](ADR/0003-supabase-boundary.md) | Frontière Supabase, SQL sans ORM | ✅ | — |
 | [0004](ADR/0004-mutation-model.md) | Commandes transactionnelles | 🟡 | Réserves R1–R4 prouvées **commande par commande** (permanent) |
 | [0005](ADR/0005-routes.md) | Convention de routes | ✅ | — |
-| [0006](ADR/0006-ui-components.md) | Composants UI | ✅ | À recroiser avec le cahier UX |
+| [0006](ADR/0006-ui-components.md) | Composants UI | ✅ | Révisé P2-A (28/10) : tokens D-41, `<dialog>` natif, Radix Dialog retiré (CSP) |
 | [0007](ADR/0007-client-state.md) | État client | ✅ | — |
 | [0008](ADR/0008-realtime.md) | Temps réel | ✅ | — |
 | [0009](ADR/0009-jobs-ttl.md) | Jobs et échéances | ✅ | — |
