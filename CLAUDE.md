@@ -3,7 +3,8 @@
 ## Périmètre autorisé
 - Repo : `selimkh31-glitch/cpc-v2` uniquement.
 - Supabase : **staging `cglbsllwdmluvbisozyx` uniquement**, via le connecteur `supabase-cpc-v2-write` (écriture) ou `supabase-cpc-v2` (lecture). Avant chaque `apply_migration`, `get_project_url` doit renvoyer `https://cglbsllwdmluvbisozyx.supabase.co`.
-- Phase en cours : **Phase 1 (S-1.1 → S-1.12)**. Aucune Phase 2 sans autorisation explicite de Selim.
+- Phase 1 (S-1.1 → S-1.12) : livrée, statut officiel **G2 HOLD** (`docs/21`).
+- Phase en cours : **Phase 2 produit** (`docs/22`). **Seul le lot P2-A** (design system et shell, UI sans base de données, `docs/23`) est autorisé (GO Selim du 27/10/2026). Chaque autre lot exige un GO spécifique ; aucune migration avant ce GO.
 
 ## Interdits absolus
 - CPC V1 : repo `CPC`, `CPCP`, `Cpclanding`, `clubpro-match` ; Supabase `cfgvtyxiggewauevvigm` ; projets Vercel `cpc`, `cpc-v1kt`, `cpclanding`, `cpcp-ed8e`, `cpc-admin`, `cpc-admin-mmjb`, `cpc-web-beta`. Aucune écriture, aucune réutilisation de secrets, d'URL ou de données.

@@ -1,6 +1,6 @@
 # CPC V2 — 23 · Brief d'exécution P2-A : design system et shell premium iPhone
 
-**Statut :** brief prêt, **non démarré**. Exécution seulement après **GO P2-A** de Selim et validation de **D-41** (direction visuelle) et **D-42** (dépendances UI).
+**Statut :** **GO P2-A donné par Selim le 27/10/2026** ; D-41 ✅ (palette amendée : noir, vert, blanc, gris) ; D-42 ✅.
 **Nature :** UI seule. **Aucune migration, aucune nouvelle table, aucune nouvelle commande, aucune nouvelle fonctionnalité métier.** Seuls les écrans et données existants sont redessinés.
 **Références :** cahier UX §1, §2, §7, §12 · SPEC UX-01..04 · ADR-0006 (shadcn/ui, tokens, WCAG AA, ≥ 44 px, Reduce Motion), ADR-0017 (CSP à nonce) · `docs/22`.
 
@@ -14,28 +14,32 @@ Faire de CPC une application qui se ressent **native sur iPhone** : surfaces som
 
 ---
 
-## 2. Direction visuelle « Stade de nuit » (D-41, à valider)
+## 2. Direction visuelle « Stade de nuit » (D-41 ✅ — palette noir, vert, blanc, gris)
 
 Inspiration : un stade éclairé la nuit. Fond profond, surfaces superposées, lumière néon **réservée au LIVE**. Le thème clair reste complet, car l'iPhone peut être réglé en clair.
 
 ### 2.1 Couleurs (tokens CSS, `globals.css`)
+Palette validée par Selim : **noir, vert, blanc, gris**. Aucune autre teinte de marque. Le vert de marque (`--accent`) et le vert LIVE (`--live`) sont distincts : le LIVE se reconnaît à son **halo lumineux et à son libellé « LIVE »**, jamais à la seule couleur.
+
 | Token | Sombre (par défaut) | Clair | Usage |
 |---|---|---|---|
-| `--bg` | `#07090C` | `#F2F3F5` | fond d'application |
-| `--surface-1` | `#0F1216` | `#FFFFFF` | sections, listes groupées |
-| `--surface-2` | `#161A20` | `#F7F8FA` | éléments surélevés, champs |
-| `--surface-3` | `#1E232B` | `#ECEEF1` | pressé, sélection |
+| `--bg` | `#050607` | `#F2F2F4` | fond d'application |
+| `--surface-1` | `#111315` | `#FFFFFF` | sections, listes groupées |
+| `--surface-2` | `#181A1D` | `#F7F7F8` | éléments surélevés, champs |
+| `--surface-3` | `#22252A` | `#E9E9EC` | pressé, sélection |
 | `--separator` | `rgb(255 255 255 / 0.08)` | `rgb(0 0 0 / 0.08)` | filets 0,5 px |
-| `--text` | `#F5F7FA` | `#0B0D10` | texte principal |
-| `--text-2` | `rgb(245 247 250 / 0.64)` | `rgb(11 13 16 / 0.60)` | secondaire |
-| `--text-3` | `rgb(245 247 250 / 0.42)` | `rgb(11 13 16 / 0.42)` | tertiaire (jamais pour une info essentielle) |
-| `--accent` | `#4C8DFF` | `#1F6FEB` | actions principales, liens, onglet actif |
-| `--on-accent` | `#FFFFFF` | `#FFFFFF` | texte sur accent |
-| `--live` | `#39FF88` | `#00A651` | **LIVE uniquement** (pastille, halo, terrain) |
-| `--danger` | `#FF5C5C` | `#D93025` | destructif, erreurs |
-| `--warning` | `#FFB547` | `#B26A00` | expiration proche |
+| `--text` | `#F5F5F5` | `#0A0A0A` | texte principal |
+| `--text-2` | `#A1A1A6` | `#5C5C63` | secondaire |
+| `--text-3` | `#828289` | `#6E6E75` | tertiaire |
+| `--accent` | `#22C55E` | `#0F7A3A` | actions principales, liens, onglet actif |
+| `--on-accent` | `#050607` (noir) | `#FFFFFF` | texte sur accent |
+| `--live` | `#39FF88` | `#00A651` | **LIVE uniquement** : pastille, halo, terrain (élément graphique) |
+| `--live-text` | `#39FF88` | `#00803F` | libellé « LIVE » |
+| `--danger` | `#FF6B6B` | `#C62828` | destructif, erreurs |
 
-Règles : contraste **AA vérifié** pour chaque paire texte/fond (`--text-3` interdit sous 4,5:1 pour un texte informatif). `--live` n'est **jamais** utilisé comme couleur de marque ni pour un état non LIVE.
+Contrastes calculés (WCAG 2.1) : texte 18,6:1 et 17,7:1 · texte secondaire 7,2:1 et 6,6:1 · tertiaire 4,9:1 et 4,5:1 · accent sur fond 8,9:1 et 5,4:1 · texte sur accent 8,9:1 et 5,4:1 · libellé LIVE 15,3:1 et 5,1:1 · danger 6,7:1 et 5,6:1. Le test unitaire de P2-A (§7) les revérifie.
+
+Règles : `--live` n'est **jamais** utilisé pour un état non LIVE. Pas d'autre couleur : les états d'avertissement utilisent le texte et les icônes, pas une teinte supplémentaire.
 
 ### 2.2 Typographie
 Pile système : `-apple-system, "SF Pro Text", "SF Pro Display", system-ui, …`, soit SF Pro natif sur iPhone, **sans police externe** (CSP, performance, pas de requête tierce).

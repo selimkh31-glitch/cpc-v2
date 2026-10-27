@@ -297,9 +297,9 @@ Brief d'exécution complet : **`docs/23_BRIEF_P2A_DESIGN_SYSTEM.md`**.
 
 | ID | Décision | Recommandation |
 |---|---|---|
-| GO-P2A | Lancer P2-A (UI seule, sans DB) | GO après validation de D-41 et D-42 |
-| D-41 | Direction visuelle « Stade de nuit » (`docs/23` §2) | 🔵 valider ou amender (couleur d'accent) |
-| D-42 | Dépendances UI : shadcn/ui (Radix, déjà prévu par ADR-0006) + `lucide-react` (icônes, licence ISC) | 🔵 valider |
+| GO-P2A | Lancer P2-A (UI seule, sans DB) | ✅ GO (27/10, 19:27) |
+| D-41 | Direction visuelle « Stade de nuit » (`docs/23` §2) | ✅ palette noir, vert, blanc, gris |
+| D-42 | Dépendances UI : shadcn/ui (Radix, déjà prévu par ADR-0006) + `lucide-react` (icônes, licence ISC) | ✅ |
 | D-43 | Blasons de club en bucket privé `crests` | 🔵 valider avant P2-C |
 | D-21, D-23 | Création et visibilité des clubs | trancher avant P2-C |
-| CLAUDE.md | Passage « Phase en cours » à la Phase 2 produit au premier GO de code | à acter avec le GO |
+| CLAUDE.md | Passage « Phase en cours » à la Phase 2 produit | ✅ fait avec le GO P2-A (lot P2-A uniquement) |
