@@ -52,3 +52,68 @@ test("Reduce Motion : aucune animation résiduelle sur les squelettes", async ({
   const animation = await page.locator(".animate-pulse").first().evaluate((el) => getComputedStyle(el).animationName);
   expect(animation).toBe("none");
 });
+
+test.describe("P2-A · A2 — sheets et shell", () => {
+  test("une seule sheet à la fois, Échap, voile, focus et verrou de défilement", async ({ page }) => {
+    const cspErrors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && /Content Security Policy|CSP/i.test(msg.text())) cspErrors.push(msg.text());
+    });
+    await page.goto("/dev/ui");
+
+    await page.getByRole("button", { name: "Ouvrir la fiche A" }).click();
+    const sheetA = page.getByRole("dialog", { name: "Fiche A" });
+    await expect(sheetA).toBeVisible();
+    // Le focus est dans la sheet (modal natif : le reste de la page est inerte).
+    expect(await sheetA.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+    await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe("hidden");
+
+    // Ouvrir B depuis A : A se ferme, jamais deux sheets.
+    await sheetA.getByRole("button", { name: "Ouvrir la fiche B" }).click();
+    await expect(page.getByRole("dialog", { name: "Fiche B" })).toBeVisible();
+    await expect(page.getByRole("dialog")).toHaveCount(1);
+    await expect.poll(() => page.locator("dialog[data-sheet][open]").count()).toBe(1);
+    // La fermeture de A ne doit pas rendre le défilement tant que B est ouverte.
+    await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe("hidden");
+
+    // Échap ferme ; le défilement est rendu.
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    // L'événement « close » du <dialog> est asynchrone : le verrou est libéré juste après.
+    await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe("");
+
+    // Tap sur le voile (haut de l'écran, hors du panneau) : fermeture.
+    await page.getByRole("button", { name: "Ouvrir la fiche A" }).click();
+    await expect(sheetA).toBeVisible();
+    await page.mouse.click(10, 10);
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+
+    // Bouton Fermer.
+    await page.getByRole("button", { name: "Ouvrir la fiche A" }).click();
+    await sheetA.getByRole("button", { name: "Fermer" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+
+    await page.waitForLoadState("networkidle");
+    expect(cspErrors, "aucune violation CSP à l'ouverture des sheets").toEqual([]);
+  });
+
+  test("titre compact dans l'en-tête quand le grand titre défile hors de vue", async ({ page }) => {
+    await page.goto("/dev/ui");
+    const compact = page.getByTestId("header-compact-title");
+    await expect(compact).toHaveCSS("opacity", "0");
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect(compact).toHaveText("Galerie UI");
+    await expect(compact).toHaveCSS("opacity", "1");
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(compact).toHaveCSS("opacity", "0");
+  });
+
+  test("barre d'onglets : trois onglets, cibles ≥ 44 px", async ({ page }) => {
+    await page.goto("/dev/ui");
+    const nav = page.getByRole("navigation", { name: "Navigation principale" });
+    await expect(nav.getByRole("link")).toHaveCount(3);
+    for (const link of await nav.getByRole("link").all()) {
+      expect((await link.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
+    }
+  });
+});

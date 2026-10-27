@@ -1,20 +1,34 @@
-import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+"use client";
+
+import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
+import { useShellTitle } from "./shell-title";
 
 /**
- * En-tête du shell (cahier UX §2). Les emplacements Radar, messages et notifications
- * n'affichent rien tant que ces fonctionnalités n'existent pas (aucun bouton factice).
+ * En-tête du shell (cahier UX §2) : matière translucide, titre compact qui apparaît quand le grand
+ * titre de l'écran défile hors de vue. Les emplacements Radar et notifications restent vides tant que
+ * ces fonctionnalités n'existent pas (aucun bouton factice) : lots P2-B et P2-G.
  */
-export async function AppHeader() {
-  const t = await getTranslations("app");
+export function AppHeader() {
+  const t = useTranslations("app");
+  const compact = useShellTitle();
   return (
-    <header className="sticky top-0 z-40 border-b border-foreground/15 bg-background pt-[env(safe-area-inset-top)]">
-      <div className="mx-auto flex min-h-14 max-w-md items-center justify-between px-4">
-        <Link href="/home" className="flex min-h-11 items-center font-semibold">
-          {t("name")}
-        </Link>
-        {/* Emplacements réservés : Radar (Phase 3), messages et notifications (Phase 5). */}
-        <div data-slot="header-actions" className="flex items-center gap-2" />
+    <header className="material sticky top-0 z-40 pt-[env(safe-area-inset-top)] hairline-b">
+      <div className="relative mx-auto flex min-h-11 max-w-md items-center justify-between px-4">
+        <span aria-hidden={compact ? true : undefined} className={cn("text-headline transition-opacity duration-200", compact ? "opacity-0" : "opacity-100")}>
+          {t("shortName")}
+        </span>
+        <span
+          aria-hidden
+          data-testid="header-compact-title"
+          className={cn(
+            "pointer-events-none absolute inset-x-16 truncate text-center text-headline transition-opacity duration-200",
+            compact ? "opacity-100" : "opacity-0",
+          )}
+        >
+          {compact}
+        </span>
+        <div data-slot="header-actions" className="flex items-center gap-1" />
       </div>
     </header>
   );
