@@ -7,7 +7,7 @@ cpc-v2/
 ├─ src/
 │  ├─ app/
 │  │  ├─ dev/ui/page.tsx              # galerie du design system (P2-A) : notFound() hors ENABLE_UI_GALLERY=1, jamais sur Vercel
-│  │  ├─ dev/ui/screens/[screen]/     # écrans réels (HomeView, ProfileView) avec données fictives, même garde
+│  │  ├─ dev/ui/screens/[screen]/     # écrans réels (HomeView, ProfileView) avec données fictives, même garde (layout + loading)
 │  │  ├─ (public)/                    # accessible sans compte
 │  │  │  ├─ page.tsx                  # accueil public → /login ou /home si connecté
 │  │  │  ├─ legal/{terms,privacy,support}/
@@ -41,13 +41,14 @@ cpc-v2/
 │  │  └─ layout.tsx  error.tsx  not-found.tsx  global-error.tsx
 │  ├─ components/
 │  │  ├─ ui/                          # design system P2-A (docs/23) : Button/SubmitButton, IconButton, TextField, Chip, Badge, Avatar, Skeleton, EmptyState, InlineStatus, use-submit-lock, Sheet (<dialog> natif), SheetLauncher, ListSection/ListRow, LivePill/LiveHalo, ChoiceChip ; styles des boutons dans button-styles.ts (utilisables côté serveur)
-│  │  ├─ layout/                      # AppShell, TabBar, Header, RadarIndicator, Sheet
-│  │  └─ states/                      # Loading, Empty, Error, Offline, Expired, Forbidden, Conflict (UX-01)
+│  │  ├─ layout/                      # AppHeader (matière, titre compact), TabBar (3 onglets), ShellTitle (PageTitle + IntersectionObserver) ; RadarIndicator à venir (P2-C)
+│  │  ├─ patterns/                    # compositions réutilisables : AuthShell (écrans d'authentification)
+│  │  └─ states/                      # StatePanel, PageSkeleton, OfflineBanner, PendingButton (UX-01) ; Expired/Forbidden/Conflict à venir avec leurs lots
 │  ├─ features/                       # un dossier par domaine, même structure partout
-│  │  ├─ auth/  profiles/  clubs/  memberships/  recruitment/
+│  │  ├─ auth/  onboarding/  home/  profiles/  clubs/  memberships/  recruitment/
 │  │  ├─ radar/  live/  lineup/  explore/  ea/
 │  │  ├─ messaging/  notifications/  reviews/  safety/  pro/  admin/
-│  │  │   └─ <domaine>/
+│  │  │   └─ <domaine>/               # ex. home/components/home-view.tsx, profiles/components/profile-view.tsx, onboarding/components/onboarding-stepper.tsx
 │  │  │       ├─ components/          # UI du domaine
 │  │  │       ├─ actions.ts           # Server Actions ('use server') → RPC api.*
 │  │  │       ├─ queries.ts           # lectures serveur (server-only)
@@ -91,7 +92,8 @@ cpc-v2/
 │  ├─ reference/CPC_Cahier_UX_V1_Reference.docx   # référence UX (V-09)
 │  ├─ BACKLOG_V2.md                   # 06
 │  ├─ AUDIT_PHASE2.md                 # 01
-│  └─ ADR/0001-stack.md … 0016-v1-isolation.md
+│  ├─ 22_MASTER_PLAN_PHASE2.md  23_BRIEF_P2A_DESIGN_SYSTEM.md (PR #27)  24_RAPPORT_P2A.md
+│  └─ ADR/0001-stack.md … 0017-rendering-csp.md
 ├─ .github/
 │  ├─ workflows/ci.yml                # lint, typecheck, unit, supabase+pgTAP, build, e2e, gitleaks, garde-fou V1
 │  └─ pull_request_template.md        # preuves exigées par gate
@@ -105,6 +107,7 @@ cpc-v2/
 ```
 
 **Conventions**
+- Les pages `app/` chargent les données (serveur) et délèguent l'affichage à une vue de domaine (`features/<domaine>/components/*-view.tsx`), ce qui permet à la galerie de rendre la même vue avec des données fictives.
 - Un domaine n'importe jamais les `actions.ts` ou `queries.ts` d'un autre domaine. Les dépendances transverses passent par `lib/`.
 - `lib/supabase/admin.ts` est importable uniquement depuis `app/api/webhooks/*`, avec une règle ESLint `no-restricted-imports`.
 - Commits en français, un lot par PR, preuves de gate dans la description.
