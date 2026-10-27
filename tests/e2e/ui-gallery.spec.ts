@@ -122,6 +122,15 @@ test.describe("P2-A · A4 — écrans (données fictives de galerie)", () => {
   for (const colorScheme of ["dark", "light"] as const) {
     test(`Accueil et Profil : accessibilité, CSP, sheet — ${colorScheme}`, async ({ page }, testInfo) => {
       await page.emulateMedia({ colorScheme });
+      // Diagnostic CSP : élément, directive et extrait de chaque violation (sans contenu sensible).
+      await page.addInitScript(() => {
+        const store: string[] = [];
+        (window as unknown as { __csp: string[] }).__csp = store;
+        document.addEventListener("securitypolicyviolation", (e) => {
+          const el = e.target as Element | null;
+          store.push([e.violatedDirective, e.blockedURI, (e.sample || "").slice(0, 80), e.sourceFile, e.lineNumber, el?.tagName ?? "", el?.outerHTML?.slice(0, 160) ?? ""].join(" | "));
+        }, true);
+      });
       const cspErrors: string[] = [];
       page.on("console", (msg) => {
         if (msg.type() === "error" && /Content Security Policy|CSP/i.test(msg.text())) cspErrors.push(msg.text());
@@ -142,6 +151,8 @@ test.describe("P2-A · A4 — écrans (données fictives de galerie)", () => {
       await sheet.getByRole("button", { name: "Fermer" }).click();
       await expect(page.getByRole("dialog")).toHaveCount(0);
       await page.waitForLoadState("networkidle");
+      const violations = await page.evaluate(() => (window as unknown as { __csp?: string[] }).__csp ?? []);
+      expect(violations, "violations CSP détaillées").toEqual([]);
       expect(cspErrors).toEqual([]);
     });
   }
