@@ -189,3 +189,10 @@ jobs:
       - run: pnpm test:e2e --project=mobile-webkit
       - if: always()
         run: node scripts/ci/annotate.mjs playwright playwright-report/results.json
+      # Captures iPhone (WebKit) du design system : preuve visuelle jointe à chaque PR (P2-A).
+      - if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report-webkit
+          path: playwright-report/
+          retention-days: 14
