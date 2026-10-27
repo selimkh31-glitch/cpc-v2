@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import type { Page } from "@playwright/test";
+
+/** Marque l'étape en cours pour attribuer chaque violation CSP (diagnostic). */
+async function step(page: Page, name: string) {
+  await page.evaluate((n) => { (window as unknown as { __step: string }).__step = n; }, name);
+}
 
 /**
  * P2-A (docs/23 §7) — galerie du design system : accessibilité clair/sombre, CSP sans violation,
@@ -126,12 +132,20 @@ test.describe("P2-A · A4 — écrans (données fictives de galerie)", () => {
       // Les captures utilisent caret: "initial" : par défaut Playwright injecte un <style> (masquage du
       // curseur) que WebKit bloque à juste titre sous notre CSP à nonce — artefact de test, pas de l'appli.
       await page.addInitScript(() => {
+        const w = window as unknown as { __csp: string[]; __step: string };
         const store: string[] = [];
-        (window as unknown as { __csp: string[] }).__csp = store;
+        w.__csp = store;
+        w.__step = "chargement";
         document.addEventListener("securitypolicyviolation", (e) => {
           const el = e.target as Element | null;
-          store.push([e.violatedDirective, e.blockedURI, (e.sample || "").slice(0, 80), e.sourceFile, e.lineNumber, el?.tagName ?? "", el?.outerHTML?.slice(0, 160) ?? ""].join(" | "));
+          store.push([w.__step, e.violatedDirective, e.blockedURI, (e.sample || "").slice(0, 80), e.sourceFile, e.lineNumber, el?.tagName ?? "", el?.outerHTML?.slice(0, 160) ?? ""].join(" | "));
         }, true);
+        // Toute balise <style> ajoutée sans nonce est signalée avec l'étape en cours et son début de contenu.
+        new MutationObserver((records) => {
+          for (const r of records) for (const n of r.addedNodes) {
+            if (n instanceof HTMLStyleElement && !n.nonce) store.push(`${w.__step} | <style> ajouté | ${(n.textContent ?? "").replace(/\s+/g, " ").slice(0, 120)}`);
+          }
+        }).observe(document, { childList: true, subtree: true });
       });
       const cspErrors: string[] = [];
       page.on("console", (msg) => {
@@ -140,16 +154,21 @@ test.describe("P2-A · A4 — écrans (données fictives de galerie)", () => {
       for (const screen of ["home", "profile"]) {
         await page.goto(`/dev/ui/screens/${screen}`);
         await expect(page.getByRole("heading", { level: 1 })).toHaveText(screen === "home" ? "Accueil" : "Profil");
+        await step(page, `${screen}:axe`);
         const results = await new AxeBuilder({ page }).analyze();
         const blocking = results.violations.filter((v) => v.impact === "critical" || v.impact === "serious");
         expect(blocking.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(", ")}`), screen).toEqual([]);
+        await step(page, `${screen}:capture`);
         await testInfo.attach(`${screen}-${colorScheme}-${testInfo.project.name}`, { body: await page.screenshot({ fullPage: true, caret: "initial" }), contentType: "image/png" });
       }
       // Édition en sheet : panneau court, une action, fermeture.
+      await step(page, "sheet:ouverture");
       await page.getByRole("button", { name: /^Présentation/ }).click();
       const sheet = page.getByRole("dialog", { name: "Présentation" });
       await expect(sheet.getByLabel("Ta présentation")).toHaveValue("Exemple de présentation fictive pour la galerie.");
+      await step(page, "sheet:capture");
       await testInfo.attach(`profile-sheet-${colorScheme}-${testInfo.project.name}`, { body: await page.screenshot({ caret: "initial" }), contentType: "image/png" });
+      await step(page, "sheet:fermeture");
       await sheet.getByRole("button", { name: "Fermer" }).click();
       await expect(page.getByRole("dialog")).toHaveCount(0);
       await page.waitForLoadState("networkidle");
