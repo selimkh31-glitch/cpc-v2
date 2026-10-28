@@ -8,17 +8,24 @@ test.describe("S-1.9 — profil et avatar privé", () => {
     const user = await createOnboardedUser();
     await login(page, user.email);
     await page.goto("/profile");
-    await page.getByLabel("Ta présentation").fill("Milieu box-to-box, dispo le soir.");
-    await page.getByRole("region", { name: "Présentation" }).getByRole("button", { name: "Enregistrer" }).click();
+    // P2-A : édition par panneau court (sheet), même formulaire et même Server Action.
+    await page.getByRole("button", { name: /^Présentation/ }).click();
+    const presentation = page.getByRole("dialog", { name: "Présentation" });
+    await presentation.getByLabel("Ta présentation").fill("Milieu box-to-box, dispo le soir.");
+    await presentation.getByRole("button", { name: "Enregistrer" }).click();
     await expect(page).toHaveURL(/\/profile\?saved=presentation$/);
     await expect(page.getByRole("status").filter({ hasText: "Présentation enregistrée." })).toBeVisible();
     await expect(page.getByLabel("Ta présentation")).toHaveValue("Milieu box-to-box, dispo le soir.");
 
-    await page.getByLabel("Gamertag EA").fill("QA_Gamertag");
-    await page.getByRole("region", { name: "Identifiant EA" }).getByRole("button", { name: "Enregistrer" }).click();
+    // La sheet se referme après l'enregistrement confirmé par le serveur.
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await page.getByRole("button", { name: /^Identifiant EA/ }).click();
+    const ea = page.getByRole("dialog", { name: "Identifiant EA" });
+    await ea.getByLabel("Gamertag EA").fill("QA_Gamertag");
+    await ea.getByRole("button", { name: "Enregistrer" }).click();
     await expect(page).toHaveURL(/\/profile\?saved=gamertag$/);
     await expect(page.getByLabel("Gamertag EA")).toHaveValue("QA_Gamertag");
-    await expect(page.getByText("Déclaratif : il n'est pas vérifié par CPC.")).toBeVisible();
+    await expect(page.getByText("L'identifiant EA est déclaratif : il n'est pas vérifié par CPC.")).toBeVisible();
     // La présentation n'a pas été écrasée par l'autre panneau.
     await expect(page.getByLabel("Ta présentation")).toHaveValue("Milieu box-to-box, dispo le soir.");
   });
@@ -28,8 +35,13 @@ test.describe("S-1.9 — profil et avatar privé", () => {
     await login(page, user.email);
     await page.goto("/profile");
 
-    await page.getByLabel("Choisir une image").setInputFiles({ name: "avatar.png", mimeType: "image/png", buffer: TINY_PNG });
-    await page.getByRole("button", { name: "Envoyer l'avatar" }).click();
+    const openAvatarSheet = async () => {
+      await page.getByRole("button", { name: /^Photo de profil/ }).click();
+      return page.getByRole("dialog", { name: "Avatar" });
+    };
+    let sheet = await openAvatarSheet();
+    await sheet.getByLabel("Choisir une image").setInputFiles({ name: "avatar.png", mimeType: "image/png", buffer: TINY_PNG });
+    await sheet.getByRole("button", { name: "Envoyer l'avatar" }).click();
     await expect(page).toHaveURL(/\/profile\?saved=avatar$/);
     const img = page.getByTestId("profile-avatar");
     await expect(img).toBeVisible();
@@ -39,14 +51,16 @@ test.describe("S-1.9 — profil et avatar privé", () => {
     expect((await page.request.get(src)).status(), "URL signée valide").toBe(200);
 
     // S7 : SVG déguisé en image refusé (signature réelle contrôlée côté serveur).
-    await page.getByLabel("Choisir une image").setInputFiles({ name: "x.png", mimeType: "image/png", buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"></svg>') });
-    await page.getByRole("button", { name: "Envoyer l'avatar" }).click();
+    sheet = await openAvatarSheet();
+    await sheet.getByLabel("Choisir une image").setInputFiles({ name: "x.png", mimeType: "image/png", buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"></svg>') });
+    await sheet.getByRole("button", { name: "Envoyer l'avatar" }).click();
     await expect(page).toHaveURL(/\/profile\?error=avatar_type$/);
     await expect(page.getByRole("main").getByRole("alert")).toHaveText(/Format refusé/);
 
     // Retrait : l'ancien objet est supprimé, son URL signée devient inopérante (S8).
     await page.goto("/profile");
-    await page.getByRole("button", { name: "Retirer l'avatar" }).click();
+    sheet = await openAvatarSheet();
+    await sheet.getByRole("button", { name: "Retirer l'avatar" }).click();
     await expect(page).toHaveURL(/\/profile\?saved=avatar_removed$/);
     await expect(page.getByTestId("profile-avatar")).toHaveCount(0);
     expect((await page.request.get(src)).status(), "S8 — objet supprimé : URL signée refusée").toBeGreaterThanOrEqual(400);

@@ -1,17 +1,15 @@
-import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
-/** Chargement (cahier UX §12) : squelette neutre, annoncé une seule fois aux lecteurs d'écran. */
-export function Skeleton({ className }: { className?: string }) {
-  return <div aria-hidden className={cn("animate-pulse rounded-card bg-foreground/10 motion-reduce:animate-none", className)} />;
-}
+export { Skeleton };
 
+/** Chargement d'un écran du shell : grand titre et sections fantômes, annoncés une seule fois. */
 export function PageSkeleton({ label }: { label: string }) {
   return (
-    <main aria-busy="true" className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 py-6">
+    <main aria-busy="true" className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-4 pb-8 pt-4">
       <p role="status" className="sr-only">{label}</p>
-      <Skeleton className="h-8 w-40" />
-      <Skeleton className="h-28 w-full" />
-      <Skeleton className="h-28 w-full" />
+      <Skeleton className="h-10 w-44 rounded-field" />
+      <Skeleton className="h-36 w-full rounded-hero" />
+      <Skeleton className="h-24 w-full" />
     </main>
   );
 }

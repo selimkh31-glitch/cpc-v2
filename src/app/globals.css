@@ -1,32 +1,179 @@
 @import "tailwindcss";
 
-/* Design tokens (ADR-0006) — valeurs provisoires, à aligner sur le cahier UX. */
+/*
+ * Design tokens « Stade de nuit » (D-41 ✅, docs/23 §2) — palette noir, vert, blanc, gris.
+ * Sombre par défaut ; thème clair complet selon le réglage de l'appareil.
+ * Les contrastes sont revérifiés par tests/unit/design-tokens.test.ts (WCAG 2.1 AA).
+ * `--live` est réservé au LIVE (pastille, halo, terrain) : jamais pour un autre état.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+  --bg: #050607;
+  --surface-1: #111315;
+  --surface-2: #181a1d;
+  --surface-3: #22252a;
+  --separator: rgb(255 255 255 / 0.08);
+  --text: #f5f5f5;
+  --text-2: #a1a1a6;
+  --text-3: #828289;
+  --accent: #22c55e;
+  --on-accent: #050607;
   --live: #39ff88;
-  --radius: 0.75rem;
+  --live-text: #39ff88;
+  --danger: #ff6b6b;
+  --material: rgb(5 6 7 / 0.72);
+
+  /* Alias historiques (écrans Phase 1, migrés en A3/A4). */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --radius: 0.875rem;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --bg: #f2f2f4;
+    --surface-1: #ffffff;
+    --surface-2: #f7f7f8;
+    --surface-3: #e9e9ec;
+    --separator: rgb(0 0 0 / 0.08);
+    --text: #0a0a0a;
+    --text-2: #5c5c63;
+    --text-3: #6e6e75;
+    --accent: #0f7a3a;
+    --on-accent: #ffffff;
+    --live: #009b4c;
+    --live-text: #00803f;
+    --danger: #c62828;
+    --material: rgb(242 242 244 / 0.72);
+  }
 }
 
 @theme inline {
+  /* Couleurs */
+  --color-canvas: var(--bg);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-separator: var(--separator);
+  --color-ink: var(--text);
+  --color-ink-2: var(--text-2);
+  --color-ink-3: var(--text-3);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-live: var(--live);
+  --color-live-text: var(--live-text);
+  --color-danger: var(--danger);
+  --color-material: var(--material);
+  /* Alias historiques */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-live: var(--live);
+
+  /* Rayons */
+  --radius-field: 0.625rem;
+  --radius-row: 0.875rem;
   --radius-card: var(--radius);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --radius-hero: 1.375rem;
+  --radius-sheet: 1.75rem;
+
+  /* Typographie système iOS (SF Pro), aucune police externe (CSP, performance). */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Mouvement */
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Échelle typographique (iOS Human Interface Guidelines), en rem pour respecter le zoom texte. */
+@utility text-large-title {
+  font-size: 2.125rem;
+  line-height: 2.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+@utility text-title-2 {
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+}
+@utility text-headline {
+  font-size: 1.0625rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+}
+@utility text-body {
+  font-size: 1.0625rem;
+  line-height: 1.375rem;
+  font-weight: 400;
+}
+@utility text-subhead {
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+}
+@utility text-footnote {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  font-weight: 400;
+}
+@utility text-caption {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+}
+
+/* Filet fin (0,5 px sur écran Retina). */
+@utility hairline-b {
+  box-shadow: inset 0 -0.5px 0 var(--separator);
+}
+@utility hairline-t {
+  box-shadow: inset 0 0.5px 0 var(--separator);
+}
+
+/* Matière translucide (en-tête, barre d'onglets) avec repli opaque. */
+@utility material {
+  background-color: var(--bg);
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background-color: var(--material);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+}
+
+/* Mouvements courts (docs/23 §2.4) : jamais en boucle, neutralisés par Reduce Motion. */
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes live-glow {
+  0% {
+    box-shadow: 0 0 0 1px var(--live), 0 0 0 0 var(--live);
+  }
+  50% {
+    box-shadow: 0 0 0 1px var(--live), 0 0 32px 2px var(--live);
+  }
+  100% {
+    box-shadow: 0 0 0 1px var(--live), 0 0 24px -4px var(--live);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--text);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -42,7 +189,7 @@ body {
 
 /* S-1.10 — accessibilité (cahier UX §12, WCAG 2.1 AA). */
 :focus-visible {
-  outline: 2px solid currentColor;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 

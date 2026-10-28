@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { PendingButton } from "@/components/states/pending-button";
+import { AuthShell } from "@/components/patterns/auth-shell";
+import { SubmitButton } from "@/components/ui/button";
+import { subtleLinkClasses } from "@/components/ui/button-styles";
+import { InlineStatus } from "@/components/ui/inline-status";
+import { TextField } from "@/components/ui/text-field";
 import { signInAction } from "@/features/auth/actions";
 import { safeNextPath } from "@/lib/auth/redirect";
 
@@ -10,39 +14,34 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const tStates = await getTranslations("states");
   const next = safeNextPath(params.next, "/home");
   return (
-    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-4 px-4 py-10">
-      <h1 className="text-2xl font-semibold">{t("loginTitle")}</h1>
-      {params.error ? (
-        <p role="alert" className="rounded-card border border-red-500 p-3 text-sm">
-          {t("invalidCredentials")}
-        </p>
-      ) : null}
-      <form action={signInAction} className="flex flex-col gap-3">
+    <AuthShell
+      title={t("loginTitle")}
+      footer={
+        // Accès sans compte aux documents légaux.
+        <nav aria-label={t("legalNav")} className="flex flex-wrap justify-center gap-x-5 text-footnote text-ink-3">
+          <Link href="/legal/terms" className="inline-flex min-h-11 items-center">{t("legalTerms")}</Link>
+          <Link href="/legal/privacy" className="inline-flex min-h-11 items-center">{t("legalPrivacy")}</Link>
+          <Link href="/legal/support" className="inline-flex min-h-11 items-center">{t("legalSupport")}</Link>
+        </nav>
+      }
+    >
+      {params.error ? <InlineStatus kind="error">{t("invalidCredentials")}</InlineStatus> : null}
+      <form action={signInAction} className="flex flex-col gap-4">
         <input type="hidden" name="next" value={next} />
-        <label className="flex flex-col gap-1 text-sm">
-          {t("email")}
-          <input name="email" type="email" autoComplete="email" required className="min-h-11 rounded-card border px-3" />
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          {t("password")}
-          <input name="password" type="password" autoComplete="current-password" required minLength={10} className="min-h-11 rounded-card border px-3" />
-        </label>
-        <PendingButton pendingLabel={tStates("pending")} className="bg-foreground font-medium text-background">
+        <TextField label={t("email")} name="email" type="email" autoComplete="email" inputMode="email" required />
+        <TextField label={t("password")} name="password" type="password" autoComplete="current-password" required minLength={10} />
+        <SubmitButton size="lg" pendingLabel={tStates("pending")} className="mt-2">
           {t("submitLogin")}
-        </PendingButton>
+        </SubmitButton>
       </form>
-      <Link href="/forgot-password" className="inline-flex min-h-11 items-center text-sm underline">
-        {t("goToForgot")}
-      </Link>
-      <Link href={`/signup?next=${encodeURIComponent(next)}`} className="inline-flex min-h-11 items-center text-sm underline">
-        {t("goToSignup")}
-      </Link>
-      {/* Accès sans compte aux documents légaux (auparavant sur la page provisoire `/`). */}
-      <nav aria-label={t("legalNav")} className="mt-6 flex flex-wrap gap-x-4 text-sm">
-        <Link href="/legal/terms" className="inline-flex min-h-11 items-center underline">{t("legalTerms")}</Link>
-        <Link href="/legal/privacy" className="inline-flex min-h-11 items-center underline">{t("legalPrivacy")}</Link>
-        <Link href="/legal/support" className="inline-flex min-h-11 items-center underline">{t("legalSupport")}</Link>
-      </nav>
-    </main>
+      <div className="flex flex-col items-center">
+        <Link href="/forgot-password" className={subtleLinkClasses()}>
+          {t("goToForgot")}
+        </Link>
+        <Link href={`/signup?next=${encodeURIComponent(next)}`} className={subtleLinkClasses()}>
+          {t("goToSignup")}
+        </Link>
+      </div>
+    </AuthShell>
   );
 }

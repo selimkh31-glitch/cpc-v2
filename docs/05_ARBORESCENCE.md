@@ -6,6 +6,8 @@ Nouveau dépôt GitHub (nom suggéré : `cpc-v2`), **sans aucun fichier copié d
 cpc-v2/
 ├─ src/
 │  ├─ app/
+│  │  ├─ dev/ui/page.tsx              # galerie du design system (P2-A) : notFound() hors ENABLE_UI_GALLERY=1, jamais sur Vercel
+│  │  ├─ dev/ui/screens/[screen]/     # écrans réels (HomeView, ProfileView) avec données fictives, même garde
 │  │  ├─ (public)/                    # accessible sans compte
 │  │  │  ├─ page.tsx                  # accueil public → /login ou /home si connecté
 │  │  │  ├─ legal/{terms,privacy,support}/
@@ -38,7 +40,7 @@ cpc-v2/
 │  │  ├─ manifest.webmanifest/route.ts # PWA (D-08) ; lien émis dans layout.tsx (crossorigin use-credentials)
 │  │  └─ layout.tsx  error.tsx  not-found.tsx  global-error.tsx
 │  ├─ components/
-│  │  ├─ ui/                          # primitives shadcn/ui (Radix) + tokens
+│  │  ├─ ui/                          # design system P2-A (docs/23) : Button/SubmitButton, IconButton, TextField, Chip, Badge, Avatar, Skeleton, EmptyState, InlineStatus, use-submit-lock, Sheet (<dialog> natif), SheetLauncher, ListSection/ListRow, LivePill/LiveHalo, ChoiceChip ; styles des boutons dans button-styles.ts (utilisables côté serveur)
 │  │  ├─ layout/                      # AppShell, TabBar, Header, RadarIndicator, Sheet
 │  │  └─ states/                      # Loading, Empty, Error, Offline, Expired, Forbidden, Conflict (UX-01)
 │  ├─ features/                       # un dossier par domaine, même structure partout

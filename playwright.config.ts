@@ -36,6 +36,8 @@ export default defineConfig({
     ? undefined
     : {
         command: `pnpm start --port ${PORT}`,
+        // Galerie du design system (P2-A) : serveur de test uniquement, jamais sur Vercel.
+        env: { ...process.env, ENABLE_UI_GALLERY: "1" } as Record<string, string>,
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,

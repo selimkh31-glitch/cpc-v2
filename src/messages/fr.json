@@ -48,7 +48,9 @@
     "activityTitle": "Ton activité",
     "empty": "Aucune activité pour l'instant. Les sessions et les clubs apparaîtront ici dès leur ouverture.",
     "explore": "Explorer",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "greeting": "Salut {handle}",
+    "profileShortcut": "Ouvrir ton profil"
   },
   "onboarding": {
     "title": "Ton profil joueur",
@@ -86,7 +88,20 @@
       "LW": "LW — Ailier gauche",
       "CF": "CF — Attaquant en retrait",
       "ST": "ST — Avant-centre"
-    }
+    },
+    "stepIdentity": "Identité",
+    "stepPositions": "Postes",
+    "stepConfirm": "Confirmation",
+    "next": "Continuer",
+    "back": "Retour",
+    "progress": "Étape {current} sur {total}",
+    "groups": {
+      "GK": "Gardien",
+      "DEF": "Défense",
+      "MID": "Milieu",
+      "ATT": "Attaque"
+    },
+    "confirmIntro": "Ton profil sera visible des autres joueurs connectés à CPC."
   },
   "nav": {
     "tabsLabel": "Navigation principale",
@@ -97,7 +112,8 @@
   },
   "explore": {
     "title": "Explorer",
-    "unavailable": "Les sessions ouvertes, les clubs et la recherche de joueurs ne sont pas encore disponibles."
+    "unavailable": "Les sessions ouvertes, les clubs et la recherche de joueurs ne sont pas encore disponibles.",
+    "emptyTitle": "Rien à explorer pour l'instant"
   },
   "profile": {
     "title": "Profil",
@@ -123,7 +139,7 @@
     "save": "Enregistrer",
     "eaTitle": "Identifiant EA",
     "eaLabel": "Gamertag EA",
-    "eaHint": "Déclaratif : il n'est pas vérifié par CPC.",
+    "eaHint": "L'identifiant EA est déclaratif : il n'est pas vérifié par CPC.",
     "saved": {
       "presentation": "Présentation enregistrée.",
       "gamertag": "Identifiant EA enregistré.",
@@ -138,7 +154,19 @@
       "avatar_type": "Format refusé : PNG, JPEG ou WebP uniquement.",
       "avatar_upload": "L'avatar n'a pas pu être enregistré. Réessaie.",
       "avatar_remove": "L'avatar n'a pas pu être retiré. Réessaie."
-    }
+    },
+    "sectionProfile": "Profil joueur",
+    "sectionAccount": "Compte",
+    "noPresentation": "Aucune présentation",
+    "notProvided": "Non renseigné",
+    "avatarRow": "Photo de profil",
+    "avatarRowNone": "Aucune photo",
+    "avatarRowSet": "Photo ajoutée",
+    "close": "Fermer",
+    "editPresentation": "Modifier ta présentation",
+    "editGamertag": "Modifier ton identifiant EA",
+    "editAvatar": "Modifier ta photo",
+    "eaFieldHint": "32 caractères maximum. Information déclarée, non vérifiée par CPC."
   },
   "states": {
     "loading": "Chargement…",
