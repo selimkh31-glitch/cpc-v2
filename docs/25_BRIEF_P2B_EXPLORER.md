@@ -1,6 +1,6 @@
 # CPC V2 — 25 · Brief P2-B : Explorer, premier lot fonctionnel
 
-- **Statut :** 🟡 BRIEF, soumis à validation. **Aucune migration ni implémentation** avant le GO de Selim sur ce périmètre.
+- **Statut :** ✅ PÉRIMÈTRE VALIDÉ (Selim, 28/10/2026 19:43). Décisions D-21, D-23, D-43, D-45 à D-48 tranchées (§10). **GO limité au sous-lot B0** (contrats). B1 à B7 exigent chacun un GO d'exécution ; **aucune migration appliquée au staging sans GO spécifique**.
 - **Date :** 28/10/2026 · **Base :** `main` `f91a337` (P2-A fusionné).
 - **Demande (Selim, 28/10) :** faire d'Explorer le vrai point d'entrée pour découvrir joueurs, clubs et sessions LIVE, en respectant les fonctionnalités et dépendances du cahier UX, sans inventer de clubs, de sessions ni de statistiques.
 - **Sources :** cahier UX §5 (EXP-01/02/03), `docs/22` master plan (PR #27), `docs/04` schéma, `docs/06` backlog (S-2.1, S-2.2, S-2.3, S-4.2, S-4.4), registre `docs/02` (D-11, D-21, D-23, D-43, D-01), ADR-0004, ADR-0005, ADR-0006, ADR-0008, ADR-0015, ADR-0017.
@@ -28,7 +28,7 @@ Le master plan (`docs/22` §4) place Explorer Clubs (P2-F) après les clubs (P2-
 **Reportés au lot suivant (P2-C2 « Recrutement », ex-P2-D) :** candidature, invitation club, profil d'autrui. Dans ce lot, la carte club n'affiche **pas** de bouton « Candidater » (aucun bouton sans backend). L'état « candidature active » arrive avec P2-C2.
 **Reportés plus loin :** notifications in-app (socle P2-B, utile seulement avec les candidatures), blasons de club (D-43), inversion PRIMARY↔SECONDARY, quitter un club, gouvernance.
 
-> **Arbitrage demandé (D-45, §10) :** valider ce recadrage, ou garder l'ordre du master plan (Clubs → Recrutement → Explorer), plus long avant qu'Explorer ne change sur l'iPhone.
+> **D-45 ✅ (Selim, 28/10) :** Explorer Clubs est le premier lot fonctionnel vertical (socle indispensable + création de club + Explorer Clubs). Le master plan `docs/22` (PR #27) est mis en cohérence avec ce nouvel ordre.
 
 ---
 
@@ -54,7 +54,7 @@ Le master plan (`docs/22` §4) place Explorer Clubs (P2-F) après les clubs (P2-
 1. Onglet **Explorer**. Le dernier segment utilisé s'ouvre, Clubs par défaut.
 2. Il voit la liste des clubs actifs. Filtres visibles : **Plateforme** (sa plateforme présélectionnée), **Recrute** (activé par défaut), **Poste** (son poste principal proposé, non imposé). Les autres filtres (langue, niveau) sont dans un panneau.
 3. Un tap sur une carte ouvre la **fiche rapide** en sheet. Le bouton « Voir le club » mène à `/clubs/[id]`.
-4. Sur la fiche, il voit l'identité, le niveau déclaré, les langues, le recrutement, les postes recherchés et l'effectif. **Aucun bouton Candidater** dans ce lot. Une ligne indique qu'il pourra candidater depuis cette fiche quand le recrutement sera ouvert (formulation à valider, §10 D-46).
+4. Sur la fiche, il voit l'identité, le niveau déclaré, les langues, le recrutement, les postes recherchés et l'effectif. **Aucune mention de candidature** (D-46) : ni bouton, ni texte, ni « bientôt ».
 5. Retour arrière : la liste revient avec les mêmes filtres et la même position de défilement.
 
 ### 3.2 Joueur qui crée son club (futur manager)
@@ -64,9 +64,10 @@ Le master plan (`docs/22` §4) place Explorer Clubs (P2-F) après les clubs (P2-
    - **Jeu** : plateforme, langues ≤ 3, niveau déclaré ;
    - **Recrutement** : ouvert ou fermé, postes recherchés.
 3. Envoi unique (verrou A-3, `request_id` idempotent). Le créateur devient **OWNER** : PRIMARY si son slot est libre, sinon SECONDARY. Refus s'il a déjà 2 affiliations, ou s'il a créé un club il y a moins de 24 h (D-21).
+   **Il reste un joueur** : même compte, mêmes trois onglets, même profil. Les droits OWNER et manager sont **contextuels au club** et contrôlés côté serveur, à chaque commande et à chaque page de gestion ; ce n'est pas un « mode manager » global.
 4. Il arrive sur la fiche de son club, avec un bouton **Gérer le recrutement**, visible seulement pour OWNER et manager (contrôle côté serveur).
 5. `/clubs/[id]/manage/settings` : ouvrir ou fermer le recrutement, postes recherchés, description, langues, niveau.
-6. Son club apparaît dans Explorer pour les autres joueurs authentifiés (D-23 : jamais en anonyme).
+6. Son club apparaît dans Explorer pour les autres utilisateurs **autorisés** (D-23) : authentifiés, onboardés, sans blocage avec l'OWNER. Jamais en anonyme.
 
 ### 3.3 Manager qui cherche des joueurs
 **Hors lot.** Le segment Joueurs reste absent, ni grisé ni « bientôt ». Il apparaîtra quand le Radar (P2-G) fournira une disponibilité prouvée et que D-11 sera implémenté.
@@ -80,7 +81,8 @@ Le master plan (`docs/22` §4) place Explorer Clubs (P2-F) après les clubs (P2-
 - Colonnes :
   - `id` uuid PK ;
   - `name` text 3–32 ;
-  - `slug` citext unique, dérivé du nom ;
+  - `slug` citext unique, dérivé du nom (`citext` déjà installé sur le staging) ;
+  - `search_name` text, rempli par les commandes via `private.normalize_search(name)` (D-48) ;
   - `description` ≤ 500 ;
   - `platform` platform ;
   - `languages` text[] (≤ 3, ISO 639-1) ;
@@ -95,11 +97,11 @@ Le master plan (`docs/22` §4) place Explorer Clubs (P2-F) après les clubs (P2-
 - Index :
   - `(status, platform, recruiting_open)` ;
   - GIN sur `recruiting_positions` et sur `languages` ;
-  - trigramme sur `name` (extension `pg_trgm`, à confirmer dans `list_extensions` du staging).
+  - btree sur `search_name` (pas de `pg_trgm`, D-48).
 
 **`public.club_memberships`**
 - Colonnes : `id` · `club_id` · `profile_id` · `slot` (`primary` / `secondary`) · `role` (`owner` / `manager` / `member`) · `is_active` · `joined_at` · `ended_at` · `end_reason`.
-- Invariants posés **dès ce lot**, même si seules les créations les exercent :
+- Invariants posés **dès ce lot**, même si seules les créations les exercent. Ils exigent l'extension **`btree_gist`** (disponible mais non installée sur le staging, vérifié le 28/10 en lecture seule), à installer par la migration B2 :
   - exclusion `(profile_id, slot) WHERE is_active`, **DEFERRABLE** ;
   - unique partiel `(club_id, profile_id) WHERE is_active` ;
   - exclusion « 1 OWNER actif par club », DEFERRABLE.
@@ -108,31 +110,38 @@ Le master plan (`docs/22` §4) place Explorer Clubs (P2-F) après les clubs (P2-
 
 **`public.user_blocks`** : `(blocker_id, blocked_id)` PK · `created_at` · CHECK `blocker_id <> blocked_id`. Commandes `block_user` / `unblock_user` serveur, **sans UI** dans ce lot.
 
-**Helpers `private.*`** (SECURITY DEFINER, `search_path=''`, EXECUTE retiré à PUBLIC et anon) :
+**Helpers `private.*`** (SECURITY DEFINER, `search_path=''`, EXECUTE retiré à PUBLIC, anon **et authenticated**, invariant P4 existant) :
 - `uid()` ;
 - `is_onboarded(uid)` ;
 - `is_blocked_between(a, b)` ;
 - `is_club_member(club, uid)` ;
 - `is_club_manager(club, uid)` (OWNER ou manager actif) ;
-- `active_membership_count(uid)`.
+- `active_membership_count(uid)` ;
+- `has_active_sanction(uid)` : **renvoie toujours false** tant que la table des sanctions n'existe pas (Phase 5). C'est documenté et testé, pour que la séquence d'ADR-0004 (« sanction vérifiée ») soit déjà câblée ;
+- `normalize_search(text)` IMMUTABLE : minuscules + suppression des accents par `translate()` sur une table fixe, **sans extension** (D-48).
+
+**Policies RLS et helpers.** Une policy s'exécute avec les droits de l'appelant, qui n'a pas le droit d'exécuter `private.*`. Comme pour les avatars (`storage_policies`), les prédicats utilisés par les policies passent par un schéma dédié **`rls_policies`**, non exposé par l'API : usage à `authenticated` seulement, fonctions SECURITY DEFINER minces qui délèguent à `private.*` et renvoient un booléen (`rls_policies.can_see_profile(id)`, `rls_policies.can_see_club(id)`).
 
 ### 4.2 Commandes `api.*` (Definition of Done d'ADR-0004 : R1 autorisation, R2 EXECUTE, R3 `search_path`, R4 abus)
 | Commande | Autorisation (R1) | Règles et erreurs codées | Abus (R4) |
 |---|---|---|---|
-| `create_club(p_request_id, name, description, platform, languages, level, recruiting_open, recruiting_positions)` | onboardé, `assert_session_active` non requis (action non sensible) | `NAME_TAKEN` (slug), `MEMBERSHIP_LIMIT` (2 affiliations), `RATE_LIMITED` (1 création / 24 h, D-21), `INVALID_INPUT` | idempotence `private.idempotency_keys` ; `private.rate_limits` |
-| `update_club(p_club_id, patch, p_expected_updated_at)` | `is_club_manager` | `FORBIDDEN`, `CONFLICT` (verrou optimiste), `NOT_FOUND` (club dissous ou invisible) | rate limit léger |
-| `search_clubs(q, platform, languages, level, recruiting_only, position, cursor, limit ≤ 20)` | onboardé | lecture **SECURITY INVOKER** (sous RLS) ; exclut les clubs dissous et ceux dont l'OWNER est bloqué ou bloquant (B) ; curseur `(name, id)` | `limit` plafonné |
-| `block_user(target)` / `unblock_user(target)` | soi | `INVALID_TARGET` | rate limit |
+| `create_club(p_request_id, p_name, p_description, p_platform, p_languages, p_level, p_recruiting_open, p_recruiting_positions)` | onboardé (`UNAUTHENTICATED` sinon) ; `assert_session_active` non requis (action non sensible) | `CONFLICT` (nom déjà pris, comme le pseudo à l'onboarding), `LIMIT_REACHED` (2 affiliations), `RATE_LIMITED` (1 création / 24 h, D-21), `VALIDATION` | idempotence `private.idempotency_keys` (rejeu → même réponse) ; `private.rate_limits` ; verrou `FOR UPDATE` sur les adhésions actives du créateur (course C7) |
+| `update_club(p_request_id, p_club_id, p_expected_updated_at, champs…)` | `is_club_manager` sur **le club ciblé** | `FORBIDDEN`, `CONFLICT` (verrou optimiste), `NOT_FOUND` (club dissous ou invisible), `VALIDATION` | idempotence ; rate limit léger |
+| `search_clubs(p_q, p_platform, p_languages, p_level, p_recruiting_only, p_position, p_cursor, p_limit ≤ 20)` | onboardé | lecture **SECURITY INVOKER** (sous RLS) ; exclut les clubs dissous et ceux dont l'OWNER est bloqué ou bloquant (B) ; curseur `(search_name, id)` | `p_limit` plafonné ; `p_q` ≤ 32 caractères |
+| `block_user(p_request_id, p_target)` / `unblock_user(p_request_id, p_target)` | soi | `VALIDATION` (soi-même, cible inconnue) | idempotence ; rate limit |
+
+Codes d'erreur : uniquement la liste canonique de `docs/03` §4. `src/lib/errors/rpc.ts` connaît déjà `UNAUTHENTICATED`, `FORBIDDEN`, `VALIDATION`, `CONFLICT`, `ALREADY_HANDLED`, `EXPIRED` et `RATE_LIMITED` ; B0 y ajoute **`NOT_FOUND`** et **`LIMIT_REACHED`**, déjà prévus par `docs/03`. Aucun code nouveau. Convention existante : `raise exception using message = '<CODE>', errcode = 'P0001'`.
 
 La création ajoute dans la même transaction le club, l'adhésion OWNER (slot calculé) et l'événement. Aucune écriture directe sur les tables : INSERT, UPDATE et DELETE sont refusés à `authenticated`.
 
 ### 4.3 RLS (matrice P2, testée en pgTAP)
 | Table | SELECT `authenticated` | INSERT / UPDATE / DELETE | `anon` |
 |---|---|---|---|
-| `clubs` | `status = 'active'` et non bloqué avec l'OWNER (B) ; ou club dont je suis/ai été membre | ∅ (commandes uniquement) | ∅ |
-| `club_memberships` | adhésions actives de tout club visible (effectif CLB-05) ; inactives : soi + managers du club | ∅ | ∅ |
+| `clubs` | `rls_policies.can_see_club(id)` : lecteur onboardé, et (`status = 'active'` sans blocage avec l'OWNER, ou club dont il est/a été membre) | ∅ (commandes uniquement) | ∅ |
+| `club_memberships` | adhésions actives de tout club visible (effectif CLB-05), **sauf les membres avec qui un blocage existe** ; inactives : soi + managers du club | ∅ | ∅ |
 | `user_blocks` | lignes où je suis `blocker_id` | ∅ | ∅ |
-| `profiles` (existante) | **modifiée** : + non bloqué (B) | inchangé | ∅ |
+| `profiles` (existante) | **modifiée** : + `rls_policies.can_see_profile(id)` (non bloqué, B) ; soi toujours visible | inchangé | ∅ |
+| Avatars (`storage.objects`, existante) | **modifiée** : `private.avatar_is_visible` ajoute le contrôle B | inchangé | ∅ |
 | `private.membership_events` | non exposée | — | — |
 
 Garanties existantes inchangées : D-38 (`rls_auto_enable`, `ensure_rls`), privilèges par défaut fermés (A-2), P4 (aucune fonction `api` ou `private` exécutable par PUBLIC ou anon), P5 (`search_path=''`), D-40 sur les actions sensibles, CSP à nonce.
@@ -174,7 +183,7 @@ Règles : pas de classes Tailwind brutes pour les surfaces, boutons et listes (m
   - Recrute : défaut activé ;
   - Poste : suggestion = poste principal, désactivé par défaut.
 - **Panneau :** langue(s), niveau déclaré.
-- **Recherche texte :** nom du club, ≥ 2 caractères, insensible à la casse et aux accents. Validation explicite (bouton Rechercher ou clavier), sans requête à chaque frappe en v1.
+- **Recherche texte (D-48) :** nom du club, 2 à 32 caractères, insensible à la casse et aux accents. Comparaison `search_name LIKE '%' || normalize_search(q) || '%'` avec échappement de `%` et `_`. **Aucune extension** : pas de `pg_trgm` ; `unaccent` non utilisé car non installé (et non IMMUTABLE). Validation explicite (bouton Rechercher ou clavier), sans requête à chaque frappe en v1.
 - **Chips effaçables** pour chaque filtre actif, plus « Tout effacer ».
 - **Mémoire par intention (S-4.4) :** l'URL porte l'état ; la dernière URL de chaque segment est gardée en `sessionStorage` (confort par lecteur, lecture et écriture en try/catch). Le retour arrière restaure les filtres. La position de défilement est restaurée par le navigateur et, à défaut, par l'ancre du dernier club ouvert.
 - **Tri v1 :** clubs qui recrutent d'abord, puis par nom. Aucun tri par popularité ou activité (pas de donnée fiable).
@@ -189,7 +198,7 @@ Règles : pas de classes Tailwind brutes pour les surfaces, boutons et listes (m
 | Explorer Clubs | chargement (squelettes de cartes) · résultats · **aucun club sur CPC** (« Aucun club pour l'instant » + « Créer un club ») · **aucun résultat avec ces filtres** (« Effacer les filtres ») · erreur (réessayer) · hors ligne (bandeau existant) |
 | Carte / fiche rapide | recrutement ouvert (badge vert) · **recrutement fermé** (badge neutre) · **déjà membre** (badge « Ton club ») · **deux affiliations occupées** (note discrète sur la fiche, sans bouton) |
 | Explorer Jouer | état vide véridique : « Aucune session ouverte pour l'instant. » Aucune carte, aucun compteur, aucun bouton « Demander l'accès » |
-| `/clubs/new` | étape invalide (erreur en ligne) · `NAME_TAKEN` · `MEMBERSHIP_LIMIT` (explication + lien Mes clubs) · `RATE_LIMITED` (heure de la prochaine création possible) · envoi en cours (verrou) |
+| `/clubs/new` | étape invalide (erreur en ligne) · `CONFLICT` (nom déjà pris) · `LIMIT_REACHED` (2 affiliations : explication + lien Mes clubs) · `RATE_LIMITED` (heure de la prochaine création possible) · envoi en cours (verrou) |
 | Fiche club | club introuvable ou dissous → 404 · effectif vide (impossible : OWNER au minimum) · gestion visible seulement pour OWNER et manager |
 | Réglages | `CONFLICT` (modifié ailleurs : rechargement et explication) · `FORBIDDEN` (page 404) |
 
@@ -230,13 +239,18 @@ Parallélisme : B1 → B2 → B3 (DB, en série) et B4 (UI, en parallèle) ; B5 
 
 | ID | Décision | Recommandation |
 |---|---|---|
-| D-45 | Recadrage : Explorer Clubs comme premier lot fonctionnel (P2-B + P2-C minimal + P2-F), recrutement au lot suivant | ✅ recommandé |
-| D-21 | Création de club | valider la recommandation du registre (slot libre, 2 affiliations maximum, OWNER, 1 / 24 h) |
-| D-23 | Visibilité des clubs | valider : authentifiés uniquement |
-| D-43 | Blasons | **reporter** : monogramme dans ce lot, bucket `crests` dans un lot ultérieur |
-| D-46 | Fiche club sans candidature dans ce lot | **Option A (recommandée)** : aucune mention. **Option B** : ligne « La candidature arrive bientôt ». La règle « pas de bientôt déguisé » plaide pour A |
-| D-47 | Segment Jouer visible avec état vide véridique, ou masqué jusqu'au LIVE | **Visible** (structure EXP-01 stable, aucune fausse donnée) |
-| D-48 | Recherche texte : `pg_trgm` (si l'extension est disponible sur le staging) ou `ILIKE` simple | `ILIKE` + `unaccent` en v1, `pg_trgm` si la volumétrie le justifie |
+Toutes tranchées par Selim le 28/10/2026 à 19:43 (registre `docs/02`).
+
+| ID | Décision | Statut |
+|---|---|---|
+| D-45 | Explorer Clubs = premier lot fonctionnel vertical (socle indispensable + création de club + Explorer Clubs) ; recrutement au lot suivant | ✅ |
+| D-21 | Joueur onboardé ; 2 affiliations maximum ; PRIMARY puis SECONDARY ; créateur OWNER ; 1 création / 24 h | ✅ |
+| D-23 | Clubs visibles uniquement des utilisateurs authentifiés **autorisés** (onboardés, sans blocage) ; jamais anon | ✅ |
+| D-43 | Blasons reportés ; monogrammes temporaires | ✅ (report) |
+| D-46 | Aucune mention de candidature tant que le parcours n'existe pas | ✅ |
+| D-47 | Segment Jouer visible avec un état vide véridique, sans données ni actions fictives | ✅ |
+| D-48 | Recherche simple par nom, insensible à la casse et aux accents, sans `pg_trgm` ; normalisation par `translate()` (aucune extension) | ✅ |
+| — | Trois onglets Accueil / Explorer / Profil conservés ; le créateur reste joueur, droits OWNER et manager contextuels et contrôlés côté serveur | ✅ |
 
 ---
 
