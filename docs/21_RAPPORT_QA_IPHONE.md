@@ -60,3 +60,9 @@
 - A-7 : Node.js 22.x (vérifié).
 - Ignored Build Step : **vérifié** — un commit sur la branche `docs/suivi-qa-vercel` (`ad30d08`) a produit un déploiement `CANCELED` (« Canceled by Ignored Build Step ») ; seule `preview` construit.
 - Reste ouvert : Site URL du staging à confirmer (`docs/19` §5) ; intégration Supabase toujours installée au niveau de l'équipe (portée « tous les projets ») — à restreindre pour qu'elle ne réinjecte pas de clés dans un futur projet.
+
+## 7. Décision de Selim (27/10/2026)
+- M1 (partie restante), M5 (HEIC), M6, M7 (barre d'état), M8, M9 : **reportés** à une campagne QA ultérieure. Ils restent **NON EXÉCUTÉS** ; ce report n'est pas une validation.
+- M2 et M10 : **obligatoires avant toute publication publique** ; ils ne bloquent pas la préparation des développements.
+- Google OAuth (A6) : reporté jusqu'à décision distincte.
+- **Phase 1 / G2 : HOLD maintenu.**

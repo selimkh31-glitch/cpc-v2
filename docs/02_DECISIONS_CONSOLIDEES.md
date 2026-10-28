@@ -50,6 +50,14 @@
 
 ---
 
+## 2 bis. Phase 2 produit — design (P2-A, `docs/22`, `docs/23`) — livré
+
+| ID | Sujet | Recommandation | Statut |
+|---|---|---|---|
+| D-41 | Direction visuelle | « Stade de nuit », palette **noir, vert, blanc, gris** (Selim), sombre par défaut + thème clair complet, typographie système iOS, néon réservé au LIVE (`docs/23` §2) | ✅ |
+| D-42 | Dépendances UI | shadcn/ui (Radix Slot) + `lucide-react`, versions épinglées. Radix Dialog retiré à l'exécution (style sans nonce, incompatible avec la CSP) → `<dialog>` natif | ✅ |
+| D-43 | Blasons de club | Bucket privé `crests`, URL signées (ADR-0015) | ✅ **reporté** (28/10), voir §3 bis |
+
 ## 3. Phase 2 — Clubs (à trancher avant la Phase 2)
 
 | ID | Sujet | Recommandation | Statut |
@@ -134,6 +142,8 @@ Tranchées par Selim le 28/10/2026 à 19:43.
 
 | Date | Changement |
 |---|---|
+| 27/10/2026 (Selim) | Tests iPhone M1–M10 restants **reportés** à une campagne QA ultérieure ; **M2 et M10 obligatoires avant toute publication publique**, non bloquants pour préparer les développements ; **Google OAuth reporté** jusqu'à décision distincte ; Phase 1 / G2 **restent HOLD**. Master plan Phase 2 produit proposé (`docs/22`), D-41 à D-43 🔵 |
+| 27/10/2026 19:27 (Selim) | **GO P2-A** ; D-41 ✅ avec palette noir, vert, blanc, gris ; D-42 ✅ |
 | 25/10/2026 | v1 : 33 décisions ouvertes issues de l'audit Phase 2 |
 | 25/10/2026 | v2 : V-01→V-11 validés ; D-05, D-14, D-15, D-16, D-17, D-20 ✅ ; D-12 🟠 (18+, à valider) ; D-18 et D-19 ⚪ avec impact précisé ; référence au prix Pro retirée (V-10) ; ADR-0004 🟡 |
 | 25/10/2026 | v2.1 : D-14 décompte explicité (15 codes, répartition par groupe) ; orientation technique Lot 1 approuvée ; ADR-0002, 0012 et 0015 corrigés (🟡, relecture) ; tests de permissions et de concurrence conservés intégralement (ADR-0011) |
