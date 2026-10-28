@@ -50,13 +50,13 @@
 
 ---
 
-## 2 bis. Phase 2 produit — design (à trancher avant P2-A, `docs/22`, `docs/23`)
+## 2 bis. Phase 2 produit — design (P2-A, `docs/22`, `docs/23`) — livré
 
 | ID | Sujet | Recommandation | Statut |
 |---|---|---|---|
 | D-41 | Direction visuelle | « Stade de nuit », palette **noir, vert, blanc, gris** (Selim), sombre par défaut + thème clair complet, typographie système iOS, néon réservé au LIVE (`docs/23` §2) | ✅ |
 | D-42 | Dépendances UI | shadcn/ui (Radix Dialog, Slot) + `lucide-react`, versions épinglées | ✅ |
-| D-43 | Blasons de club | Bucket privé `crests`, URL signées (ADR-0015) | 🔵 |
+| D-43 | Blasons de club | Bucket privé `crests`, URL signées (ADR-0015) | ✅ **reporté** (28/10), voir §3 bis |
 
 ## 3. Phase 2 — Clubs (à trancher avant la Phase 2)
 

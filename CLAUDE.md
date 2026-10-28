@@ -4,7 +4,7 @@
 - Repo : `selimkh31-glitch/cpc-v2` uniquement.
 - Supabase : **staging `cglbsllwdmluvbisozyx` uniquement**, via le connecteur `supabase-cpc-v2-write` (écriture) ou `supabase-cpc-v2` (lecture). Avant chaque `apply_migration`, `get_project_url` doit renvoyer `https://cglbsllwdmluvbisozyx.supabase.co`.
 - Phase 1 (S-1.1 → S-1.12) : livrée, statut officiel **G2 HOLD** (`docs/21`).
-- Phase en cours : **Phase 2 produit** (`docs/22`). **Seul le lot P2-A** (design system et shell, UI sans base de données, `docs/23`) est autorisé (GO Selim du 27/10/2026). Chaque autre lot exige un GO spécifique ; aucune migration avant ce GO.
+- Phase 2 produit : **P2-A livré** (design system « Stade de nuit », #28–#31, #33). **P2-B « Explorer Clubs »** (`docs/25`, contrat `docs/26`) : seul le sous-lot **B0** (contrats, sans migration) est autorisé (GO Selim du 28/10/2026). **B1 à B7 exigent chacun un GO d'exécution** ; aucune migration appliquée au staging sans GO spécifique. Radar et LIVE non démarrés.
 
 ## Interdits absolus
 - CPC V1 : repo `CPC`, `CPCP`, `Cpclanding`, `clubpro-match` ; Supabase `cfgvtyxiggewauevvigm` ; projets Vercel `cpc`, `cpc-v1kt`, `cpclanding`, `cpcp-ed8e`, `cpc-admin`, `cpc-admin-mmjb`, `cpc-web-beta`. Aucune écriture, aucune réutilisation de secrets, d'URL ou de données.
