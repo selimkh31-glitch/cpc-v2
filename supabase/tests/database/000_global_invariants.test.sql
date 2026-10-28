@@ -2,7 +2,7 @@
 -- Valables dès maintenant (base vide) et pour toutes les migrations futures.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(11);
+select plan(16);
 
 -- P2 : toute table des schémas exposés a la RLS activée.
 select is(
@@ -103,6 +103,40 @@ select ok(
   not has_function_privilege('authenticated', 'api.qa_default_privileges_probe()', 'EXECUTE')
   and not has_function_privilege('anon', 'api.qa_default_privileges_probe()', 'EXECUTE'),
   'R2 — nouvelle fonction api fermée par défaut (aucun EXECUTE implicite)'
+);
+
+-- P2-B · B1 : schéma rls_policies (prédicats de policy). Mêmes exigences que api/private, et jamais anon.
+select ok(
+  not has_schema_privilege('anon', 'rls_policies', 'USAGE') and not has_schema_privilege('public', 'rls_policies', 'USAGE'),
+  'P4 — schéma rls_policies fermé à anon et à PUBLIC'
+);
+select is(
+  (select count(*)::int
+     from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'rls_policies'
+      and (has_function_privilege('anon', p.oid, 'EXECUTE') or has_function_privilege('public', p.oid, 'EXECUTE'))),
+  0,
+  'P4 — aucune fonction rls_policies exécutable par anon ou PUBLIC'
+);
+select is(
+  (select count(*)::int
+     from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'rls_policies'
+      and not (p.prosecdef and ('search_path=""' = any (coalesce(p.proconfig, '{}')) or 'search_path=' = any (coalesce(p.proconfig, '{}'))))),
+  0,
+  'R3 / P5 — fonctions rls_policies : SECURITY DEFINER et search_path vide'
+);
+select is(
+  (select count(*)::int from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'rls_policies'),
+  0,
+  'P2 — aucune table ni vue dans rls_policies'
+);
+select is(
+  (select count(*)::int
+     from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'rls_policies' and p.provolatile <> 's'),
+  0,
+  'rls_policies — prédicats STABLE uniquement (aucune écriture possible depuis une policy)'
 );
 
 select * from finish();
