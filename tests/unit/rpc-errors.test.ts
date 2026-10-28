@@ -5,6 +5,8 @@ describe("rpcErrorCode", () => {
   it("reconnaît les codes stables", () => {
     expect(rpcErrorCode({ message: "CONFLICT" })).toBe("CONFLICT");
     expect(rpcErrorCode({ message: " VALIDATION " })).toBe("VALIDATION");
+    expect(rpcErrorCode({ message: "NOT_FOUND" })).toBe("NOT_FOUND");
+    expect(rpcErrorCode({ message: "LIMIT_REACHED" })).toBe("LIMIT_REACHED");
   });
   it("ne laisse jamais passer un message technique", () => {
     expect(rpcErrorCode({ message: 'duplicate key value violates unique constraint "profiles_handle_key"' })).toBe("UNKNOWN");
@@ -16,6 +18,8 @@ describe("rpcErrorCode", () => {
 describe("stateKindFor", () => {
   it.each([
     ["FORBIDDEN", "forbidden"],
+    ["NOT_FOUND", "forbidden"],
+    ["LIMIT_REACHED", "error"],
     ["UNAUTHENTICATED", "forbidden"],
     ["EXPIRED", "expired"],
     ["CONFLICT", "conflict"],
