@@ -20,6 +20,15 @@ const sizes: Record<ButtonSize, string> = {
   lg: "min-h-13 w-full rounded-row px-5 text-headline",
 };
 
+/** Lien secondaire discret (actions tertiaires) : texte gris, cible ≥ 44 px, sans fond ni accent. */
+export function subtleLinkClasses(className?: string) {
+  return cn(
+    "inline-flex min-h-11 items-center justify-center px-2 text-center text-subhead text-ink-2 underline-offset-4 transition-colors duration-150 " +
+      "hover:underline active:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+    className,
+  );
+}
+
 export function buttonClasses({ variant = "primary", size = "md", className }: { variant?: ButtonVariant; size?: ButtonSize; className?: string } = {}) {
   return cn(base, variants[variant], sizes[size], className);
 }

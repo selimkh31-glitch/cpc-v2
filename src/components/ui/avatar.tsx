@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-const sizes = { 32: "size-8 text-caption", 48: "size-12 text-subhead", 96: "size-24 text-title-2" } as const;
+const sizes = { 32: "size-8 text-caption", 48: "size-12 text-subhead", 72: "size-18 text-title-2", 96: "size-24 text-title-2" } as const;
 
 /**
  * Avatar : URL signée privée (ADR-0015) en <img> simple — jamais next/image, qui la mettrait en cache
