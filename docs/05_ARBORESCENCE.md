@@ -51,6 +51,7 @@ cpc-v2/
 │  │  │       ├─ components/          # UI du domaine
 │  │  │       ├─ actions.ts           # Server Actions ('use server') → RPC api.*
 │  │  │       ├─ queries.ts           # lectures serveur (server-only)
+│  │  │       ├─ contract.ts          # Zod : contrat des commandes api.* et des filtres, écrit en premier (P2-B : clubs/, explore/)
 │  │  │       ├─ schemas.ts           # Zod (entrées/sorties)
 │  │  │       ├─ hooks.ts             # client : realtime, TanStack Query (si écran temps réel)
 │  │  │       └─ rules.ts             # règles pures testables (ex. AUTOFILL, priorités ACC-01)

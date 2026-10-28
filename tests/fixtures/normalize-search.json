@@ -1,0 +1,17 @@
+{
+  "description": "Vecteurs de normalisation D-48. Rejoués en Vitest (B0) et en pgTAP contre private.normalize_search (B2) : les deux implémentations doivent donner le même résultat.",
+  "vectors": [
+    ["FC Bayonne", "fc bayonne", "fc-bayonne"],
+    ["Étoile Rouge", "etoile rouge", "etoile-rouge"],
+    ["  Les   Canaris  ", "les canaris", "les-canaris"],
+    ["ÉLITE Ñandú", "elite nandu", "elite-nandu"],
+    ["Cœur de Lion", "coeur de lion", "coeur-de-lion"],
+    ["Æther Club", "aether club", "aether-club"],
+    ["Straße 11", "strasse 11", "strasse-11"],
+    ["Pro_Clubs.FR", "pro_clubs.fr", "pro-clubs-fr"],
+    ["L'Équipe & Co!", "l'equipe & co!", "l-equipe-co"],
+    ["Žalgiris Šiauliai", "zalgiris siauliai", "zalgiris-siauliai"],
+    ["Ça Ira", "ca ira", "ca-ira"],
+    ["ÀÉÎÕÜ", "aeiou", "aeiou"]
+  ]
+}
