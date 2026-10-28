@@ -25,7 +25,7 @@ test.describe("S-1.9 — profil et avatar privé", () => {
     await ea.getByRole("button", { name: "Enregistrer" }).click();
     await expect(page).toHaveURL(/\/profile\?saved=gamertag$/);
     await expect(page.getByLabel("Gamertag EA")).toHaveValue("QA_Gamertag");
-    await expect(page.getByText("Déclaratif : il n'est pas vérifié par CPC.")).toBeVisible();
+    await expect(page.getByText("L'identifiant EA est déclaratif : il n'est pas vérifié par CPC.")).toBeVisible();
     // La présentation n'a pas été écrasée par l'autre panneau.
     await expect(page.getByLabel("Ta présentation")).toHaveValue("Milieu box-to-box, dispo le soir.");
   });

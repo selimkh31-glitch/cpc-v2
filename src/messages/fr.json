@@ -50,9 +50,7 @@
     "explore": "Explorer",
     "signOut": "Se déconnecter",
     "greeting": "Salut {handle}",
-    "profileShortcut": "Ton profil",
-    "profileShortcutDetail": "Présentation, avatar, identifiant EA",
-    "shortcuts": "Raccourcis"
+    "profileShortcut": "Ouvrir ton profil"
   },
   "onboarding": {
     "title": "Ton profil joueur",
@@ -141,7 +139,7 @@
     "save": "Enregistrer",
     "eaTitle": "Identifiant EA",
     "eaLabel": "Gamertag EA",
-    "eaHint": "Déclaratif : il n'est pas vérifié par CPC.",
+    "eaHint": "L'identifiant EA est déclaratif : il n'est pas vérifié par CPC.",
     "saved": {
       "presentation": "Présentation enregistrée.",
       "gamertag": "Identifiant EA enregistré.",

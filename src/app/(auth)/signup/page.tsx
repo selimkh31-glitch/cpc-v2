@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { AuthShell } from "@/components/patterns/auth-shell";
 import { SubmitButton } from "@/components/ui/button";
-import { buttonClasses } from "@/components/ui/button-styles";
+import { subtleLinkClasses } from "@/components/ui/button-styles";
 import { InlineStatus } from "@/components/ui/inline-status";
 import { TextField } from "@/components/ui/text-field";
 import { signUpAction } from "@/features/auth/actions";
@@ -32,7 +32,7 @@ export default async function SignupPage({ searchParams }: PageProps<"/signup">)
         </SubmitButton>
       </form>
       <div className="flex justify-center">
-        <Link href={`/login?next=${encodeURIComponent(next)}`} className={buttonClasses({ variant: "ghost" })}>
+        <Link href={`/login?next=${encodeURIComponent(next)}`} className={subtleLinkClasses()}>
           {t("goToLogin")}
         </Link>
       </div>
