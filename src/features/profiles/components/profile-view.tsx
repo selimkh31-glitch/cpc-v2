@@ -32,25 +32,26 @@ export async function ProfileView({ profile, avatarUrl, saved, error }: { profil
 
       {profile ? (
         <>
-          <section aria-label={t("identity")} className="flex flex-col items-center gap-3 rounded-hero bg-surface-1 px-5 pb-6 pt-7 text-center">
-            <Avatar src={avatarUrl} alt={t("avatarAlt")} fallback={profile.handle} size={96} testId="profile-avatar" />
-            <div className="flex flex-col gap-1">
-              <p className="text-title-2" data-testid="profile-handle">{profile.handle}</p>
+          {/* Carte d'identité compacte (finition P2-A) : avatar à gauche, identité et postes à droite. */}
+          <section aria-label={t("identity")} className="flex items-center gap-4 rounded-hero bg-surface-1 p-4">
+            <Avatar src={avatarUrl} alt={t("avatarAlt")} fallback={profile.handle} size={72} testId="profile-avatar" />
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <p className="truncate text-title-2" data-testid="profile-handle">{profile.handle}</p>
               <p className="text-subhead text-ink-2">{tRef(`platforms.${profile.platform}`)}</p>
+              <dl className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                <dt className="sr-only">{t("mainPosition")}</dt>
+                <dd className="flex">
+                  <Chip selected>{tRef(`positions.${profile.mainPosition}`)}</Chip>
+                </dd>
+                <dt className="sr-only">{t("secondaryPositions")}</dt>
+                <dd className="flex flex-wrap gap-1.5">
+                  {profile.secondaryPositions.length ? profile.secondaryPositions.map((p) => <Chip key={p}>{p}</Chip>) : <span className="sr-only">{t("none")}</span>}
+                </dd>
+              </dl>
             </div>
-            <dl className="flex flex-col items-center gap-2">
-              <dt className="sr-only">{t("mainPosition")}</dt>
-              <dd className="flex flex-wrap justify-center gap-1.5">
-                <Chip selected>{tRef(`positions.${profile.mainPosition}`)}</Chip>
-              </dd>
-              <dt className="sr-only">{t("secondaryPositions")}</dt>
-              <dd className="flex flex-wrap justify-center gap-1.5">
-                {profile.secondaryPositions.length ? profile.secondaryPositions.map((p) => <Chip key={p}>{p}</Chip>) : <span className="text-footnote text-ink-3">{t("none")}</span>}
-              </dd>
-            </dl>
           </section>
 
-          <ListSection title={t("sectionProfile")}>
+          <ListSection title={t("sectionProfile")} footer={t("eaHint")}>
             <li>
               <SheetLauncher
                 trigger={{ kind: "row", icon: <Text />, label: t("presentationTitle"), detail: profile.bio || t("noPresentation") }}
@@ -66,7 +67,7 @@ export async function ProfileView({ profile, avatarUrl, saved, error }: { profil
             </li>
             <li>
               <SheetLauncher
-                trigger={{ kind: "row", icon: <Gamepad2 />, label: t("eaTitle"), value: profile.eaGamertag || t("notProvided"), detail: t("eaHint") }}
+                trigger={{ kind: "row", icon: <Gamepad2 />, label: t("eaTitle"), detail: profile.eaGamertag || t("notProvided") }}
                 title={t("eaTitle")}
                 description={t("editGamertag")}
                 closeLabel={t("close")}
@@ -79,7 +80,7 @@ export async function ProfileView({ profile, avatarUrl, saved, error }: { profil
             </li>
             <li>
               <SheetLauncher
-                trigger={{ kind: "row", icon: <ImageIcon />, label: t("avatarRow"), value: profile.avatarPath ? t("avatarRowSet") : t("avatarRowNone") }}
+                trigger={{ kind: "row", icon: <ImageIcon />, label: t("avatarRow"), detail: profile.avatarPath ? t("avatarRowSet") : t("avatarRowNone") }}
                 title={t("avatarTitle")}
                 description={t("editAvatar")}
                 closeLabel={t("close")}

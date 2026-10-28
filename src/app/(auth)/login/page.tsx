@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { AuthShell } from "@/components/patterns/auth-shell";
 import { SubmitButton } from "@/components/ui/button";
-import { buttonClasses } from "@/components/ui/button-styles";
+import { subtleLinkClasses } from "@/components/ui/button-styles";
 import { InlineStatus } from "@/components/ui/inline-status";
 import { TextField } from "@/components/ui/text-field";
 import { signInAction } from "@/features/auth/actions";
@@ -34,11 +34,11 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           {t("submitLogin")}
         </SubmitButton>
       </form>
-      <div className="flex flex-col items-center gap-1">
-        <Link href="/forgot-password" className={buttonClasses({ variant: "ghost" })}>
+      <div className="flex flex-col items-center">
+        <Link href="/forgot-password" className={subtleLinkClasses()}>
           {t("goToForgot")}
         </Link>
-        <Link href={`/signup?next=${encodeURIComponent(next)}`} className={buttonClasses({ variant: "ghost" })}>
+        <Link href={`/signup?next=${encodeURIComponent(next)}`} className={subtleLinkClasses()}>
           {t("goToSignup")}
         </Link>
       </div>
