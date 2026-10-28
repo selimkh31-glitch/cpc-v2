@@ -1,6 +1,7 @@
 # CPC V2 — 22 · MASTER PLAN PHASE 2 (produit)
 
-**Statut :** PLAN, soumis à validation. **Aucun code fonctionnel, aucune migration, aucun déploiement** avant le GO spécifique de Selim pour chaque lot.
+**Statut :** PLAN. **Aucun code fonctionnel, aucune migration, aucun déploiement** avant le GO spécifique de Selim pour chaque lot.
+**Mise à jour 28/10/2026 (D-45, Selim) :** P2-A est **livré** (#28 à #31, finitions #33). Le premier lot fonctionnel est **P2-B « Explorer Clubs »**, un lot vertical qui absorbe P2-F et une partie de P2-C (brief `docs/25`, contrat `docs/26`). Les sections 4, 5, 6, 7 et 9 tiennent compte de ce nouvel ordre.
 **Date :** 27/10/2026 · **Base :** `main` `a492eee`.
 **Sources, par ordre de priorité :** décisions de Selim (registre `docs/02`) → `docs/source/CPC_V2_PRODUCT_SPEC.md` → `docs/reference/CPC_Cahier_UX_V1_Reference.md` → ADR 0001–0017 → `docs/04` (schéma proposé) → `docs/06` (backlog). Aucune fonctionnalité hors de ces sources.
 **État officiel :** Phase 1 / G2 **HOLD** (`docs/21`). Ce plan ne vaut pas validation de la Phase 1.
@@ -49,9 +50,9 @@ Légende : ✅ conforme · 🟡 partiel · ❌ absent · ⏸ hors Phase 2 produi
 | §3 Priorités d'Accueil + anti-doublon | ❌ | — | P2-J |
 | §4 Radar 30/60/120 + pastille d'en-tête | ❌ | — | P2-G |
 | EXP-01 Jouer | ❌ | — | P2-J |
-| EXP-02 Clubs | ❌ | — | P2-F |
+| EXP-02 Clubs | ❌ | — | P2-B (D-45) |
 | EXP-03 Joueurs (manager) | ❌ | — | P2-J |
-| §5 Filtres par intention, chips, scroll conservé | ❌ | — | P2-F |
+| §5 Filtres par intention, chips, scroll conservé | ❌ | — | P2-B (D-45) |
 | Candidatures (cartes, accepter/refuser) | ❌ | « Discuter » dépend de la messagerie | P2-D (⏸ Discuter) |
 | LIV-01 Terrain et banc | ❌ | — | P2-I |
 | LIV-02 Gérer la session (formation, AUTOFILL, invitations, demandes, terminer) | ❌ | COMBLER réservé au Pro | P2-H, P2-I (⏸ COMBLER) |
@@ -115,11 +116,11 @@ Chaque lot est **autonome** : il livre DB + RLS + commandes + UI + tests, démon
 |---|---|---|---|---|---|
 | **P2-0** | Décisions et cadrage | — | — | — | aucun code |
 | **P2-A** | Design system et shell premium iPhone | S-1.7/1.8 (refonte) | §1, §2, §12, UX-01..04 | GO P2-A, D-41, D-42 | M |
-| **P2-B** | Socle domaine : helpers, blocages, notifications, club actif | S-2.1 (partiel), S-2.11, S-2.12 | NOT-01 (socle), SAF-01 (serveur) | P2-0 | M |
-| **P2-C** | Clubs : création, fiche, effectif, paramètres, mes clubs | S-2.2, S-2.3, S-2.7, S-2.8 | CLB-01..06 | P2-A, P2-B, D-21, D-23 | L |
-| **P2-D** | Recrutement : candidatures, invitations, profil d'autrui | S-2.4, S-2.5, S-2.6 + PRO-02 | APP-01..04, INV-01..04, PRO-02 | P2-C, D-13, D-22 | L |
+| **P2-B** | **Explorer Clubs (vertical, D-45)** : socle (helpers, blocages côté serveur) + création de club, fiche, effectif, recrutement, Mes clubs + Explorer Jouer (vide véridique) / Clubs | S-2.1 (partiel), S-2.2, S-2.3, S-4.2, S-4.4 | CLB-04..06, EXP-01/02, SAF-01 (serveur) | P2-A, D-21, D-23, D-45 à D-48 ✅ | L |
+| **P2-C** | Clubs, compléments : inversion PRIMARY↔SECONDARY, quitter un club, club actif, blasons (D-43), socle notifications | S-2.7, S-2.8, S-2.11, S-2.12 | CLB-01..03, NOT-01 (socle) | P2-B | M |
+| **P2-D** | Recrutement : candidatures (depuis Explorer et la fiche club), invitations, profil d'autrui | S-2.4, S-2.5, S-2.6 + PRO-02 | APP-01..04, INV-01..04, PRO-02 | P2-B, D-13, D-22 | L |
 | **P2-E** | Gouvernance : rôles, retrait, transfert, dissolution | S-2.9, S-2.10 | CLB-07/08/09 | P2-D, D-06a | M |
-| **P2-F** | Explorer : structure + Clubs | S-4.2, S-4.4 | EXP-01/02/04 | P2-D | M |
+| ~~P2-F~~ | ~~Explorer : structure + Clubs~~ → **absorbé dans P2-B** (D-45). Les états « candidature active » arrivent avec P2-D | — | — | — | — |
 | **P2-G** | Radar | S-3.1, S-3.2 (Radar) | RAD-01..03 | P2-B, D-01, D-01b | S |
 | **P2-H** | LIVE : sessions et admissions | S-3.2..S-3.7 | LIV-01/02/07..10, ACC-02 | P2-C, P2-G, D-02, D-24, D-26, D-28, D-29, D-03, D-11b | L |
 | **P2-I** | Terrain et banc (Match Manager) | S-3.9..S-3.12 | LIV-03..05 | P2-H, D-25, D-27 | L |
@@ -136,7 +137,8 @@ Chaque lot est **autonome** : il livre DB + RLS + commandes + UI + tests, démon
 | Avant | Décisions |
 |---|---|
 | P2-A | **D-41** direction visuelle (§ « Brief P2-A », `docs/23`) · **D-42** ajout de dépendances UI (`@radix-ui/*` via shadcn, `lucide-react`) |
-| P2-C | D-21 création de club · D-23 visibilité des clubs · **D-43** blasons (bucket `crests` privé, ADR-0015) |
+| P2-B (D-45) | D-21 création de club ✅ · D-23 visibilité des clubs ✅ · D-45 à D-48 ✅ (28/10) |
+| P2-C | **D-43** blasons (bucket `crests` privé, ADR-0015) : reporté ici (28/10) |
 | P2-D | D-13 remplacement du SECONDARY si OWNER/manager · D-22 durées d'expiration |
 | P2-E | D-06a dissolution |
 | P2-G | D-01, D-01b |
@@ -149,7 +151,10 @@ Et une **mise à jour de `CLAUDE.md`** (« Phase en cours ») au premier GO de d
 #### P2-A — Design system et shell premium iPhone (premier chantier)
 UI seulement, **aucune migration**. Brief complet : `docs/23`.
 
-#### P2-B — Socle domaine
+#### P2-B — Explorer Clubs (lot vertical, D-45) — brief `docs/25`, contrat `docs/26`
+Sous-lots B0 (contrats) → B1 (sécurité et blocages, `docs/27`) → B2 (clubs) → B3 (recherche) ; B4 (primitives UI) en parallèle ; B5 (UI clubs), B6 (UI Explorer), B7 (QA Preview). Le détail ci-dessous des anciens P2-B, P2-C et P2-F reste la référence fonctionnelle. La répartition qui fait foi est celle de `docs/25`.
+
+#### (Référence) Socle domaine
 - **DB :** helpers `private.uid()`, `is_onboarded`, `is_blocked_between`, `has_active_sanction` (stub : `false` tant qu'il n'y a pas de sanctions, documenté) ; `public.user_blocks` (sans UI) ; `public.notifications` + broadcast `user:{uid}` ; `account_settings.active_club_id` (FK posée en P2-C).
 - **Modification d'une policy existante :** `profiles` SELECT ajoute « non bloqué » (B).
 - **UI :** cloche dans l'en-tête avec badge non lu, réel ; page `/notifications` en liste simple (lu / non lu, CTA invalides désactivés).
@@ -170,7 +175,7 @@ UI seulement, **aucune migration**. Brief complet : `docs/23`.
 - **UI :** Gérer > Membres (fiche membre contextuelle CLB-03 en sheet ; OWNER protégé visible) ; transfert : proposition, réponse du successeur, états ; dissolution (OWNER seul).
 - **Tests :** **T-09, T-10**, C5 ; invariant « exactement 1 OWNER par club actif ».
 
-#### P2-F — Explorer : structure + Clubs
+#### P2-F — Explorer : structure + Clubs (absorbé dans P2-B, D-45)
 - **DB :** `api.search_clubs(filters)` (blocages, clubs actifs, pagination par curseur).
 - **UI :** contrôle segmenté **Jouer / Clubs**, plus **Joueurs** seulement si `is_authorized_scout` (sinon absent) ; filtres fréquents visibles + panneau + chips effaçables ; filtres dans l'URL ; scroll conservé ; cartes compactes ; fiche rapide en sheet ; états fermé / déjà membre / déjà candidat / deux affiliations. Jouer affiche un état vide véridique jusqu'à P2-J.
 - **Tests :** e2e filtres + retour arrière (EXP-01) ; pgTAP blocage.
@@ -208,11 +213,10 @@ Référence détaillée : `docs/04` (colonnes, contraintes, matrice). Ce tableau
 
 | Lot | Tables / objets | RLS (SELECT authenticated ; écritures) | Commandes `api.*` | Autres |
 |---|---|---|---|---|
-| P2-B | `user_blocks` · `notifications` · `account_settings.active_club_id` · helpers `private.*` | blocks : soi (bloqueur) ; cmd. notifications : soi ; UPDATE soi (`read_at`) ; INSERT ∅ (système). **Policy `profiles` modifiée : + non bloqué** | `block_user`/`unblock_user` (serveur, sans UI), `mark_notifications_read` | trigger broadcast `user:{uid}` |
-| P2-C | `clubs` · `club_memberships` · `private.membership_events` · bucket `crests` | clubs : actifs ; cmd. memberships : actives pour tous, inactives soi + managers ; cmd | `create_club`, `update_club`, `swap_primary_secondary`, `leave_club`, `set_active_club` | exclusions DEFERRABLE ; canal `club:{id}` ; policies Storage `crests` (S1–S9) |
+| P2-B (D-45) | `user_blocks` · helpers `private.*` · schéma `rls_policies` · `clubs` · `club_memberships` · `private.membership_events` · extension `btree_gist` | blocks : soi (bloqueur) ; clubs : lecteur onboardé, actifs sans blocage avec l'OWNER (D-23) ou membre/historique ; memberships : actives des clubs visibles hors bloqués, inactives soi + managers ; écritures : cmd. **Policy `profiles` + avatars modifiées : + non bloqué** | `block_user`/`unblock_user` (sans UI), `create_club`, `update_club`, `search_clubs` | contrat `docs/26` ; exclusions DEFERRABLE ; course C7 |
+| P2-C (compléments) | `notifications` · `account_settings.active_club_id` · bucket `crests` (D-43) | notifications : soi ; UPDATE soi (`read_at`) ; INSERT ∅ (système) ; policies Storage `crests` (S1–S9) | `swap_primary_secondary`, `leave_club`, `set_active_club`, `mark_notifications_read` | canal `club:{id}` ; trigger broadcast `user:{uid}` ; course C8 |
 | P2-D | `club_applications` · `club_invitations` | soi + managers du club ciblé ; cmd | `apply_to_club`, `withdraw_application`, `decide_application`, `confirm_membership_replacement`, `invite_to_club`, `cancel_club_invitation`, `respond_club_invitation` | uniques partiels (1 active) ; expiration via job (P2-G) ou filtre `expires_at` |
 | P2-E | `ownership_transfers` | from/to + managers ; cmd | `set_member_role`, `remove_member`, `propose/cancel/respond_ownership_transfer`, `dissolve_club` | invariant 1 OWNER testé |
-| P2-F | — | — | `search_clubs` (lecture) | index de recherche |
 | P2-G | `radar_sessions` | **soi uniquement** ; cmd | `start_radar`, `stop_radar` | `pg_cron` → `private.job_expire_all` |
 | P2-H | `live_sessions` · `live_participants` · `live_requests` · `live_invitations` | `docs/04` §4 (membres, participants, découverte active hors blocage) ; cmd | 11 commandes (§4) | canal `live:{id}` ; uniques partiels D-02 / D-24 |
 | P2-I | `lineup_assignments` · `private.lineup_events` · `lineup_snapshots` | participants + managers ; cmd | `lineup_*` | `lineup_revision` (verrou optimiste) |
@@ -228,11 +232,10 @@ Référence détaillée : `docs/04` (colonnes, contraintes, matrice). Ce tableau
 | Lot | pgTAP (P2–P6, P8) | Courses (`tests/race/`) | E2E Playwright (iPhone WebKit + Chromium) | Vitest | Visuel / a11y |
 |---|---|---|---|---|---|
 | P2-A | — (aucune DB) | — | shell, sheet unique, onglets, retour arrière, Reduce Motion, CSP sans violation | utilitaires de tokens | axe 0 critique/sérieux ; captures iPhone clair/sombre jointes à la PR ; contraste AA |
-| P2-B | `user_blocks`, `notifications`, `profiles`+B, P4/P5 globaux, P8 `user:` | — | badge non lu, `/notifications` | — | axe |
-| P2-C | `clubs`, `club_memberships`, 5 commandes × personas, invariants ≤ 2 adhésions / 1 OWNER, Storage `crests` | **C7, C8** | création → fiche → paramètres ; inversion PRIMARY/SECONDARY | règles de groupement de l'effectif | captures fiche club |
+| P2-B (D-45) | `user_blocks`, `profiles`+B, avatars+B, `clubs`, `club_memberships`, `create_club`/`update_club` × personas, invariants ≤ 2 adhésions / 1 OWNER / 1 PRIMARY, vecteurs de normalisation, P4 étendu à `rls_policies` | **C7** | création → fiche → réglages ; filtres + chips + retour (scroll conservé) ; deux comptes ; blocage | contrats (filtres, curseur, normalisation) | axe ; captures Explorer et fiche club |
+| P2-C (compléments) | `notifications`, `swap_primary_secondary`, `leave_club`, `set_active_club`, Storage `crests`, P8 `user:` | **C8** | inversion PRIMARY/SECONDARY ; badge non lu | — | axe |
 | P2-D | 7 commandes, doublons, BLOCKED, IDOR | **C6, C7** | **T-01, T-02**, Mes invitations | — | captures candidatures |
 | P2-E | 6 commandes, OWNER protégé, escalade | **C5** | **T-09, T-10** | — | — |
-| P2-F | `search_clubs` (blocage, clubs dissous exclus) | — | filtres + chips + retour (scroll conservé) | sérialisation URL des filtres | captures Explorer |
 | P2-G | `radar_sessions` soi uniquement, rate limit, expiration | C9 (préparé) | reload ≠ activation, pastille, expiration | décalage d'horloge `server_now` | — |
 | P2-H | 4 tables, 11 commandes, P8 `live:` | **C2, C3, C4, C9** | **T-03, T-04, T-06, T-07, T-08**, deux navigateurs | — | captures session |
 | P2-I | `lineup_*`, révision, snapshot | **C1 (T-05)** | placement tactile, swap, retour banc, AUTOFILL | `rules.ts` AUTOFILL exhaustif | revue terrain iPhone |
@@ -248,13 +251,13 @@ Référence détaillée : `docs/04` (colonnes, contraintes, matrice). Ce tableau
 ```text
 P2-0 (décisions, en continu)
   │
-  ├─► P2-A  design system + shell ─────────────┐   (UI seule : en parallèle de P2-B)
-  └─► P2-B  socle domaine ─────────────────────┤
+  ├─► P2-A  design system + shell ✅ livré (#28–#31, #33)
+  └─► P2-B  Explorer Clubs (D-45) : B0 contrats → B1 sécurité → B2 clubs → B3 recherche
+                                     B4 primitives UI ∥  → B5 UI clubs, B6 UI Explorer → B7 QA
                                                ▼
-                                     P2-C  Clubs
+                                     P2-D  Recrutement (candidature depuis Explorer) ─► P2-E Gouvernance
                                                ▼
-                                     P2-D  Recrutement ─────┬─► P2-E Gouvernance
-                                               │            └─► P2-F Explorer Clubs
+                                     P2-C  Clubs, compléments (en parallèle de P2-D)
                                                ▼
                                      P2-G  Radar (peut démarrer dès P2-B)
                                                ▼
@@ -268,7 +271,7 @@ P2-K Profil enrichi : en parallèle, dès que P2-C est fusionné.
 
 **Pourquoi le LIVE ne peut pas passer avant les clubs :** une session LIVE appartient à un club (`live_sessions.club_id`), ses droits viennent des rôles du club (manager, D-26) et ses participants externes viennent du Radar (D-28). L'**Accueil premium** arrive, lui, dès P2-A, avec ses états réels ; il s'enrichit à chaque lot.
 
-**Gates :** G3 après P2-E (courses C5–C8 rejouées) · G4 après P2-I (C1–C4, C9 ; démo à deux téléphones) · G4b après P2-J (Explorer sans donnée inventée).
+**Gates :** G3 après P2-E (courses C5–C8 rejouées ; C7 introduite dès P2-B) · G4 après P2-I (C1–C4, C9 ; démo à deux téléphones) · G4b après P2-J (Explorer sans donnée inventée).
 
 ### Exécution multi-agents
 | Rôle | Périmètre de fichiers | Entrées | Sorties |
@@ -300,6 +303,8 @@ Brief d'exécution complet : **`docs/23_BRIEF_P2A_DESIGN_SYSTEM.md`**.
 | GO-P2A | Lancer P2-A (UI seule, sans DB) | ✅ GO (27/10, 19:27) |
 | D-41 | Direction visuelle « Stade de nuit » (`docs/23` §2) | ✅ palette noir, vert, blanc, gris |
 | D-42 | Dépendances UI : shadcn/ui (Radix, déjà prévu par ADR-0006) + `lucide-react` (icônes, licence ISC) | ✅ |
-| D-43 | Blasons de club en bucket privé `crests` | 🔵 valider avant P2-C |
-| D-21, D-23 | Création et visibilité des clubs | trancher avant P2-C |
-| CLAUDE.md | Passage « Phase en cours » à la Phase 2 produit | ✅ fait avec le GO P2-A (lot P2-A uniquement) |
+| D-43 | Blasons de club en bucket privé `crests` | ✅ **reporté** (28/10) : monogrammes en P2-B, `crests` en P2-C |
+| D-21, D-23 | Création et visibilité des clubs | ✅ (28/10) |
+| D-45 | Premier lot fonctionnel = Explorer Clubs vertical | ✅ (28/10) |
+| D-46, D-47, D-48 | Pas de candidature affichée ; Jouer vide véridique ; recherche par nom sans `pg_trgm` | ✅ (28/10) |
+| CLAUDE.md | Passage « Phase en cours » à la Phase 2 produit | ✅ P2-A livré ; P2-B : seul B0 autorisé (mis à jour par la PR B0) |
