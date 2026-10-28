@@ -67,7 +67,7 @@ Le schéma part de zéro, sans aucune référence au schéma V1. Les tables marq
 **`public.clubs`**
 | Colonne | Contraintes |
 |---|---|
-| `id` uuid PK, `name` (3–32), `slug` citext unique, `crest_path`, `description` (≤ 500) | |
+| `id` uuid PK, `name` (3–32), `slug` citext unique, `search_name` (nom normalisé, D-48), `crest_path` (inutilisé avant D-43), `description` (≤ 500) | |
 | `platform`, `languages` text[], `level` club_level | déclaratifs |
 | `recruiting_open` bool, `recruiting_positions` position_code[] | |
 | `status` (`active`/`dissolved`), `dissolved_at` | |
@@ -81,6 +81,7 @@ Le schéma part de zéro, sans aucune référence au schéma V1. Les tables marq
 | `is_active` bool, `joined_at`, `ended_at`, `end_reason` | `end_reason` NOT NULL si inactif |
 
 Invariants :
+- Les contraintes d'exclusion ci-dessous exigent l'extension `btree_gist` (disponible, non installée sur le staging au 28/10/2026 ; installée par la migration B2 de `docs/25`).
 - **Max 1 PRIMARY + 1 SECONDARY** : contrainte d'exclusion `(profile_id =, slot =) WHERE is_active`, **DEFERRABLE INITIALLY DEFERRED**, pour permettre l'inversion PRIMARY↔SECONDARY dans une seule transaction (un index unique partiel n'est pas différable).
 - **1 adhésion active par couple club/joueur** : unique partiel `(club_id, profile_id) WHERE is_active`.
 - **1 OWNER actif par club** : exclusion `(club_id =) WHERE is_active AND role = 'owner'`, différable (transfert atomique). « Au moins 1 OWNER » est garanti par les commandes et vérifié par un test pgTAP d'invariant.
@@ -210,8 +211,8 @@ Légende : **∅** = aucun privilège (`REVOKE`) · **cmd** = écriture uniqueme
 | `profile_positions` | comme `profiles` | cmd | cmd | cmd |
 | `account_settings` | soi | cmd (création à l'onboarding) | soi, colonnes `active_club_id, locale, marketing_opt_in` | ∅ |
 | `notification_preferences` | soi | soi | soi | ∅ |
-| `clubs` | `status = 'active'` (ou membre/historique) | cmd | cmd (managers via `update_club`) | ∅ |
-| `club_memberships` | actives : tout authentifié (effectif, CLB-05) ; inactives : soi + managers du club | cmd | cmd | ∅ |
+| `clubs` | lecteur onboardé ; `status = 'active'` sans blocage avec l'OWNER (B, D-23), ou membre/historique | cmd | cmd (managers via `update_club`) | ∅ |
+| `club_memberships` | actives : tout lecteur du club visible (effectif, CLB-05), hors membres bloqués (B) ; inactives : soi + managers du club | cmd | cmd | ∅ |
 | `club_applications` | soi (candidat) ; managers du club ciblé | cmd | cmd | ∅ |
 | `club_invitations` | soi (invité) ; managers du club | cmd | cmd | ∅ |
 | `ownership_transfers` | from/to ; managers du club | cmd | cmd | ∅ |
@@ -248,8 +249,8 @@ Chaque commande : `p_request_id` (idempotence) → `uid()` non nul et non sancti
 | Profil | `complete_onboarding` | handle unique, postes valides, âge confirmé | VALIDATION, CONFLICT | — |
 | | `set_positions` | ≤ 3 secondaires, différents du principal | VALIDATION | — |
 | | `request_account_deletion` | réauthentification récente (vérifiée côté app), OWNER avec membres → transfert d'abord | OWNER_MUST_TRANSFER | T-18 |
-| Club | `create_club` | slot libre (D-21), rate limit | LIMIT_REACHED | — |
-| | `update_club` | manager du club | FORBIDDEN | T-10 |
+| Club | `create_club` | onboardé, slot libre (D-21), 1 création / 24 h, idempotent | CONFLICT (nom pris), LIMIT_REACHED, RATE_LIMITED, VALIDATION | C7 |
+| | `update_club` | manager du club ciblé, `expected_updated_at` | FORBIDDEN, NOT_FOUND, CONFLICT, VALIDATION | T-10 |
 | | `apply_to_club` | non membre, pas de candidature active, recrutement ouvert, B | CONFLICT, BLOCKED | T-01 |
 | | `withdraw_application` | candidat, statut actif | ALREADY_HANDLED | — |
 | | `decide_application(accept/reject)` | manager **de ce club** ; si le candidat a 2 slots → `awaiting_player_confirmation` | FORBIDDEN, ALREADY_HANDLED | T-01, T-10 |

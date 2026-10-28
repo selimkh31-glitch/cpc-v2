@@ -54,11 +54,24 @@
 
 | ID | Sujet | Recommandation | Statut |
 |---|---|---|---|
-| D-21 | Création de club | Tout joueur onboardé avec un slot libre ; PRIMARY si libre, sinon SECONDARY ; refus avec 2 affiliations ; créateur = OWNER ; 1 création / 24 h | 🔵 |
+| D-21 | Création de club | Tout joueur onboardé avec un slot libre ; PRIMARY si libre, sinon SECONDARY ; refus avec 2 affiliations ; créateur = OWNER ; 1 création / 24 h | ✅ (Selim, 28/10/2026) |
 | D-13 | Remplacement du SECONDARY si OWNER ou manager | OWNER avec d'autres membres : refus `OWNER_MUST_TRANSFER`. Manager : autorisé, avec perte du rôle annoncée avant consentement, et audit. | 🔵 |
 | D-06a | Dissolution | OWNER seul membre uniquement ; club archivé, historique conservé | 🔵 |
 | D-22 | Durées d'expiration | Candidature 14 j · invitation club 7 j · transfert 72 h (paramètres serveur) | 🔵 |
-| D-23 | Visibilité des clubs | Authentifiés uniquement, pas de page publique anonyme | 🔵 |
+| D-23 | Visibilité des clubs | Utilisateurs authentifiés **autorisés** uniquement (onboardés, sans blocage avec l'OWNER) ; aucune page publique anonyme ; aucun accès `anon` | ✅ (Selim, 28/10/2026) |
+
+## 3 bis. Phase 2 produit — lot P2-B « Explorer Clubs » (`docs/25`)
+
+Tranchées par Selim le 28/10/2026 à 19:43.
+
+| ID | Sujet | Décision | Statut |
+|---|---|---|---|
+| D-43 | Blasons de club | **Reportés** ; monogramme (initiales) temporaire. Bucket privé `crests` (ADR-0015) dans un lot ultérieur | ✅ report |
+| D-45 | Premier lot fonctionnel | Explorer Clubs, lot vertical : socle indispensable (helpers, blocages côté serveur) + création de club, fiche, recrutement + Explorer Jouer / Clubs. Recrutement (candidatures, invitations) au lot suivant. Ordre du master plan `docs/22` mis en cohérence | ✅ |
+| D-46 | Candidature sur les fiches club | Aucune mention (ni bouton, ni texte, ni « bientôt ») tant que le parcours n'existe pas | ✅ |
+| D-47 | Segment Jouer | Visible, avec un état vide véridique ; aucune donnée ni action fictive | ✅ |
+| D-48 | Recherche de clubs | Par nom, insensible à la casse et aux accents ; normalisation par `translate()` sans extension ; pas de `pg_trgm` | ✅ |
+| — | Navigation et rôles | Trois onglets Accueil / Explorer / Profil conservés ; le créateur d'un club reste joueur ; droits OWNER et manager contextuels au club, contrôlés côté serveur | ✅ |
 
 ---
 
@@ -130,3 +143,4 @@
 | 25/10/2026 22:25 | **G1 ✅** via le connecteur `supabase-cpc-v2` (limité au projet, lecture seule) : projet vide et isolé ; `rls_auto_enable()` d'origine plateforme détectée (REVOKE prévu en migration n°0, après GO) ; D-34 à trancher avant la première migration |
 | 25/10/2026 22:15 | G1 partiel : GitHub ✅ ; Supabase V2 non vérifiable (connecteur sans accès) ; 3 projets Vercel liés à V1 ajoutés à ADR-0016 ; nouvelle décision **D-34** ouverte : région du projet V2 (eu-west-2 constatée vs eu-west-3 recommandée) |
 | 25/10/2026 22:02 | Revue v3 favorable (0002, 0012, 0015), réserves maintenues ; non-révocation des URL signées documentée (ADR-0015) ; choix techniques acceptables pour le Lot 1 ; création des environnements par Selim, puis contrôles G1 seuls par Claude, puis rapport avant toute implémentation |
+| 28/10/2026 19:43 (Selim) | **P2-A** : finitions validées, design system « Stade de nuit » adopté (#33). **P2-B** : D-21, D-23, D-43 (report), D-45, D-46, D-47, D-48 ✅ ; GO limité au sous-lot **B0** (contrats) ; B1–B7 sans GO d'exécution ; aucune migration sans GO spécifique ; G2 HOLD |
