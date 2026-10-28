@@ -1,6 +1,7 @@
 # CPC V2 — 27 · Brief d'exécution B1 : sécurité et blocages (P2-B)
 
-- **Statut :** 🟡 PRÊT POUR GO. Ce brief est autonome : un **GO B1** unique autorise la PR, sa CI, puis, **après fusion et sur un GO distinct « application staging B1 »**, l'application de la migration au staging.
+- **Statut :** 🟢 **GO B1 donné (Selim, 28/10/2026 20:23)** : développement, tests et PR. Fusion et application au staging : GO suivant. Réalisation : migration `20261028200000_p2b_b1_security_blocks.sql`, rollback `supabase/rollback/20261028200000_p2b_b1_rollback.sql`, tests `070_blocks_rls.test.sql` (51 assertions) et `000_global_invariants.test.sql` (+5).
+- **Statut initial :** 🟡 PRÊT POUR GO. Ce brief est autonome : un **GO B1** unique autorise la PR, sa CI, puis, **après fusion et sur un GO distinct « application staging B1 »**, l'application de la migration au staging.
 - **Contrat de référence :** `docs/26` §2.1, §3 (`block_user`), §4 (`user_blocks`, `profiles`).
 - **Périmètre :** base de données uniquement. Aucune UI, aucun club, aucune donnée sur le staging.
 
