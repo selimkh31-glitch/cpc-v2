@@ -19,13 +19,15 @@ Cahier UX §5 : « Aucun résultat fictif ni profil affiché comme disponible sa
 
 **Conséquence :** le premier lot fonctionnel qui rend Explorer réel est **Explorer Clubs**. Il suppose que des clubs existent, donc la création de club et sa fiche (D-21). Joueurs et Jouer ne peuvent pas être réels avant le Radar et le LIVE : les afficher maintenant obligerait à inventer de la disponibilité.
 
-### 1.1 Recadrage proposé du master plan
+### 1.1 Recadrage du master plan (D-45 ✅)
+Correspondance avec les lettres de `docs/22` : **P2-B** devient ce lot vertical ; **P2-F** (Explorer Clubs) y est absorbé ; **P2-C** se réduit aux compléments clubs (inversion PRIMARY↔SECONDARY, quitter un club, club actif, blasons) ; **P2-D** (Recrutement) est le lot suivant. Les autres lots ne changent pas.
+
 Le master plan (`docs/22` §4) place Explorer Clubs (P2-F) après les clubs (P2-C) et le recrutement (P2-D). Pour faire d'Explorer le premier lot visible, ce brief **regroupe en un lot vertical** :
 - **P2-B (partiel)** : helpers d'autorisation et `user_blocks` (le blocage est appliqué côté serveur dès la recherche, sans UI) ;
 - **P2-C (minimal)** : `clubs`, `club_memberships`, création, fiche, effectif, réglages de recrutement, « Mes clubs » ;
 - **P2-F** : Explorer, structure par intention + Clubs.
 
-**Reportés au lot suivant (P2-C2 « Recrutement », ex-P2-D) :** candidature, invitation club, profil d'autrui. Dans ce lot, la carte club n'affiche **pas** de bouton « Candidater » (aucun bouton sans backend). L'état « candidature active » arrive avec P2-C2.
+**Reportés au lot suivant (P2-D « Recrutement », master plan) :** candidature, invitation club, profil d'autrui. Dans ce lot, la carte club n'affiche **pas** de bouton « Candidater » (aucun bouton sans backend). L'état « candidature active » arrive avec P2-D.
 **Reportés plus loin :** notifications in-app (socle P2-B, utile seulement avec les candidatures), blasons de club (D-43), inversion PRIMARY↔SECONDARY, quitter un club, gouvernance.
 
 > **D-45 ✅ (Selim, 28/10) :** Explorer Clubs est le premier lot fonctionnel vertical (socle indispensable + création de club + Explorer Clubs). Le master plan `docs/22` (PR #27) est mis en cohérence avec ce nouvel ordre.
@@ -36,10 +38,10 @@ Le master plan (`docs/22` §4) place Explorer Clubs (P2-F) après les clubs (P2-
 
 | Inclus | Exclu (lot suivant ou plus tard) |
 |---|---|
-| Créer un club (D-21), en étapes courtes | Candidater, inviter, décider (P2-C2) |
-| Fiche club : identité, recrutement, postes recherchés, effectif groupé GK/DEF/MID/ATT, rôles | Profil d'autrui `/players/[id]` (P2-C2) |
+| Créer un club (D-21), en étapes courtes | Candidater, inviter, décider (P2-D) |
+| Fiche club : identité, recrutement, postes recherchés, effectif groupé GK/DEF/MID/ATT, rôles | Profil d'autrui `/players/[id]` (P2-D) |
 | Réglages de recrutement du club (OWNER et manager) | Rôles, retrait, transfert, dissolution (P2-E) |
-| Profil > Mes clubs (lecture) | Inversion PRIMARY↔SECONDARY, quitter un club (P2-C3) |
+| Profil > Mes clubs (lecture) | Inversion PRIMARY↔SECONDARY, quitter un club (P2-C, compléments clubs) |
 | Explorer : contrôle segmenté **Jouer / Clubs** | Segment **Joueurs** (absent : Radar et D-11 requis) |
 | Explorer Clubs : recherche, filtres, chips, fiche rapide en sheet, pagination | Alertes enregistrées (S-4.7) |
 | Explorer Jouer : état vide véridique | Sessions LIVE (P2-H) |
@@ -219,7 +221,7 @@ Une PR par story. DB et UI avancent en parallèle sur le contrat fusionné.
 | B4 | **UI primitives** | SegmentedControl, SearchField, FilterBar, FilterSheet, ClubMonogram, ClubCard, LoadMore, Stepper (extrait) dans la galerie | B0 | e2e galerie (axe, CSP, 44 px, Reduce Motion) Chromium + WebKit |
 | B5 | **UI clubs** | `/clubs/new`, `/clubs/[id]`, `/clubs/[id]/manage/settings`, Profil > Mes clubs | B2, B4 | e2e Supabase local : création → fiche → réglages ; refus 2 affiliations ; 24 h ; FORBIDDEN |
 | B6 | **UI Explorer** | `/explore` → segments, Clubs (liste, filtres URL, chips, fiche rapide, pagination), Jouer (vide véridique) | B3, B4 | e2e : filtres + retour arrière + scroll ; deux comptes (A crée, B trouve) ; blocage (B ne voit pas le club de A) ; Vitest règles et URL |
-| B7 | **QA Preview** | campagne iPhone, captures, rapport `docs/26` | B1–B6 fusionnées | grille QA, comptes `qa_*` |
+| B7 | **QA Preview** | campagne iPhone, captures, rapport `docs/28` | B1–B6 fusionnées | grille QA, comptes `qa_*` |
 
 Parallélisme : B1 → B2 → B3 (DB, en série) et B4 (UI, en parallèle) ; B5 après B2 et B4 ; B6 après B3 et B4.
 
@@ -273,7 +275,7 @@ Toutes tranchées par Selim le 28/10/2026 à 19:43 (registre `docs/02`).
 
 ## 12. Suite après ce lot (indicatif)
 
-- **P2-C2 Recrutement** : candidature avec message facultatif depuis la carte et la fiche, décision par le manager, invitations club, Mes invitations, profil d'autrui. Les états « candidature active » d'EXP-02 sont alors complets.
+- **P2-D Recrutement** : candidature avec message facultatif depuis la carte et la fiche, décision par le manager, invitations club, Mes invitations, profil d'autrui. Les états « candidature active » d'EXP-02 sont alors complets.
 - **P2-G Radar**, puis **P2-H LIVE** : Explorer Jouer passe aux vraies sessions.
 - **Explorer Joueurs** (managers, D-11), avec la disponibilité prouvée par le Radar.
 
