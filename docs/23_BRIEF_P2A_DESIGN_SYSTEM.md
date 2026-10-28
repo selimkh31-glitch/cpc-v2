@@ -1,6 +1,7 @@
 # CPC V2 — 23 · Brief d'exécution P2-A : design system et shell premium iPhone
 
-**Statut :** **GO P2-A donné par Selim le 27/10/2026** ; D-41 ✅ (palette amendée : noir, vert, blanc, gris) ; D-42 ✅.
+**Statut :** **GO P2-A donné par Selim le 27/10/2026** ; D-41 ✅ (palette amendée : noir, vert, blanc, gris) ; D-42 ✅. **Livré** (#28 à #31, finitions #33, validé par Selim le 28/10).
+**Écart d'exécution :** le risque prévu au §9 s'est réalisé. `@radix-ui/react-dialog` injecte un `<style>` sans nonce (via `react-remove-scroll`), ce que bloque la CSP. Il a donc été **retiré**, et la sheet est construite sur le `<dialog>` natif. Seul `@radix-ui/react-slot` est conservé. Les mentions de Radix Dialog ci-dessous sont historiques.
 **Nature :** UI seule. **Aucune migration, aucune nouvelle table, aucune nouvelle commande, aucune nouvelle fonctionnalité métier.** Seuls les écrans et données existants sont redessinés.
 **Références :** cahier UX §1, §2, §7, §12 · SPEC UX-01..04 · ADR-0006 (shadcn/ui, tokens, WCAG AA, ≥ 44 px, Reduce Motion), ADR-0017 (CSP à nonce) · `docs/22`.
 

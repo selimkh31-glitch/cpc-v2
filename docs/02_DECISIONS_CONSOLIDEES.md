@@ -55,7 +55,7 @@
 | ID | Sujet | Recommandation | Statut |
 |---|---|---|---|
 | D-41 | Direction visuelle | « Stade de nuit », palette **noir, vert, blanc, gris** (Selim), sombre par défaut + thème clair complet, typographie système iOS, néon réservé au LIVE (`docs/23` §2) | ✅ |
-| D-42 | Dépendances UI | shadcn/ui (Radix Dialog, Slot) + `lucide-react`, versions épinglées | ✅ |
+| D-42 | Dépendances UI | shadcn/ui (Radix Slot) + `lucide-react`, versions épinglées. Radix Dialog retiré à l'exécution (style sans nonce, incompatible avec la CSP) → `<dialog>` natif | ✅ |
 | D-43 | Blasons de club | Bucket privé `crests`, URL signées (ADR-0015) | ✅ **reporté** (28/10), voir §3 bis |
 
 ## 3. Phase 2 — Clubs (à trancher avant la Phase 2)
