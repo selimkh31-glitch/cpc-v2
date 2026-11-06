@@ -4,8 +4,10 @@ import { cn } from "@/lib/utils";
 export function clubInitials(name: string): string {
   const words = name.trim().split(/\s+/u).filter(Boolean);
   if (!words.length) return "?";
-  if (words.length === 1) return Array.from(words[0]).slice(0, 2).join("").toLocaleUpperCase("fr");
-  return (Array.from(words[0])[0] + Array.from(words[words.length - 1])[0]).toLocaleUpperCase("fr");
+  const first = Array.from(words[0] ?? "");
+  if (words.length === 1) return first.slice(0, 2).join("").toLocaleUpperCase("fr");
+  const last = Array.from(words[words.length - 1] ?? "");
+  return ((first[0] ?? "") + (last[0] ?? "")).toLocaleUpperCase("fr");
 }
 
 export function ClubMonogram({
