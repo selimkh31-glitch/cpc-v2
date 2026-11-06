@@ -105,7 +105,8 @@ test.describe("P2-A · A2 — sheets et shell", () => {
     await sheetA.getByRole("button", { name: "Fermer" }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
 
-    await page.waitForLoadState("networkidle");
+    // Aucun networkidle : la connexion Supabase peut rester ouverte en arrière-plan.
+    // Les assertions précédentes attendent déjà la fermeture effective des dialogues.
     expect(cspErrors, "aucune violation CSP à l'ouverture des sheets").toEqual([]);
   });
 
