@@ -7,7 +7,7 @@ const baseURL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;
  * Projets : mobile Chromium (Pixel), mobile WebKit (iPhone), desktop Chromium.
  * En local, seul Chromium peut être disponible : `pnpm test:e2e --project=mobile-chromium`.
  */
-const SUPABASE_SPECS = /(auth-(spike|flows)|onboarding|navigation|states|profile|a11y)\.spec\.ts/;
+const SUPABASE_SPECS = /(auth-(spike|flows)|onboarding|navigation|states|profile|a11y|clubs)\.spec\.ts/;
 
 export default defineConfig({
   testDir: "tests/e2e",
