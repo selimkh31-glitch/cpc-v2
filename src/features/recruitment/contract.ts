@@ -19,6 +19,13 @@ export const APPLICATION_DECISIONS = ["accept", "reject"] as const;
 export const APPLICATION_ACTIVE_STATUSES = ["pending", "awaiting_player_confirmation"] as const;
 export const APPLICATION_MESSAGE_MAX = 500;
 
+/** Durées serveur validées D-22 le 06/11/2026 ; jamais fournies dans les entrées RPC. */
+export const RECRUITMENT_EXPIRY = {
+  applicationDays: 14,
+  invitationDays: 7,
+  ownershipTransferHours: 72,
+} as const;
+
 const uuid = z.uuid();
 const serverNow = z.iso.datetime({ offset: true });
 

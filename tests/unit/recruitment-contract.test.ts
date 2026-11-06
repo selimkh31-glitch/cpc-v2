@@ -4,6 +4,7 @@ import {
   APPLICATION_COMMAND_ERRORS,
   APPLICATION_MESSAGE_MAX,
   APPLICATION_STATUSES,
+  RECRUITMENT_EXPIRY,
   applyToClubArgs,
   applyToClubSchema,
   applicationCommandResultSchema,
@@ -22,6 +23,10 @@ const applicationId = "8d985e41-677e-4211-ad2c-1a99194439d1";
 const membershipId = "035d8f27-3259-4562-a5e5-52602ae1dad7";
 
 describe("P2-D0 — contrat de candidature", () => {
+  it("expose les durées D-22 validées sans permettre leur écriture client", () => {
+    expect(RECRUITMENT_EXPIRY).toEqual({ applicationDays: 14, invitationDays: 7, ownershipTransferHours: 72 });
+    expect(applyToClubSchema.safeParse({ requestId, clubId, message: "", expiresAt: "2099-01-01" }).success).toBe(false);
+  });
   it("préserve exactement les états définis dans docs/04", () => {
     expect(APPLICATION_STATUSES).toEqual(["pending","awaiting_player_confirmation","accepted","rejected","withdrawn","expired"]);
     expect(APPLICATION_ACTIVE_STATUSES).toEqual(["pending","awaiting_player_confirmation"]);
