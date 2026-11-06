@@ -105,3 +105,7 @@ La première conséquence visible est un **resserrement** : un profil bloqué de
 
 ## 7. Hors B1
 UI de blocage et de signalement (Phase 5) ; annulation des candidatures et invitations au moment d'un blocage (ajoutée avec P2-D) ; clubs et adhésions (B2).
+
+## Alignement de version staging (06/11/2026)
+
+La migration B1 a été appliquée exclusivement au staging CPC V2 `cglbsllwdmluvbisozyx` et enregistrée par Supabase sous la version **`20261106120259`** (`p2b_b1_security_blocks`). Le fichier de migration Git a été renommé en `20261106120259_p2b_b1_security_blocks.sql` **sans changement de son SQL**, afin que l'historique local et distant corresponde. Le rollback historique reste `supabase/rollback/20261028200000_p2b_b1_rollback.sql` (non exécuté ; archivage des blocages si nécessaire). Les contrôles de permissions/RLS/advisors ont été effectués sans création de données. Aucun test d'authentification QA de bout en bout sur l'application n'a été réalisé à cette date.
