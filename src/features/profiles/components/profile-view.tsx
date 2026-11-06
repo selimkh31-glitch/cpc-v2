@@ -21,7 +21,7 @@ import { MyClubsSection } from "@/features/clubs/components/my-clubs-section";
  * (sheets) et enregistrements indépendants (cahier UX §7, PRO-05). Statistiques EA indisponibles
  * (D-04) : aucune métrique inventée. Mêmes Server Actions et validations qu'en Phase 1.
  */
-export async function ProfileView({ profile, clubs, avatarUrl, saved, error }: { profile: OwnProfile | null; clubs: MyClub[]; avatarUrl: string | null; saved: string | null; error: string | null }) {
+export async function ProfileView({ profile, clubs = [], avatarUrl, saved, error }: { profile: OwnProfile | null; clubs?: MyClub[]; avatarUrl: string | null; saved: string | null; error: string | null }) {
   const t = await getTranslations("profile");
   const tRef = await getTranslations("onboarding");
   const tStates = await getTranslations("states");
