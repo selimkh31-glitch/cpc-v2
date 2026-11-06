@@ -183,6 +183,7 @@ as $$
     select 1 from public.club_memberships m
     join public.clubs c on c.id = m.club_id
     where m.id = p_membership_id
+      and rls_policies.can_see_club(c.id)
       and not private.is_blocked_between(auth.uid(), c.created_by)
       and not private.is_blocked_between(auth.uid(), m.profile_id)
       and (
