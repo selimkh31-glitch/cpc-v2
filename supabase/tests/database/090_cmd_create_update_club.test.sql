@@ -60,9 +60,9 @@ select throws_ok($$select api.create_club(null,'Sans Request',null,'ps5','{fr}',
   'P0001','VALIDATION','R4 : request_id obligatoire');
 select throws_ok($$select api.create_club(gen_random_uuid(),'Club',null,'ps5','{fr,fr}','casual',true,'{}')$$,
   'P0001','VALIDATION','R4 : langues dupliquées refusées');
-select is((select count(*)::int from private.membership_events where profile_id='00000000-0000-4000-8000-000000000b31'),1,
-  'A : événement joined écrit une seule fois');
 reset role;
+select is((select count(*)::int from private.membership_events where profile_id='00000000-0000-4000-8000-000000000b31'),1,
+  'A : événement joined écrit une seule fois (lecture admin de test uniquement)');
 
 -- B : rejet nom pris (casse/accents), puis création valide.
 set local role authenticated;
