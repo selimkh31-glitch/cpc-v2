@@ -1,12 +1,13 @@
 import { getTranslations } from "next-intl/server";
-import { BarChart3, Gamepad2, ImageIcon, Text } from "lucide-react";
+import { BarChart3, Gamepad2, ImageIcon, Plus, Text } from "lucide-react";
 import { PageTitle } from "@/components/layout/shell-title";
 import { StatePanel } from "@/components/states/state-panel";
 import { Avatar } from "@/components/ui/avatar";
 import { SubmitButton } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { InlineStatus } from "@/components/ui/inline-status";
-import { ListSection } from "@/components/ui/list";
+import { ListRow, ListSection } from "@/components/ui/list";
+import type { OwnClub } from "@/features/clubs/queries";
 import { SheetLauncher } from "@/components/ui/sheet-launcher";
 import { TextArea, TextField } from "@/components/ui/text-field";
 import { signOutAction } from "@/features/auth/actions";
@@ -19,7 +20,7 @@ import type { OwnProfile } from "@/features/profiles/queries";
  * (sheets) et enregistrements indépendants (cahier UX §7, PRO-05). Statistiques EA indisponibles
  * (D-04) : aucune métrique inventée. Mêmes Server Actions et validations qu'en Phase 1.
  */
-export async function ProfileView({ profile, avatarUrl, saved, error }: { profile: OwnProfile | null; avatarUrl: string | null; saved: string | null; error: string | null }) {
+export async function ProfileView({ profile, avatarUrl, saved, error, clubs }: { profile: OwnProfile | null; avatarUrl: string | null; saved: string | null; error: string | null; clubs: OwnClub[] }) {
   const t = await getTranslations("profile");
   const tRef = await getTranslations("onboarding");
   const tStates = await getTranslations("states");
@@ -112,6 +113,20 @@ export async function ProfileView({ profile, avatarUrl, saved, error }: { profil
             </li>
           </ListSection>
         </>
+      ) : null}
+
+      {/* Affiliations : données réelles RLS uniquement, jamais de clubs de démonstration. */}
+      {profile ? (
+        <ListSection title="Mes clubs" footer="Jusqu’à un club principal et un club secondaire. Les rôles sont propres à chaque club.">
+          {clubs.map((club) => (
+            <ListRow key={club.id} href={"/clubs/" + club.id}
+              label={club.name}
+              detail={(club.slot === "primary" ? "Principal" : "Secondaire") + " · " +
+                (club.role === "owner" ? "Propriétaire" : club.role === "manager" ? "Manager" : "Membre")}
+              value={club.recruitingOpen ? "Recrute" : undefined} />
+          ))}
+          <ListRow href="/clubs/new" icon={<Plus />} label="Créer un club" detail="Choisir son nom, sa plateforme et ses postes recherchés" />
+        </ListSection>
       ) : null}
 
       {/* Données véridiques (D-04) : aucune statistique tant qu'aucune source EA n'est autorisée. */}
