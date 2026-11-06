@@ -4,7 +4,10 @@ import { z } from "zod";
 import { PageTitle } from "@/components/layout/shell-title";
 import { ClubHero } from "@/components/patterns/club-hero";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, SubmitButton } from "@/components/ui/button";
+import { TextArea } from "@/components/ui/text-field";
+import { getOwnClubApplication } from "@/features/recruitment/queries";
+import { applyToClubAction, withdrawApplicationAction } from "@/features/recruitment/actions";
 import { Chip } from "@/components/ui/chip";
 import { InlineStatus } from "@/components/ui/inline-status";
 import { getClubDetail } from "@/features/clubs/queries";
@@ -18,13 +21,31 @@ export default async function ClubDetailPage({ params, searchParams }: PageProps
   const { clubId } = await params;
   if (!z.uuid().safeParse(clubId).success) notFound();
   const user = await requireOnboardedUser("/clubs/" + clubId);
-  const [club, search] = await Promise.all([getClubDetail(clubId, user.userId), searchParams]);
+  const [club, search, myApplication] = await Promise.all([
+    getClubDetail(clubId, user.userId), searchParams,
+    getOwnClubApplication(clubId, user.userId),
+  ]);
   if (!club) notFound();
+  const isMember = club.members.some(member => member.profileId === user.userId);
+  const activeApplication = myApplication && new Date(myApplication.expiresAt).getTime() > Date.now()
+    ? myApplication : null;
+  const errors: Record<string, string> = {
+    VALIDATION: "Vérifie le message et réessaie.",
+    CONFLICT: "Tu fais déjà partie de ce club ou ta demande est déjà active.",
+    NOT_FOUND: "Ce club ne peut plus recevoir de candidature.",
+    RATE_LIMITED: "Trop de candidatures envoyées. Réessaie plus tard.",
+    ALREADY_HANDLED: "Cette candidature a déjà été traitée.",
+    UNKNOWN: "L'opération n'a pas abouti. Réessaie.",
+  };
+  const errorMessage = typeof search.error === "string" ? errors[search.error] : null;
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-4 pb-8 pt-4">
       <PageTitle>Club</PageTitle>
       {search.saved === "settings" ? <InlineStatus kind="success">Réglages du club enregistrés.</InlineStatus> : null}
+      {search.application === "sent" ? <InlineStatus kind="success">Candidature envoyée au club.</InlineStatus> : null}
+      {search.application === "withdrawn" ? <InlineStatus kind="success">Candidature retirée.</InlineStatus> : null}
+      {errorMessage ? <InlineStatus kind="error">{errorMessage}</InlineStatus> : null}
       <ClubHero name={club.name} platform={PLAT[club.platform] ?? club.platform}
         level={LEVEL[club.level] ?? club.level} recruitingOpen={club.recruitingOpen} />
       <section aria-label="Présentation" className="rounded-hero bg-surface-1 p-5">
@@ -65,9 +86,47 @@ export default async function ClubDetailPage({ params, searchParams }: PageProps
         })}
       </section>
       {club.canManage ? (
-        <Button asChild size="lg" variant="secondary">
-          <Link href={"/clubs/" + club.id + "/manage/settings"}>Gérer le recrutement</Link>
-        </Button>
+        <div className="flex flex-col gap-2">
+          <Button asChild size="lg" variant="secondary">
+            <Link href={"/clubs/" + club.id + "/manage/applications"}>Voir les candidatures</Link>
+          </Button>
+          <Button asChild size="lg" variant="secondary">
+            <Link href={"/clubs/" + club.id + "/manage/settings"}>Paramètres du club</Link>
+          </Button>
+        </div>
+      ) : null}
+      {!isMember && !club.canManage && activeApplication ? (
+        <section aria-label="Ma candidature" className="rounded-hero bg-surface-1 p-5">
+          <h2 className="text-headline">Ma candidature</h2>
+          <p className="mt-2 text-subhead text-ink-2">
+            {activeApplication.status === "pending"
+              ? "En attente de décision du club."
+              : "Acceptée sous réserve : confirme ton changement de club secondaire."}
+          </p>
+          {activeApplication.status === "pending" ? (
+            <form action={withdrawApplicationAction} className="mt-4">
+              <input type="hidden" name="requestId" value={crypto.randomUUID()} />
+              <input type="hidden" name="applicationId" value={activeApplication.id} />
+              <input type="hidden" name="clubId" value={club.id} />
+              <SubmitButton pendingLabel="Retrait…">Retirer ma candidature</SubmitButton>
+            </form>
+          ) : <Button asChild size="lg" variant="secondary">
+            <Link href="/applications">Confirmer mon changement de club</Link>
+          </Button>}
+        </section>
+      ) : null}
+      {!isMember && !club.canManage && club.recruitingOpen && !activeApplication ? (
+        <section aria-label="Rejoindre le club" className="rounded-hero bg-surface-1 p-5">
+          <h2 className="text-headline">Rejoindre ce club</h2>
+          <p className="mt-2 text-subhead text-ink-2">Envoie une candidature aux responsables du club.</p>
+          <form action={applyToClubAction} className="mt-4 flex flex-col gap-4">
+            <input type="hidden" name="requestId" value={crypto.randomUUID()} />
+            <input type="hidden" name="clubId" value={club.id} />
+            <TextArea label="Message (facultatif)" name="message" maxLength={500} rows={3}
+              placeholder="Présente ton style de jeu…" />
+            <SubmitButton size="lg" pendingLabel="Envoi en cours…">Candidater</SubmitButton>
+          </form>
+        </section>
       ) : null}
     </main>
   );
