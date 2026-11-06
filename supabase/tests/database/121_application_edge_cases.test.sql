@@ -102,7 +102,7 @@ select is((select count(*)::int from public.club_memberships
  and club_id='10000000-0000-4000-8000-000000000f23' and is_active and role='owner'),1,
  'OWNER préservé dans le club secondaire');
 
-update public.club_applications set expires_at=now()-interval '1 minute'
+update public.club_applications set expires_at=now()-interval '1 minute', created_at=now()-interval '15 days'
 where id=current_setting('qa.d2e_e_app')::uuid;
 set local role authenticated;
 set local request.jwt.claims='{"sub":"00000000-0000-4000-8000-000000000f23","role":"authenticated"}';
