@@ -45,11 +45,15 @@ reset role;
 
 select is((select count(*)::int from private.application_events where event_type='applied'),1,'audit unique de candidature');
 
+-- Capturer l'UUID dans le rôle de test admin : l'intrus n'a PAS le droit de lire
+-- l'application, donc une sous-requête sous son JWT renverrait NULL avant la RPC.
+select set_config('qa.d2_known_app_id',
+  (select id::text from public.club_applications where profile_id='00000000-0000-4000-8000-000000000f12'),true);
 set local role authenticated;
 set local request.jwt.claims='{"sub":"00000000-0000-4000-8000-000000000f15","role":"authenticated"}';
-select throws_ok($$select api.decide_application(gen_random_uuid(),
- (select id from public.club_applications where profile_id='00000000-0000-4000-8000-000000000f12'),
- 'accept')$$,'P0001','NOT_FOUND','intrus ne décide pas à la place du manager');
+select throws_ok($select api.decide_application(gen_random_uuid(),
+ current_setting('qa.d2_known_app_id')::uuid, 'accept')$,
+ 'P0001','NOT_FOUND','intrus ne décide pas même avec UUID connu');
 reset role;
 
 set local role authenticated;
