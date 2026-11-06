@@ -50,7 +50,7 @@ test.describe("P2-B / B6 — découverte des clubs", () => {
     await login(page, viewer.email);
     await page.goto("/explore/clubs");
     await expect(page.getByRole("heading", { name })).toBeVisible();
-    await expect(page.getByRole("status").filter({ hasText: /\\b\\d+ clubs? affichés?\\b/ })).toBeVisible();
+    await expect(page.getByRole("status").filter({ hasText: /\b\d+ clubs? affichés?\b/ })).toBeVisible();
 
     await page.getByRole("searchbox", { name: "Rechercher un club par nom" }).fill("QA Club");
     await page.getByRole("button", { name: "Chercher" }).click();
