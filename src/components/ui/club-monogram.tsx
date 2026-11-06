@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 export function getClubInitials(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean);
   if (!words.length) return "FC";
-  return (words.length === 1 ? words[0].slice(0, 2) : words.slice(0, 2).map((word) => word[0]).join(""))
+  return (words.length === 1 ? (words[0] ?? "FC").slice(0, 2) : words.slice(0, 2).map((word) => word.charAt(0)).join(""))
     .toLocaleUpperCase("fr-FR");
 }
 
