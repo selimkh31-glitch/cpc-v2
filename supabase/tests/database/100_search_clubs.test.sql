@@ -73,19 +73,7 @@ select is((select jsonb_array_length(api.search_clubs(null,null,true,null,null,'
 select ok((api.search_clubs(null,null,true,null,null,null,null,null,null,1)->'data'->>'next_cursor') is not null,
  'Page 1 : curseur présent si résultat supplémentaire');
 select ok((api.search_clubs(null,null,true,null,null,null,null,null,null,1)->'data'->>'next_cursor')
- ~ '^[A-Za-z0-9_-]+
-select is((api.search_clubs(null,null,true,null,null,null,true,'alpha fc',
-  '10000000-0000-4000-8000-000000000d31',1)->'data'->'items'->0->>'name'),'Étoile Rouge',
- 'Page 2 : reprise après le dernier club affiché');
-select throws_ok($$select api.search_clubs(null,null,true,null,null,null,null,null,null,21)$$,
- 'P0001','VALIDATION','R4 : limite plafonnée à 20');
-select throws_ok($$select api.search_clubs(repeat('x',33))$$,
- 'P0001','VALIDATION','R4 : recherche trop longue refusée');
-reset role;
-
-select * from finish();
-rollback;
-, 'Curseur URL-safe sans LF ni padding base64');
+ ~ '^[A-Za-z0-9_-]+$', 'Curseur URL-safe sans LF ni padding base64');
 select is((api.search_clubs(null,null,true,null,null,null,true,'alpha fc',
   '10000000-0000-4000-8000-000000000d31',1)->'data'->'items'->0->>'name'),'Étoile Rouge',
  'Page 2 : reprise après le dernier club affiché');
