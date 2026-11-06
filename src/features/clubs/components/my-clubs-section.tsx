@@ -7,7 +7,7 @@ import type { MyClub } from "@/features/clubs/queries";
 /** Mes clubs : reflète les affiliations PRIMARY/SECONDARY, jamais des clubs simulés. */
 export function MyClubsSection({ clubs }: { clubs: MyClub[] }) {
   return (
-    <section aria-label="Mes clubs" className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       <ListSection title="Mes clubs" footer="Un joueur peut appartenir à deux clubs maximum.">
         {clubs.map((club) => (
           <ListRow key={club.clubId} href={"/clubs/" + club.clubId} icon={<Building2 />} label={club.name}
@@ -21,6 +21,6 @@ export function MyClubsSection({ clubs }: { clubs: MyClub[] }) {
           <Link href="/clubs/new"><PlusCircle aria-hidden className="size-5" />Créer un club</Link>
         </Button>
       ) : null}
-    </section>
+    </div>
   );
 }
