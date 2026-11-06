@@ -11,6 +11,8 @@ export const RPC_ERROR_CODES = [
   "EXPIRED",
   "LIMIT_REACHED",
   "RATE_LIMITED",
+  "CONSENT_REQUIRED",
+  "OWNER_MUST_TRANSFER",
 ] as const;
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | "UNKNOWN";
 

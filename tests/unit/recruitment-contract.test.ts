@@ -62,9 +62,10 @@ describe("P2-D0 — contrat de candidature", () => {
   });
   it("le remplacement d'un SECONDARY exige un consentement sur une adhésion précise", () => {
     expect(confirmMembershipReplacementSchema.safeParse({ requestId, applicationId }).success).toBe(false);
-    const input = confirmMembershipReplacementSchema.parse({ requestId, applicationId, replaceMembershipId: membershipId });
+    const input = confirmMembershipReplacementSchema.parse({ requestId, applicationId, replaceMembershipId: membershipId, acknowledgeManagerRoleLoss: true });
     expect(confirmMembershipReplacementArgs(input)).toEqual({
       p_request_id: requestId, p_application_id: applicationId, p_replace_membership_id: membershipId,
+      p_acknowledge_manager_role_loss: true,
     });
   });
   it("sortie serveur versionnée et horodatée, idempotente pour la même requête", () => {

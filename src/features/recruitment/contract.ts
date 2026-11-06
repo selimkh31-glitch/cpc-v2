@@ -58,6 +58,7 @@ export const confirmMembershipReplacementSchema = z.strictObject({
   requestId: uuid,
   applicationId: uuid,
   replaceMembershipId: uuid,
+  acknowledgeManagerRoleLoss: z.boolean(),
 });
 export type ConfirmMembershipReplacementInput = z.infer<typeof confirmMembershipReplacementSchema>;
 
@@ -86,6 +87,7 @@ export function confirmMembershipReplacementArgs(input: ConfirmMembershipReplace
     p_request_id: input.requestId,
     p_application_id: input.applicationId,
     p_replace_membership_id: input.replaceMembershipId,
+    p_acknowledge_manager_role_loss: input.acknowledgeManagerRoleLoss,
   };
 }
 
@@ -119,5 +121,5 @@ export const APPLICATION_COMMAND_ERRORS = {
   apply_to_club: ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "VALIDATION", "CONFLICT", "LIMIT_REACHED", "RATE_LIMITED"],
   withdraw_application: ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "VALIDATION", "ALREADY_HANDLED"],
   decide_application: ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "VALIDATION", "ALREADY_HANDLED", "EXPIRED", "CONFLICT"],
-  confirm_membership_replacement: ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "VALIDATION", "ALREADY_HANDLED", "EXPIRED", "CONFLICT"],
+  confirm_membership_replacement: ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "VALIDATION", "ALREADY_HANDLED", "EXPIRED", "CONFLICT", "CONSENT_REQUIRED", "OWNER_MUST_TRANSFER"],
 } as const satisfies Record<string, readonly (typeof RPC_ERROR_CODES)[number][]>;
