@@ -68,8 +68,8 @@ export default async function ExploreClubsPage({ searchParams }: PageProps<"/exp
           description="Essaie une autre recherche ou efface les filtres pour voir les clubs disponibles."
           action={<Button asChild size="lg" variant="secondary"><Link href="/explore/clubs">Effacer les filtres</Link></Button>} />
       ) : (
-        <EmptyState icon={<Compass />} title="Aucun club sur CPC pour l'instant"
-          description="Le premier club apparaîtra ici dès sa création par un joueur."
+        <EmptyState icon={<Compass />} title="Aucun club qui recrute sur ta plateforme pour l'instant"
+          description="Tu peux consulter tous les clubs ou créer le tien. Aucun résultat n'est inventé."
           action={<Button asChild size="lg"><Link href="/clubs/new">Créer un club</Link></Button>} />
       )}
     </main>
