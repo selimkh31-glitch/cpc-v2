@@ -10,7 +10,11 @@ test.describe("P2-B / B6 — découverte des clubs", () => {
     await page.goto("/explore");
     await expect(page).toHaveURL(/\/explore\/clubs$/);
     await expect(page.getByRole("navigation", { name: "Choisir ce que tu recherches" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Aucun club qui recrute sur ta plateforme pour l'instant" })).toBeVisible();
+    // Les autres tests s'exécutent en parallèle et peuvent créer un club sur cette plateforme.
+    // Une recherche impossible garantit un état vide filtré véridique, quel que soit cet ordre.
+    await page.getByRole("searchbox", { name: "Rechercher un club par nom" }).fill("ZZZnomjamaisutilise");
+    await page.getByRole("button", { name: "Chercher" }).click();
+    await expect(page.getByRole("heading", { name: "Aucun club ne correspond à tes filtres" })).toBeVisible();
     await page.getByRole("link", { name: "Jouer", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Aucune session ouverte pour l'instant" })).toBeVisible();
   });
@@ -46,7 +50,7 @@ test.describe("P2-B / B6 — découverte des clubs", () => {
     await login(page, viewer.email);
     await page.goto("/explore/clubs");
     await expect(page.getByRole("heading", { name })).toBeVisible();
-    await expect(page.getByRole("status").filter({ hasText: "1 club affiché" })).toBeVisible();
+    await expect(page.getByRole("status").filter({ hasText: /\\b\\d+ clubs? affichés?\\b/ })).toBeVisible();
 
     await page.getByRole("searchbox", { name: "Rechercher un club par nom" }).fill("QA Club");
     await page.getByRole("button", { name: "Chercher" }).click();

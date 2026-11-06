@@ -48,6 +48,10 @@ test.describe("S-1.10 — accessibilité", () => {
     await login(page, user.email);
     for (const path of ["/home", "/explore", "/profile"]) {
       await page.goto(path);
+      // /explore effectue une redirection serveur vers la vraie intention Clubs.
+      // Attendre la destination avant d'injecter axe pour éviter une analyse pendant navigation.
+      if (path === "/explore") await expect(page).toHaveURL(/\/explore\/clubs$/);
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       await auditPage(page, path);
     }
   });
