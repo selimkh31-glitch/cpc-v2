@@ -18,7 +18,7 @@ export default async function ClubPage({ params, searchParams }: PageProps<"/clu
   const saved = query.created === "1" || query.updated === "1";
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-4 pb-8 pt-4">
-      <Link href="/explore/clubs" className="min-h-11 w-fit text-subhead text-ink-2">Retour à Explorer</Link>
+      <Link href="/explore" className="min-h-11 w-fit text-subhead text-ink-2">Retour à Explorer</Link>
       {saved ? <p role="status" className="rounded-field bg-surface-2 px-4 py-3 text-subhead text-accent">Club enregistré.</p> : null}
       <ClubHero name={club.name} description={club.description} platform={club.platform.toUpperCase()}
         level={club.level} recruitingOpen={club.recruitingOpen} />
