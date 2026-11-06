@@ -15,10 +15,10 @@
 | B3 recherche | migration staging `20261106130459_p2b_b3_search_clubs`, RPC SECURITY INVOKER, anonyme interdit |
 | B4 design | PR #39 fusionnée, composants premium testés |
 | B5 création / gestion | PR #43 fusionnée, CI 5/5 sur SHA testé ; prise en compte sur main |
-| B6 Explorer | PR #45 en attente de CI complète puis fusion et Preview |
+| B6 Explorer | PR #45 fusionnée, CI 5/5 sur `main` et Preview READY (`f58143a`) |
 | Git / staging | migrations alignées via PR #37, #42 et #44 |
 
-**Attention :** une CI verte n'est pas une revue utilisateur sur Safari réel.
+**Déploiement :** branche `preview` = `f58143aadc35a340f4811f430312369c78b28995`, déploiement Vercel `dpl_2BkpvLJnD8DcpbHwKiJLRxHyxJ36` READY et authentification Vercel maintenue. **Attention :** une CI verte n'est pas une revue utilisateur sur Safari réel.
 
 ## 2. Préflight obligatoire avant les tests iPhone
 
