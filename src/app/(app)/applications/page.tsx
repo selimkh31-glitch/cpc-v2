@@ -50,7 +50,7 @@ export default async function MyApplicationsPage({ searchParams }: PageProps<"/a
       ) : (
         <section aria-label="Historique des candidatures" className="flex flex-col gap-3">
           {applications.map(app => {
-            const expired = new Date(app.expiresAt).getTime() <= Date.now();
+            const expired = app.isExpired;
             const status = expired && (app.status === "pending" || app.status === "awaiting_player_confirmation")
               ? "expired" : app.status;
             const awaiting = status === "awaiting_player_confirmation";
@@ -80,7 +80,7 @@ export default async function MyApplicationsPage({ searchParams }: PageProps<"/a
                       : secondary.role === "owner" ? (
                         <InlineStatus kind="error">
                           Tu es propriétaire de {secondary.clubName || "ton club secondaire"}.
-                          Tu dois d'abord transférer la propriété avant tout remplacement.
+                          Tu dois d’abord transférer la propriété avant tout remplacement.
                         </InlineStatus>
                       ) : (
                         <form action={confirmMembershipReplacementAction} className="flex flex-col gap-3">

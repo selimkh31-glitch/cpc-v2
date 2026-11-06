@@ -11,6 +11,7 @@ export type ClubApplication = {
   status: "pending" | "awaiting_player_confirmation" | "accepted" | "rejected" | "withdrawn" | "expired";
   createdAt: string;
   expiresAt: string;
+  isExpired: boolean;
   clubName?: string | null;
   applicantHandle?: string | null;
 };
@@ -22,6 +23,7 @@ function parseRow(row: unknown): ClubApplication | null {
     id: r.data.id, clubId: r.data.club_id, profileId: r.data.profile_id,
     message: r.data.message, status: r.data.status, createdAt: r.data.created_at,
     expiresAt: r.data.expires_at,
+    isExpired: new Date(r.data.expires_at).getTime() <= Date.now(),
   };
 }
 const COLUMNS = "id,club_id,profile_id,message,status,created_at,expires_at";
@@ -32,6 +34,7 @@ export async function getOwnClubApplication(clubId: string, userId: string): Pro
   const { data, error } = await db.from("club_applications").select(COLUMNS)
     .eq("club_id", clubId).eq("profile_id", userId)
     .in("status", ["pending", "awaiting_player_confirmation"])
+    .gt("expires_at", new Date().toISOString())
     .order("created_at", { ascending: false }).limit(1).maybeSingle();
   return error || !data ? null : parseRow(data);
 }

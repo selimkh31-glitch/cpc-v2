@@ -27,8 +27,7 @@ export default async function ClubDetailPage({ params, searchParams }: PageProps
   ]);
   if (!club) notFound();
   const isMember = club.members.some(member => member.profileId === user.userId);
-  const activeApplication = myApplication && new Date(myApplication.expiresAt).getTime() > Date.now()
-    ? myApplication : null;
+  const activeApplication = myApplication;
   const errors: Record<string, string> = {
     VALIDATION: "Vérifie le message et réessaie.",
     CONFLICT: "Tu fais déjà partie de ce club ou ta demande est déjà active.",
