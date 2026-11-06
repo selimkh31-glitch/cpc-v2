@@ -12,6 +12,8 @@ import { TextArea, TextField } from "@/components/ui/text-field";
 import { signOutAction } from "@/features/auth/actions";
 import { removeAvatarAction, updateGamertagAction, updatePresentationAction, uploadAvatarAction } from "@/features/profiles/actions";
 import type { OwnProfile } from "@/features/profiles/queries";
+import type { MyClub } from "@/features/clubs/queries";
+import { MyClubsSection } from "@/features/clubs/components/my-clubs-section";
 
 
 /**
@@ -19,7 +21,7 @@ import type { OwnProfile } from "@/features/profiles/queries";
  * (sheets) et enregistrements indépendants (cahier UX §7, PRO-05). Statistiques EA indisponibles
  * (D-04) : aucune métrique inventée. Mêmes Server Actions et validations qu'en Phase 1.
  */
-export async function ProfileView({ profile, avatarUrl, saved, error }: { profile: OwnProfile | null; avatarUrl: string | null; saved: string | null; error: string | null }) {
+export async function ProfileView({ profile, clubs = [], avatarUrl, saved, error }: { profile: OwnProfile | null; clubs?: MyClub[]; avatarUrl: string | null; saved: string | null; error: string | null }) {
   const t = await getTranslations("profile");
   const tRef = await getTranslations("onboarding");
   const tStates = await getTranslations("states");
@@ -124,6 +126,8 @@ export async function ProfileView({ profile, avatarUrl, saved, error }: { profil
           <p className="text-subhead text-ink-2">{t("statsUnavailable")}</p>
         </div>
       </section>
+
+      <MyClubsSection clubs={clubs} />
 
       <section aria-label={t("sectionAccount")} className="flex flex-col gap-2">
         <h2 className="px-4 text-footnote uppercase tracking-wide text-ink-3">{t("sectionAccount")}</h2>
