@@ -45,11 +45,13 @@ select ok((select prosecdef from pg_proc where oid='rls_policies.can_see_club_ap
 select is((select count(*)::int from pg_proc where oid='rls_policies.can_see_club_application(uuid)'::regprocedure
 and 'search_path=""'=any(proconfig)),1,'chemin de recherche vide');
 select is((select count(*)::int from public.club_applications),2,'deux fixtures créées');
+select is((select count(*)::int from public.club_applications where status='pending'),2,'fixtures en attente');
 select is((select extract(day from expires_at - created_at)::int from public.club_applications
 where id='20000000-0000-4000-8000-000000000e12'),14,'D-22 : expiration 14 jours');
 
 set local role anon;
-select is((select count(*)::int from public.club_applications),0,'anon RLS : aucun enregistrement');
+select throws_ok($select count(*) from public.club_applications$,
+  '42501',null,'anon : table inaccessible sans GRANT SELECT');
 reset role;
 
 set local role authenticated;
