@@ -94,6 +94,8 @@ jobs:
             psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -X -q -t -A -v ON_ERROR_STOP=1 -f "$f" 2>&1 | tee -a pgtap.log
           done
           if grep -q '^not ok' pgtap.log; then echo "::error::Au moins un test pgTAP a échoué"; exit 1; fi
+      - name: Course C7 — deux créations concurrentes, un seul slot libre
+        run: bash tests/race/c7_create_club.sh
       - if: always()
         run: node scripts/ci/annotate.mjs pgtap pgtap.log
       - if: always()

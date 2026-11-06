@@ -88,6 +88,9 @@ const descriptionSchema = z
   .pipe(z.string().max(CLUB_LIMITS.descriptionMax))
   .transform((v) => (v === "" ? null : v));
 
+/** Le patch utilise une chaîne vide pour effacer, car NULL signifie « inchangé » dans la RPC. */
+const updateDescriptionSchema = z.string().transform((v) => v.trim()).pipe(z.string().max(CLUB_LIMITS.descriptionMax));
+
 const distinct = <T>(values: readonly T[]) => new Set(values).size === values.length;
 
 const languagesSchema = z
@@ -120,7 +123,7 @@ export const updateClubInputSchema = z
     clubId: z.uuid(),
     /** Verrou optimiste : valeur `updated_at` lue avant édition ; différence → CONFLICT. */
     expectedUpdatedAt: z.iso.datetime({ offset: true }),
-    description: descriptionSchema.optional(),
+    description: updateDescriptionSchema.optional(),
     languages: languagesSchema.optional(),
     level: z.enum(CLUB_LEVELS).optional(),
     recruitingOpen: z.boolean().optional(),

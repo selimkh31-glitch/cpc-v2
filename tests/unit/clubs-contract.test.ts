@@ -10,6 +10,7 @@ import {
   createClubRpcArgs,
   normalizeSearch,
   updateClubInputSchema,
+  updateClubRpcArgs,
 } from "@/features/clubs/contract";
 import { RPC_ERROR_CODES } from "@/lib/errors/rpc";
 
@@ -109,6 +110,13 @@ describe("update_club : entrées", () => {
   });
   it("refuse une modification vide", () => {
     expect(updateClubInputSchema.safeParse({ requestId: REQ, clubId: CLUB, expectedUpdatedAt: ok.expectedUpdatedAt }).success).toBe(false);
+  });
+  it("description : chaîne vide transmise pour effacer, absence transmise pour conserver", () => {
+    const cleared = updateClubInputSchema.parse({ ...ok, description: "   " });
+    expect(cleared.description).toBe("");
+    expect(updateClubRpcArgs(cleared).p_description).toBe("");
+    const unchanged = updateClubInputSchema.parse(ok);
+    expect(updateClubRpcArgs(unchanged).p_description).toBeUndefined();
   });
   it("le nom n'est pas modifiable dans ce lot", () => {
     const parsed = updateClubInputSchema.parse({ ...ok, name: "Autre" });
