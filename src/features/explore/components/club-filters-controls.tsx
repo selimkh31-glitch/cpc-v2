@@ -40,7 +40,7 @@ export function ClubFiltersControls({ filters, defaults }: { filters: ClubFilter
       </form>
       <FilterBar>
         <Link href={urlFor({ ...filters, recruitingOnly: !filters.recruitingOnly }, defaults)}
-          aria-pressed={filters.recruitingOnly}
+          aria-current={filters.recruitingOnly ? "true" : undefined}
           className={"inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-subhead " +
             (filters.recruitingOnly ? "border-accent bg-surface-2 text-ink" : "border-separator bg-surface-1 text-ink-2")}>
           {filters.recruitingOnly ? "Recrute uniquement" : "Tous recrutements"}
@@ -57,6 +57,20 @@ export function ClubFiltersControls({ filters, defaults }: { filters: ClubFilter
       </FilterBar>
       {(filters.q || count > 0) ? (
         <div className="flex flex-wrap items-center gap-2 text-footnote">
+          {filters.platform !== defaults.platform ? (
+            <Link href={urlFor({ ...filters, platform: defaults.platform }, defaults)}
+              className="inline-flex min-h-11 items-center gap-1 rounded-full bg-surface-2 px-3 text-ink"
+              aria-label="Retirer le filtre plateforme">
+              Toutes plateformes<X aria-hidden className="size-4" />
+            </Link>
+          ) : null}
+          {!filters.recruitingOnly ? (
+            <Link href={urlFor({ ...filters, recruitingOnly: true }, defaults)}
+              className="inline-flex min-h-11 items-center gap-1 rounded-full bg-surface-2 px-3 text-ink"
+              aria-label="Réactiver le filtre Recrute uniquement">
+              Tous recrutements<X aria-hidden className="size-4" />
+            </Link>
+          ) : null}
           {filters.q ? <Link href={urlFor({ ...filters, q: null }, defaults)}
             className="inline-flex min-h-11 items-center gap-1 rounded-full bg-surface-2 px-3 text-ink"
             aria-label="Effacer la recherche par nom">
