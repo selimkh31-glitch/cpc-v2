@@ -39,7 +39,7 @@ set local role authenticated;
 set local request.jwt.claims='{"sub":"00000000-0000-4000-8000-000000000f12","role":"authenticated"}';
 select is((api.apply_to_club('11111111-1111-4111-8111-11111111f012','10000000-0000-4000-8000-000000000f11','Je veux rejoindre')->'data'->>'status'),'pending','candidature créée par candidat');
 select is((api.apply_to_club('11111111-1111-4111-8111-11111111f012','10000000-0000-4000-8000-000000000f11','Je veux rejoindre')->'data'->>'status'),'pending','rejeu de candidature idempotent');
-select throws_ok($$$select api.apply_to_club(gen_random_uuid(),'10000000-0000-4000-8000-000000000f11','Doublon')$$,
+select throws_ok($$select api.apply_to_club(gen_random_uuid(),'10000000-0000-4000-8000-000000000f11','Doublon')$$,
  'P0001','CONFLICT','doublon actif interdit');
 reset role;
 
@@ -51,8 +51,8 @@ select set_config('qa.d2_known_app_id',
   (select id::text from public.club_applications where profile_id='00000000-0000-4000-8000-000000000f12'),true);
 set local role authenticated;
 set local request.jwt.claims='{"sub":"00000000-0000-4000-8000-000000000f15","role":"authenticated"}';
-select throws_ok($select api.decide_application(gen_random_uuid(),
- current_setting('qa.d2_known_app_id')::uuid, 'accept')$,
+select throws_ok($$select api.decide_application(gen_random_uuid(),
+ current_setting('qa.d2_known_app_id')::uuid, 'accept')$$,
  'P0001','NOT_FOUND','intrus ne décide pas même avec UUID connu');
 reset role;
 
@@ -116,7 +116,7 @@ insert into public.user_blocks(blocker_id,blocked_id) values
 ('00000000-0000-4000-8000-000000000f15','00000000-0000-4000-8000-000000000f11');
 set local role authenticated;
 set local request.jwt.claims='{"sub":"00000000-0000-4000-8000-000000000f15","role":"authenticated"}';
-select throws_ok($$$select api.apply_to_club(gen_random_uuid(),'10000000-0000-4000-8000-000000000f11','Candidature bloquée')$$,
+select throws_ok($$select api.apply_to_club(gen_random_uuid(),'10000000-0000-4000-8000-000000000f11','Candidature bloquée')$$,
  'P0001','NOT_FOUND','blocage bidirectionnel : pas de nouvelle candidature');
 reset role;
 
