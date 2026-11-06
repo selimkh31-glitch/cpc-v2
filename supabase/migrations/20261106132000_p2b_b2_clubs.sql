@@ -55,6 +55,7 @@ create function private.valid_recruiting_positions(p_pos public.position_code[])
 as $$
   select p_pos is not null
     and pg_catalog.cardinality(p_pos) between 0 and 15
+    and not exists (select 1 from pg_catalog.unnest(p_pos) as x(v) where x.v is null)
     and (select pg_catalog.count(*) = pg_catalog.count(distinct x.v)
          from pg_catalog.unnest(p_pos) as x(v))
 $$;
