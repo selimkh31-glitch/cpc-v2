@@ -69,7 +69,6 @@ export default async function ClubDetailPage({ params, searchParams }: PageProps
           <Link href={"/clubs/" + club.id + "/manage/settings"}>Gérer le recrutement</Link>
         </Button>
       ) : null}
-      <p className="text-center text-footnote text-ink-3">Les candidatures seront disponibles avec le parcours de recrutement.</p>
     </main>
   );
 }

@@ -1,4 +1,5 @@
 import { ProfileView } from "@/features/profiles/components/profile-view";
+import { getMyClubs } from "@/features/clubs/queries";
 import { signedAvatarUrl } from "@/features/profiles/media";
 import { getOwnProfile } from "@/features/profiles/queries";
 import { requireOnboardedUser } from "@/lib/auth/session";
@@ -9,9 +10,9 @@ const ERRORS = new Set(["presentation", "gamertag", "avatar_missing", "avatar_si
 /** Profil personnel (PRO-01, S-1.9) : lecture RLS de son propre profil, puis vue de présentation. */
 export default async function ProfilePage({ searchParams }: PageProps<"/profile">) {
   const user = await requireOnboardedUser("/profile");
-  const [profile, params] = await Promise.all([getOwnProfile(user.userId), searchParams]);
+  const [profile, clubs, params] = await Promise.all([getOwnProfile(user.userId), getMyClubs(user.userId), searchParams]);
   const avatarUrl = await signedAvatarUrl(profile?.avatarPath ?? null);
   const saved = typeof params.saved === "string" && SAVED.has(params.saved) ? params.saved : null;
   const error = typeof params.error === "string" && ERRORS.has(params.error) ? params.error : null;
-  return <ProfileView profile={profile} avatarUrl={avatarUrl} saved={saved} error={error} />;
+  return <ProfileView profile={profile} clubs={clubs} avatarUrl={avatarUrl} saved={saved} error={error} />;
 }
