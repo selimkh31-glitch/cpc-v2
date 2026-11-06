@@ -94,9 +94,11 @@ begin
       -- Le curseur reprend la DERNIÈRE ligne rendue, pas la ligne supplémentaire.
       v_next := pg_catalog.rtrim(
         pg_catalog.translate(
-          pg_catalog.encode(pg_catalog.convert_to(
-            pg_catalog.jsonb_build_object('r',v_last_r,'n',v_last_n,'i',v_last_i)::text,
-            'UTF8'), 'base64'),
+          pg_catalog.replace(
+            pg_catalog.encode(pg_catalog.convert_to(
+              pg_catalog.jsonb_build_object('r',v_last_r,'n',v_last_n,'i',v_last_i)::text,
+              'UTF8'), 'base64'),
+            E'\\n', ''),
           '+/', '-_'),
         '=');
       exit;
