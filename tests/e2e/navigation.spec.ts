@@ -18,7 +18,7 @@ test.describe("S-1.7 — navigation à trois onglets", () => {
     await expect(nav.getByRole("link", { name: /messages/i })).toHaveCount(0);
 
     await nav.getByRole("link", { name: "Explorer" }).click();
-    await expect(page).toHaveURL(/\/explore$/);
+    await expect(page).toHaveURL(/\/explore\/clubs$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Explorer");
     await expect(nav.getByRole("link", { name: "Explorer" })).toHaveAttribute("aria-current", "page");
 
@@ -57,7 +57,7 @@ test.describe("S-1.7 — navigation à trois onglets", () => {
     await page.getByLabel("Adresse email").fill(user.email);
     await page.getByLabel("Mot de passe").fill(PASSWORD);
     await page.getByRole("button", { name: "Se connecter" }).click();
-    await expect(page).toHaveURL(/\/explore$/);
+    await expect(page).toHaveURL(/\/explore\/clubs$/);
   });
 
   test("en-tête de chemin forgé par le client ignoré (anti open redirect)", async ({ page }) => {
