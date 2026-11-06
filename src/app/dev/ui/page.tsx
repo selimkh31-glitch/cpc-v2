@@ -15,6 +15,12 @@ import { LiveHalo, LivePill } from "@/components/ui/live";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TextArea, TextField } from "@/components/ui/text-field";
 import { isUiGalleryEnabled } from "@/lib/dev/gallery";
+import { ClubMonogram } from "@/components/ui/club-monogram";
+import { SearchField } from "@/components/ui/search-field";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import { Stepper } from "@/components/patterns/stepper";
+import { FilterBar } from "@/components/patterns/filter-bar";
+import { ClubCard } from "@/components/patterns/club-card";
 import { GallerySheets } from "./gallery-sheets";
 
 export const metadata = { title: "Galerie UI (développement)", robots: { index: false, follow: false } };
@@ -104,6 +110,38 @@ export default function UiGalleryPage() {
 
       <Section title="Panneaux inférieurs">
         <GallerySheets />
+      </Section>
+
+      <Section title="Explorer Clubs · échantillon de galerie uniquement">
+        <SegmentedControl
+          label="Intention de recherche"
+          items={[
+            { href: "/dev/ui?intent=play", label: "Jouer", active: false },
+            { href: "/dev/ui?intent=clubs", label: "Clubs", active: true },
+          ]}
+        />
+        <SearchField label="Rechercher des clubs" placeholder="Nom du club" />
+        <FilterBar>
+          <Chip selected>PS5</Chip>
+          <Chip>Recrute</Chip>
+          <Chip>Postes</Chip>
+        </FilterBar>
+        <ClubMonogram name="Étoile de Bayonne" />
+        <ClubCard
+          club={{
+            id: "10000000-0000-4000-8000-000000000001",
+            name: "Étoile de Bayonne",
+            slug: "etoile-de-bayonne",
+            platform: "ps5",
+            level: "competitive",
+            languages: ["fr", "en"],
+            recruiting_open: true,
+            recruiting_positions: ["ST", "CB"],
+            member_count: 7,
+            viewer_is_member: false,
+          }}
+        />
+        <Stepper current={1} steps={["Identité", "Jeu", "Recrutement"]} />
       </Section>
 
       <Section title="LIVE (galerie uniquement)">
