@@ -7,7 +7,7 @@ import { FilterBar } from "@/components/patterns/filter-bar";
 import { FilterSheet } from "@/components/patterns/filter-sheet";
 import { SearchField } from "@/components/ui/search-field";
 import { Button } from "@/components/ui/button";
-import { ClubFilters, activeFilterCount, serializeClubFilters, type ClubFilterDefaults } from "@/features/explore/contract";
+import { activeFilterCount, serializeClubFilters, type ClubFilters, type ClubFilterDefaults } from "@/features/explore/contract";
 import { CLUB_LANGUAGES, CLUB_LEVELS } from "@/features/clubs/contract";
 import { PLATFORMS, POSITIONS } from "@/features/onboarding/referentials";
 
