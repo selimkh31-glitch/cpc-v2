@@ -1,7 +1,7 @@
 -- B2 : créations et mises à jour de club, R1–R4, idempotence et limites D-21.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(29);
+select plan(30);
 
 insert into auth.users (id,email,aud,role) values
  ('00000000-0000-4000-8000-000000000b31','qa_b2_cmd_a@example.test','authenticated','authenticated'),
