@@ -10,7 +10,7 @@ test.describe("P2-B / B6 — découverte des clubs", () => {
     await page.goto("/explore");
     await expect(page).toHaveURL(/\/explore\/clubs$/);
     await expect(page.getByRole("navigation", { name: "Choisir ce que tu recherches" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Aucun club sur CPC pour l'instant" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Aucun club qui recrute sur ta plateforme pour l'instant" })).toBeVisible();
     await page.getByRole("link", { name: "Jouer", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Aucune session ouverte pour l'instant" })).toBeVisible();
   });
