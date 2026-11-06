@@ -55,9 +55,9 @@
 | ID | Sujet | Recommandation | Statut |
 |---|---|---|---|
 | D-21 | Création de club | Tout joueur onboardé avec un slot libre ; PRIMARY si libre, sinon SECONDARY ; refus avec 2 affiliations ; créateur = OWNER ; 1 création / 24 h | ✅ (Selim, 28/10/2026) |
-| D-13 | Remplacement du SECONDARY si OWNER ou manager | OWNER avec d'autres membres : refus `OWNER_MUST_TRANSFER`. Manager : autorisé, avec perte du rôle annoncée avant consentement, et audit. | 🔵 |
+| D-13 | Remplacement du SECONDARY si OWNER ou manager | Aucun remplacement automatique. SECONDARY OWNER avec d'autres membres : transfert de propriété obligatoire avant remplacement. Si OWNER seul : aucune suppression orpheline, utiliser plus tard le parcours de dissolution validé. SECONDARY manager : remplacement possible après avertissement explicite de perte du rôle, consentement et audit. | ✅ (Selim, 06/11/2026) |
 | D-06a | Dissolution | OWNER seul membre uniquement ; club archivé, historique conservé | 🔵 |
-| D-22 | Durées d'expiration | Candidature 14 j · invitation club 7 j · transfert 72 h (paramètres serveur) | 🔵 |
+| D-22 | Durées d'expiration | Candidature **14 jours** · invitation club **7 jours** · transfert de propriété **72 heures**, calculés et contrôlés côté serveur. | ✅ (Selim, 06/11/2026) |
 | D-23 | Visibilité des clubs | Utilisateurs authentifiés **autorisés** uniquement (onboardés, sans blocage avec l'OWNER) ; aucune page publique anonyme ; aucun accès `anon` | ✅ (Selim, 28/10/2026) |
 
 ## 3 bis. Phase 2 produit — lot P2-B « Explorer Clubs » (`docs/25`)
@@ -134,6 +134,7 @@ Tranchées par Selim le 28/10/2026 à 19:43.
 
 | Date | Changement |
 |---|---|
+| 06/11/2026 | **P2-D : D-13 et D-22 VALIDÉES** par Selim : 14 j candidature, 7 j invitation, 72 h transfert ; aucun remplacement automatique ; OWNER avec membres doit transférer ; manager averti avant consentement. |
 | 25/10/2026 | v1 : 33 décisions ouvertes issues de l'audit Phase 2 |
 | 25/10/2026 | v2 : V-01→V-11 validés ; D-05, D-14, D-15, D-16, D-17, D-20 ✅ ; D-12 🟠 (18+, à valider) ; D-18 et D-19 ⚪ avec impact précisé ; référence au prix Pro retirée (V-10) ; ADR-0004 🟡 |
 | 25/10/2026 | v2.1 : D-14 décompte explicité (15 codes, répartition par groupe) ; orientation technique Lot 1 approuvée ; ADR-0002, 0012 et 0015 corrigés (🟡, relecture) ; tests de permissions et de concurrence conservés intégralement (ADR-0011) |

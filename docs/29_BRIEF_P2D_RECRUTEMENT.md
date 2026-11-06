@@ -1,12 +1,12 @@
 # CPC V2 · P2-D0 — Contrat des candidatures et contrôles de sécurité
 
-**Statut : en préparation. Aucune migration, RPC ni CTA public créé par ce lot.** La phase P2-B est livrée sur la Preview protégée. La prochaine tranche verticale est P2-D : candidature, décision du manager, confirmation éventuelle du remplacement du SECONDARY.
+**Statut : contrat P2-D0 en validation CI ; décisions D-13 et D-22 VALIDÉES le 06/11/2026. Aucune migration, RPC ni CTA public créé par ce lot.** La phase P2-B est livrée sur la Preview protégée. La prochaine tranche verticale est P2-D : candidature, décision du manager, confirmation éventuelle du remplacement du SECONDARY.
 
 ## Sources du projet
 
 - `docs/04_SCHEMA_SUPABASE_RLS.md` §2.2 et §5 : `club_applications`, statuts, unicité, commandes `apply_to_club`, `withdraw_application`, `decide_application`, `confirm_membership_replacement`.
 - `docs/06_BACKLOG_V2.md` : S-2.4/S-2.5, scénarios T-01 et T-02.
-- `docs/02_DECISIONS_CONSOLIDEES.md` : D-21 et D-23 ✅ ; D-13 et D-22 **proposées, pas validées**.
+- `docs/02_DECISIONS_CONSOLIDEES.md` : D-21 et D-23 ✅ ; D-13 et D-22 **validées par Selim le 06/11/2026**.
 - `docs/25_BRIEF_P2B_EXPLORER.md` : D-46 ✅, pas de CTA candidature avant backend fonctionnel.
 
 ## Tranche de livraison cible
@@ -17,11 +17,11 @@
 4. **D4 (UI)** : formulaire dans fiche club uniquement si `recruiting_open`, non membre et non déjà candidat ; état « Candidature envoyée », retrait, écran « Candidatures » dans les outils du club, acceptation/rejet ; espace joueur pour confirmer le remplacement si nécessaire. Pas de bouton prématuré.
 5. **D5 (preuves)** : pgTAP RLS matriciels, fonctions non exécutables par anon, SQL `search_path=''`, course T-01/T-02 multi-connexions, double clic, cas blocage, club fermé, propriétaire/manager hors club, deux slots, expiration, UI iPhone et WebKit. Tests locaux, puis staging après fusion et revue.
 
-## Décisions bloquantes — NE PAS LES RÉÉCRIRE COMME VALIDÉES
+## Décisions validées par Selim — D-13 / D-22 (06/11/2026)
 
-- **D-22 : expiration automatique** : 14 jours pour candidatures, 7 jours pour invitations et 72 heures pour transferts sont des propositions. Ne pas graver ces durées dans la migration ni traiter la valeur comme décidée sans validation de Selim. `expires_at` doit être calculé au serveur.
-- **D-13 : remplacement SECONDARY** : l'OWNER d'un club avec d'autres membres doit transférer son club ; un manager qui remplace son affiliation perd son rôle. Les deux points demeurent à confirmer. Tant que non confirmés, refuser ce remplacement côté SQL (fail-closed), sans effet destructif.
-- Codes d'erreur : les réponses RPC publiques utilisent uniquement les codes canoniques de `src/lib/errors/rpc.ts`. L'existence d'un blocage n'est jamais révélée comme un oracle.
+- **D-22** : expiration **14 jours** pour une candidature, **7 jours** pour une invitation club et **72 heures** pour un transfert de propriété. L'horodatage provient du serveur et doit être revérifié au moment de chaque décision (le client ne fixe jamais un délai).
+- **D-13** : le joueur déjà affilié à deux clubs choisit lui-même, par action explicite et idempotente, son affiliation **SECONDARY** à remplacer ; aucun remplacement automatique à l'acceptation par le club. Le joueur OWNER d'un club avec d'autres membres doit transférer la propriété avant de remplacer ce club ; s'il est OWNER seul, aucune destruction ou club orphelin n'est autorisé : un parcours de dissolution séparé sera requis. Le joueur manager doit recevoir avant confirmation un avertissement sur la perte de son rôle et l'action doit être auditée.
+- **Test obligatoire** : course concurrente entre acceptation de deux candidatures, slot secondaire occupé, double décision, expiration et tentative de remplacement d'un OWNER.
 
 ## Règles non négociables
 
