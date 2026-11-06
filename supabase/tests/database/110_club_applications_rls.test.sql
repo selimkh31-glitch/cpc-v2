@@ -50,7 +50,7 @@ select is((select extract(day from expires_at - created_at)::int from public.clu
 where id='20000000-0000-4000-8000-000000000e12'),14,'D-22 : expiration 14 jours');
 
 set local role anon;
-select throws_ok($select count(*) from public.club_applications$,
+select throws_ok($$select count(*) from public.club_applications$$,
   '42501',null,'anon : table inaccessible sans GRANT SELECT');
 reset role;
 
