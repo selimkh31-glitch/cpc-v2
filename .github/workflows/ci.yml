@@ -96,6 +96,8 @@ jobs:
           if grep -q '^not ok' pgtap.log; then echo "::error::Au moins un test pgTAP a échoué"; exit 1; fi
       - name: Course C7 — deux créations concurrentes, un seul slot libre
         run: bash tests/race/c7_create_club.sh
+      - name: Courses T-01 / T-02 — décisions et remplacements concurrentiels
+        run: bash tests/race/t01_t02_applications.sh
       - if: always()
         run: node scripts/ci/annotate.mjs pgtap pgtap.log
       - if: always()
