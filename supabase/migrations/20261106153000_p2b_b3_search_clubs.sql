@@ -98,7 +98,7 @@ begin
             pg_catalog.encode(pg_catalog.convert_to(
               pg_catalog.jsonb_build_object('r',v_last_r,'n',v_last_n,'i',v_last_i)::text,
               'UTF8'), 'base64'),
-            E'\\n', ''),
+            pg_catalog.chr(10), ''),
           '+/', '-_'),
         '=');
       exit;
