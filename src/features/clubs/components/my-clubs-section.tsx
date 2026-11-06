@@ -16,6 +16,9 @@ export function MyClubsSection({ clubs }: { clubs: MyClub[] }) {
         ))}
         {!clubs.length ? <ListRow label="Tu n'appartiens encore à aucun club." /> : null}
       </ListSection>
+      <Button asChild variant="secondary" size="lg">
+        <Link href="/applications">Mes candidatures</Link>
+      </Button>
       {clubs.length < 2 ? (
         <Button asChild variant="secondary" size="lg">
           <Link href="/clubs/new"><PlusCircle aria-hidden className="size-5" />Créer un club</Link>
